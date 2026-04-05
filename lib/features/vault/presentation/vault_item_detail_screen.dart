@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/vault_provider.dart';
+import '../data/vault_repository.dart';
 
 class VaultItemDetailScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> item;
@@ -12,14 +13,35 @@ class VaultItemDetailScreen extends ConsumerStatefulWidget {
       _VaultItemDetailScreenState();
 }
 
-class _VaultItemDetailScreenState
-    extends ConsumerState<VaultItemDetailScreen> {
+class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   bool _showPassword = false;
+  String? _decryptedPassword;
+  bool _decrypting = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _decryptItem();
+  }
+
+  Future<void> _decryptItem() async {
+    try {
+      final decrypted = await VaultRepository().getItemDecrypted(widget.item);
+      if (mounted) {
+        setState(() {
+          _decryptedPassword = decrypted['decrypted_password'] as String?;
+          _decrypting = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _decrypting = false);
+    }
+  }
 
   void _copyToClipboard(String value, String label) {
     Clipboard.setData(ClipboardData(text: value));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label kopyalandı')),
+      SnackBar(content: Text('$label copied')),
     );
   }
 
@@ -27,23 +49,23 @@ class _VaultItemDetailScreenState
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sil'),
-        content: const Text('Bu şifreyi silmek istediğinize emin misiniz?'),
+        title: const Text('Delete'),
+        content: const Text('Are you sure you want to delete this password?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              ref
+              await ref
                   .read(vaultProvider.notifier)
                   .deleteItem(widget.item['id'].toString());
-              Navigator.pop(context);
+              if (mounted) Navigator.pop(context);
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Sil'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -59,7 +81,10 @@ class _VaultItemDetailScreenState
         side: BorderSide(color: Colors.grey.shade200),
       ),
       child: ListTile(
-        title: Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+        title: Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
         subtitle: Text(
           isPassword && !_showPassword ? '••••••••' : value,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
@@ -88,7 +113,7 @@ class _VaultItemDetailScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(item['title'] ?? 'Detay'),
+        title: Text(item['title'] ?? 'Detail'),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         actions: [
@@ -98,19 +123,21 @@ class _VaultItemDetailScreenState
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const SizedBox(height: 8),
-          _infoTile('Kullanıcı Adı', item['username']),
-          const SizedBox(height: 8),
-          _infoTile('Şifre', item['encrypted_password'], isPassword: true),
-          const SizedBox(height: 8),
-          _infoTile('URL', item['url']),
-          const SizedBox(height: 8),
-          _infoTile('Notlar', item['notes']),
-        ],
-      ),
+      body: _decrypting
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                const SizedBox(height: 8),
+                _infoTile('Username', item['username']),
+                const SizedBox(height: 8),
+                _infoTile('Password', _decryptedPassword, isPassword: true),
+                const SizedBox(height: 8),
+                _infoTile('URL', item['url']),
+                const SizedBox(height: 8),
+                _infoTile('Notes', item['notes']),
+              ],
+            ),
     );
   }
 }

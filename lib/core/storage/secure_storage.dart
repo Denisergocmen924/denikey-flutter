@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -14,11 +15,11 @@ class SecureStorage {
   static const _keyMasterKey = 'master_key';
   static const _keyEmail     = 'email';
 
-  // Linux'ta keyring yerine memory kullan (test amaçlı)
   static final Map<String, String> _memoryStorage = {};
 
   bool get _isLinux => Platform.isLinux;
 
+  // TOKEN
   Future<void> saveToken(String token) async {
     if (_isLinux) { _memoryStorage[_keyToken] = token; return; }
     await _storage.write(key: _keyToken, value: token);
@@ -34,14 +35,19 @@ class SecureStorage {
     await _storage.delete(key: _keyToken);
   }
 
-  Future<void> saveMasterKey(String key) async {
-    if (_isLinux) { _memoryStorage[_keyMasterKey] = key; return; }
-    await _storage.write(key: _keyMasterKey, value: key);
+  // MASTER KEY (List<int> → base64 string olarak saklanır)
+  Future<void> saveMasterKey(List<int> key) async {
+    final encoded = base64Encode(key);
+    if (_isLinux) { _memoryStorage[_keyMasterKey] = encoded; return; }
+    await _storage.write(key: _keyMasterKey, value: encoded);
   }
 
-  Future<String?> getMasterKey() async {
-    if (_isLinux) return _memoryStorage[_keyMasterKey];
-    return _storage.read(key: _keyMasterKey);
+  Future<List<int>?> getMasterKey() async {
+    final encoded = _isLinux
+        ? _memoryStorage[_keyMasterKey]
+        : await _storage.read(key: _keyMasterKey);
+    if (encoded == null) return null;
+    return base64Decode(encoded);
   }
 
   Future<void> deleteMasterKey() async {
@@ -49,6 +55,7 @@ class SecureStorage {
     await _storage.delete(key: _keyMasterKey);
   }
 
+  // EMAIL
   Future<void> saveEmail(String email) async {
     if (_isLinux) { _memoryStorage[_keyEmail] = email; return; }
     await _storage.write(key: _keyEmail, value: email);
@@ -59,6 +66,7 @@ class SecureStorage {
     return _storage.read(key: _keyEmail);
   }
 
+  // CLEAR ALL
   Future<void> clearAll() async {
     if (_isLinux) { _memoryStorage.clear(); return; }
     await _storage.deleteAll();

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
-import 'vault_item_detail_screen.dart';
+import '../../../core/storage/secure_storage.dart';
 
 class VaultScreen extends ConsumerStatefulWidget {
   const VaultScreen({super.key});
@@ -32,71 +33,78 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     final usernameCtrl = TextEditingController();
     final passwordCtrl = TextEditingController();
     final urlCtrl      = TextEditingController();
+    bool obscure       = true;
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Yeni Şifre Ekle'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Başlık',
-                  border: OutlineInputBorder(),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('New Password'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: usernameCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Kullanıcı Adı',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: usernameCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Şifre',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: passwordCtrl,
+                  obscureText: obscure,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () => setDialogState(() => obscure = !obscure),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: urlCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'URL (opsiyonel)',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: urlCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'URL (optional)',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (titleCtrl.text.isEmpty) return;
+                ref.read(vaultProvider.notifier).createItem({
+                  'title':    titleCtrl.text.trim(),
+                  'username': usernameCtrl.text.trim(),
+                  'password': passwordCtrl.text.trim(),
+                  'url':      urlCtrl.text.trim(),
+                  'item_type': 'login',
+                });
+                Navigator.pop(ctx);
+              },
+              style: FilledButton.styleFrom(backgroundColor: Colors.deepPurple),
+              child: const Text('Add'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (titleCtrl.text.isEmpty) return;
-              ref.read(vaultProvider.notifier).createItem({
-                'title':    titleCtrl.text.trim(),
-                'username': usernameCtrl.text.trim(),
-                'encrypted_password': passwordCtrl.text.trim(),
-                'url':      urlCtrl.text.trim(),
-                'item_type': 'login',
-              });
-              Navigator.pop(ctx);
-            },
-            style: FilledButton.styleFrom(backgroundColor: Colors.deepPurple),
-            child: const Text('Ekle'),
-          ),
-        ],
       ),
     );
   }
@@ -111,6 +119,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await SecureStorage.instance.clearAll();
+              if (context.mounted) context.go('/login');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.category_outlined),
+            onPressed: () => context.push('/categories'),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
@@ -127,11 +146,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(state.errorMessage ?? 'Hata'),
+                Text(state.errorMessage ?? 'Error'),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
-                  child: const Text('Tekrar Dene'),
+                  child: const Text('Retry'),
                 ),
               ],
             ),
@@ -146,12 +165,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 Icon(Icons.lock_open_outlined, size: 64, color: Colors.grey),
                 SizedBox(height: 16),
                 Text(
-                  'Henüz şifre eklenmemiş',
+                  'No passwords yet',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Sağ alttaki + butonuna bas',
+                  'Tap + to add a password',
                   style: TextStyle(fontSize: 13, color: Colors.grey),
                 ),
               ],
@@ -159,47 +178,46 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: state.items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
-          itemBuilder: (context, index) {
-            final item = state.items[index];
-            return Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.grey.shade200),
-              ),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.deepPurple.shade50,
-                  child: Icon(
-                    _iconForType(item['item_type']),
-                    color: Colors.deepPurple,
-                    size: 20,
-                  ),
+        return RefreshIndicator(
+          onRefresh: () => ref.read(vaultProvider.notifier).loadItems(),
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: state.items.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final item = state.items[index];
+              return Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
                 ),
-                title: Text(
-                  item['title'] ?? 'Başlıksız',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                subtitle: Text(
-                  item['username'] ?? item['url'] ?? '',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                ),
-                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => VaultItemDetailScreen(item: item),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.deepPurple.shade50,
+                    child: Icon(
+                      _iconForType(item['item_type']),
+                      color: Colors.deepPurple,
+                      size: 20,
                     ),
-                  );
-                },
-              ),
-            );
-          },
+                  ),
+                  title: Text(
+                    item['title'] ?? 'Untitled',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    item['username'] ?? item['url'] ?? '',
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                  ),
+                  trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                  onTap: () async {
+                    await context.push('/vault/detail', extra: item);
+                    ref.read(vaultProvider.notifier).loadItems();
+                  },
+                ),
+              );
+            },
+          ),
         );
       }),
       floatingActionButton: FloatingActionButton(

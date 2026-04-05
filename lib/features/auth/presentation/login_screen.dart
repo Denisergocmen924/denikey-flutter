@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
-import 'register_screen.dart';
-import '../../vault/presentation/vault_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -38,11 +37,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     ref.listen(authProvider, (_, next) {
       if (next.status == AuthStatus.success) {
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (_) => const VaultScreen()),
-  );
-}
+        context.go('/vault');
+      }
       if (next.status == AuthStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(next.errorMessage ?? 'Hata')),
@@ -75,8 +71,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 48),
-
-                  // Kullanıcı adı
                   TextFormField(
                     controller: _usernameCtrl,
                     decoration: const InputDecoration(
@@ -91,8 +85,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Master password
                   TextFormField(
                     controller: _passwordCtrl,
                     obscureText: _obscure,
@@ -112,7 +104,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 28),
-
                   FilledButton(
                     onPressed: state.status == AuthStatus.loading ? null : _submit,
                     style: FilledButton.styleFrom(
@@ -131,7 +122,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         : const Text('Giriş Yap', style: TextStyle(fontSize: 16)),
                   ),
                   const SizedBox(height: 20),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -139,12 +129,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       TextButton(
                         onPressed: () {
                           ref.read(authProvider.notifier).reset();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RegisterScreen(),
-                            ),
-                          );
+                          context.go('/register');
                         },
                         child: const Text('Kayıt Ol'),
                       ),

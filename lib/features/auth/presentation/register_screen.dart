@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -44,7 +45,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Kayıt başarılı! Giriş yapabilirsiniz.')),
         );
-        Navigator.pop(context);
+        ref.read(authProvider.notifier).reset();
+        context.go('/login');
       }
       if (next.status == AuthStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,6 +60,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         title: const Text('Kayıt Ol'),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/login'),
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -77,8 +83,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 40),
-
-                  // Kullanıcı adı
                   TextFormField(
                     controller: _usernameCtrl,
                     decoration: const InputDecoration(
@@ -96,8 +100,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Email
                   TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
@@ -113,8 +115,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Master password
                   TextFormField(
                     controller: _passwordCtrl,
                     obscureText: _obscure,
@@ -134,8 +134,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Şifre onay
                   TextFormField(
                     controller: _confirmCtrl,
                     obscureText: _obscure,
@@ -150,7 +148,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 28),
-
                   FilledButton(
                     onPressed: state.status == AuthStatus.loading ? null : _submit,
                     style: FilledButton.styleFrom(
