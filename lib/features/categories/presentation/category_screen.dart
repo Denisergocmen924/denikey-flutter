@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/category_provider.dart';
 
 class CategoryScreen extends ConsumerStatefulWidget {
@@ -32,7 +33,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
   }
 
   String _colorToHex(Color color) {
-    return '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+    return '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
   }
 
   Color _parseColor(String? hex) {
@@ -197,7 +198,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
         return ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: state.categories.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final cat = state.categories[index];
             final isSystem = cat['is_system'] == true;
@@ -212,7 +213,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
               ),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: color.withOpacity(0.15),
+                  backgroundColor: color.withAlpha(38),
                   child: Icon(
                     isSystem ? Icons.folder : Icons.folder_outlined,
                     color: color,
@@ -232,6 +233,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                         onPressed: () =>
                             _confirmDelete(cat['id'].toString(), isSystem),
                       ),
+                onTap: () => context.push('/categories/detail', extra: cat),
               ),
             );
           },

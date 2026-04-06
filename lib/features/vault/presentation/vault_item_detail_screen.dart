@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/vault_provider.dart';
 import '../data/vault_repository.dart';
+import '../../../core/network/dio_client.dart';
 
 class VaultItemDetailScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> item;
@@ -14,22 +15,32 @@ class VaultItemDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
-  bool _showPassword = false;
   String? _decryptedPassword;
   bool _decrypting = true;
+  bool _showPassword = false;
+  List<dynamic> _customFields = [];
 
   @override
   void initState() {
     super.initState();
-    _decryptItem();
+    _loadItem();
   }
 
-  Future<void> _decryptItem() async {
+  Future<void> _loadItem() async {
     try {
-      final decrypted = await VaultRepository().getItemDecrypted(widget.item);
+      // Backend'den direkt çek
+      final dio = DioClient.instance.dio;
+      final itemId = widget.item['id'].toString();
+      final response = await dio.get('/api/v1/vault/items/$itemId');
+      final fullItem = Map<String, dynamic>.from(response.data);
+
+      // Şifreyi çöz
+      final decrypted = await VaultRepository().getItemDecrypted(fullItem);
+
       if (mounted) {
         setState(() {
           _decryptedPassword = decrypted['decrypted_password'] as String?;
+          _customFields = fullItem['custom_fields'] as List<dynamic>? ?? [];
           _decrypting = false;
         });
       }
@@ -41,7 +52,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   void _copyToClipboard(String value, String label) {
     Clipboard.setData(ClipboardData(text: value));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label copied')),
+      SnackBar(content: Text('$label kopyalandı')),
     );
   }
 
@@ -49,59 +60,55 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete'),
-        content: const Text('Are you sure you want to delete this password?'),
+        title: const Text('Sil'),
+        content: const Text('Bu şifreyi silmek istediğinize emin misiniz?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
           FilledButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await ref
-                  .read(vaultProvider.notifier)
-                  .deleteItem(widget.item['id'].toString());
+              await ref.read(vaultProvider.notifier).deleteItem(widget.item['id'].toString());
               if (mounted) Navigator.pop(context);
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: const Text('Sil'),
           ),
         ],
       ),
     );
   }
 
-  Widget _infoTile(String label, String? value, {bool isPassword = false}) {
+  Widget _infoTile(String label, String? value, {bool isSecret = false}) {
     if (value == null || value.isEmpty) return const SizedBox.shrink();
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: ListTile(
-        title: Text(
-          label,
-          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Colors.grey.shade200),
         ),
-        subtitle: Text(
-          isPassword && !_showPassword ? '••••••••' : value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isPassword)
+        child: ListTile(
+          title: Text(label,
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+          subtitle: Text(
+            isSecret && !_showPassword ? '••••••••' : value,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isSecret)
+                IconButton(
+                  icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setState(() => _showPassword = !_showPassword),
+                ),
               IconButton(
-                icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
-                onPressed: () => setState(() => _showPassword = !_showPassword),
+                icon: const Icon(Icons.copy, size: 20),
+                onPressed: () => _copyToClipboard(value, label),
               ),
-            IconButton(
-              icon: const Icon(Icons.copy, size: 20),
-              onPressed: () => _copyToClipboard(value, label),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -113,7 +120,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(item['title'] ?? 'Detail'),
+        title: Text(item['title'] ?? 'Detay'),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         actions: [
@@ -129,13 +136,22 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 const SizedBox(height: 8),
-                _infoTile('Username', item['username']),
-                const SizedBox(height: 8),
-                _infoTile('Password', _decryptedPassword, isPassword: true),
-                const SizedBox(height: 8),
-                _infoTile('URL', item['url']),
-                const SizedBox(height: 8),
-                _infoTile('Notes', item['notes']),
+                _infoTile('Şifre', _decryptedPassword, isSecret: true),
+                if (_customFields.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8, left: 4),
+                    child: Text('Ek Bilgiler',
+                      style: TextStyle(fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey.shade600)),
+                  ),
+                  ..._customFields.map((field) {
+                    final fieldName = field['field_name'] as String? ?? '';
+                    final fieldValue = field['encrypted_value'] as String? ?? '';
+                    return _infoTile(fieldName, fieldValue);
+                  }),
+                ],
               ],
             ),
     );

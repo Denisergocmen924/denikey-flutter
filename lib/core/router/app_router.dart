@@ -6,6 +6,8 @@ import '../../features/auth/presentation/register_screen.dart';
 import '../../features/vault/presentation/vault_screen.dart';
 import '../../features/vault/presentation/vault_item_detail_screen.dart';
 import '../../features/categories/presentation/category_screen.dart';
+import '../../features/vault/presentation/add_vault_item_screen.dart';
+import '../../features/categories/presentation/category_detail_screen.dart';
 import '../storage/secure_storage.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -35,11 +37,28 @@ final routerProvider = Provider<GoRouter>((ref) {
               return VaultItemDetailScreen(item: item);
             },
           ),
+          GoRoute(
+            path: 'add',
+            builder: (context, state) => const AddVaultItemScreen(),
+          ),
         ],
+      ),
+      GoRoute(
+        path: '/add-item',
+        builder: (context, state) => const AddVaultItemScreen(),
       ),
       GoRoute(
         path: '/categories',
         builder: (context, state) => const CategoryScreen(),
+        routes: [
+          GoRoute(
+            path: 'detail',
+            builder: (context, state) {
+              final cat = state.extra as Map<String, dynamic>;
+              return CategoryDetailScreen(category: cat);
+            },
+          ),
+        ],
       ),
     ],
   );
