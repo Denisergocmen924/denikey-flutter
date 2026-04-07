@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
+import '../../features/auth/presentation/verify_email_screen.dart';
 import '../../features/vault/presentation/vault_screen.dart';
 import '../../features/vault/presentation/vault_item_detail_screen.dart';
 import '../../features/categories/presentation/category_screen.dart';
@@ -25,6 +26,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/verify-email',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return VerifyEmailScreen(
+            userId: extra['user_id'],
+            email: extra['email'],
+          );
+        },
       ),
       GoRoute(
         path: '/vault',

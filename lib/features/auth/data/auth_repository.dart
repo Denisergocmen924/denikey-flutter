@@ -7,16 +7,13 @@ import '../../../core/crypto/encryption_service.dart';
 class AuthRepository {
   final Dio _dio = DioClient.instance.dio;
 
-  Future<void> register({
+  Future<Map<String, dynamic>> register({
     required String username,
     required String email,
     required String masterPassword,
   }) async {
-    // 1. Salt üret
     final salt = EncryptionService.instance.generateSalt();
-
-    // 2. Backend'e gönder
-    await _dio.post(
+    final response = await _dio.post(
       ApiConstants.register,
       data: {
         'username': username,
@@ -25,6 +22,10 @@ class AuthRepository {
         'encryption_key_salt': salt,
       },
     );
+    return {
+      'user_id': response.data['user']['id'],
+      'email': response.data['user']['email'] ?? email,
+    };
   }
 
   Future<void> login({

@@ -42,11 +42,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     ref.listen(authProvider, (_, next) {
       if (next.status == AuthStatus.success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kayıt başarılı! Giriş yapabilirsiniz.')),
-        );
-        ref.read(authProvider.notifier).reset();
-        context.go('/login');
+        context.go('/verify-email', extra: {
+          'user_id': next.userId ?? '',
+          'email': next.email ?? '',
+        });
       }
       if (next.status == AuthStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
