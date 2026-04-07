@@ -39,6 +39,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (next.status == AuthStatus.success) {
         context.go('/vault');
       }
+      if (next.status == AuthStatus.needsDeviceVerification) {
+        context.push('/verify-email', extra: {
+          'user_id': next.userId,
+          'email': next.email,
+          'purpose': 'new_device',
+          'master_password': next.masterPassword,
+        });
+      }
       if (next.status == AuthStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(next.errorMessage ?? 'Hata')),
@@ -111,14 +119,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       backgroundColor: Colors.deepPurple,
                     ),
                     child: state.status == AuthStatus.loading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
+                        ? const SizedBox(height: 20, width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                         : const Text('Giriş Yap', style: TextStyle(fontSize: 16)),
                   ),
                   const SizedBox(height: 20),

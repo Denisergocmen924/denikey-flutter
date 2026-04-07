@@ -4,15 +4,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/storage/secure_storage.dart';
+import '../../../core/constants/api_constants.dart';
+import '../data/auth_repository.dart';
 
+// purpose: 'register' | 'new_device'
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   final String userId;
   final String email;
+  final String purpose;
+  final String? masterPassword;
+  final String? encryptionKeySalt;
 
   const VerifyEmailScreen({
     super.key,
     required this.userId,
     required this.email,
+    this.purpose = 'register',
+    this.masterPassword,
+    this.encryptionKeySalt,
   });
 
   @override
@@ -35,24 +44,30 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       setState(() => _error = 'Lütfen 6 haneli kodu girin');
       return;
     }
-
     setState(() { _loading = true; _error = null; });
 
     try {
-      final response = await DioClient.instance.dio.post(
-        '/api/v1/auth/verify-email',
-        data: {
-          'user_id': widget.userId,
-          'code': _codeCtrl.text.trim(),
-        },
-      );
-
-      final token = response.data['access_token'] as String;
-      await SecureStorage.instance.saveToken(token);
+      if (widget.purpose == 'new_device') {
+        await AuthRepository().verifyDevice(
+          userId: widget.userId,
+          code: _codeCtrl.text.trim(),
+          masterPassword: widget.masterPassword ?? '',
+          encryptionKeySalt: widget.encryptionKeySalt ?? '',
+        );
+      } else {
+        final response = await DioClient.instance.dio.post(
+          ApiConstants.verifyEmail,
+          data: {
+            'user_id': widget.userId,
+            'code': _codeCtrl.text.trim(),
+          },
+        );
+        final token = response.data['access_token'] as String;
+        await SecureStorage.instance.saveToken(token);
+      }
 
       if (mounted) context.go('/vault');
     } catch (e) {
-      print('VERIFY ERROR: $e');
       setState(() {
         _error = 'Geçersiz veya süresi dolmuş kod';
         _loading = false;
@@ -63,8 +78,11 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   Future<void> _resend() async {
     setState(() { _loading = true; _error = null; });
     try {
+      final endpoint = widget.purpose == 'new_device'
+          ? ApiConstants.resendVerification
+          : ApiConstants.resendVerification;
       await DioClient.instance.dio.post(
-        '/api/v1/auth/resend-verification',
+        endpoint,
         data: {'user_id': widget.userId},
       );
       if (mounted) {
@@ -83,11 +101,23 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     }
   }
 
+  String get _title {
+    if (widget.purpose == 'new_device') return 'Cihaz Doğrulama';
+    return 'E-posta Doğrulama';
+  }
+
+  String get _subtitle {
+    if (widget.purpose == 'new_device') {
+      return 'Bu cihazdan ilk kez giriş yapıyorsunuz.\n${widget.email} adresine gönderilen 6 haneli kodu girin.';
+    }
+    return '${widget.email} adresine gönderilen\n6 haneli kodu girin';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('E-posta Doğrulama'),
+        title: Text(_title),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
       ),
@@ -98,15 +128,22 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 32),
-              const Icon(Icons.mark_email_read_outlined,
-                size: 64, color: Colors.deepPurple),
+              Icon(
+                widget.purpose == 'new_device'
+                    ? Icons.devices_outlined
+                    : Icons.mark_email_read_outlined,
+                size: 64,
+                color: Colors.deepPurple,
+              ),
               const SizedBox(height: 24),
-              const Text('E-postanızı doğrulayın',
+              Text(
+                _title,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 12),
               Text(
-                '${widget.email} adresine gönderilen\n6 haneli kodu girin',
+                _subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               ),
@@ -123,7 +160,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   counterText: '',
                   errorText: _error,
                 ),
-
               ),
               const SizedBox(height: 24),
               FilledButton(

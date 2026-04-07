@@ -34,6 +34,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           return VerifyEmailScreen(
             userId: extra['user_id'],
             email: extra['email'],
+            purpose: extra['purpose'] ?? 'register',
+            masterPassword: extra['master_password'],
           );
         },
       ),
@@ -75,7 +77,6 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-// Splash: token var mı kontrol et, yönlendir
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 

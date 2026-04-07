@@ -30,7 +30,6 @@ class CategoryState {
 
 class CategoryNotifier extends StateNotifier<CategoryState> {
   final CategoryRepository _repo = CategoryRepository();
-
   CategoryNotifier() : super(const CategoryState());
 
   Future<void> loadCategories() async {
@@ -49,8 +48,8 @@ class CategoryNotifier extends StateNotifier<CategoryState> {
       await _repo.createCategory({
         'name_tr': nameTr,
         'name_en': nameEn,
-        if (icon != null) 'icon': icon,
-        if (color != null) 'color': color,
+        'icon': icon,
+        'color': color,
       });
       await loadCategories();
     } on DioException catch (e) {

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/storage/secure_storage.dart';
@@ -28,26 +29,68 @@ class AuthRepository {
     };
   }
 
-  Future<void> login({
+  Future<Map<String, dynamic>> login({
     required String username,
     required String masterPassword,
   }) async {
+    final deviceId = await SecureStorage.instance.getDeviceId();
+
     final response = await _dio.post(
       ApiConstants.login,
       data: {
         'username': username,
         'master_password': masterPassword,
+        'device_id': deviceId,
+        'device_type': _getDeviceType(),
+      },
+    );
+
+    if (response.data['needs_device_verification'] == true) {
+      return {
+        'needs_device_verification': true,
+        'user_id': response.data['user_id'],
+        'email': response.data['email'],
+      };
+    }
+
+    final token = response.data['access_token'] as String;
+    final salt = response.data['encryption_key_salt'] as String;
+
+    await SecureStorage.instance.saveToken(token);
+    await SecureStorage.instance.saveEmail(username);
+
+    final masterKey = await EncryptionService.instance.deriveMasterKey(
+      masterPassword,
+      salt,
+    );
+    await SecureStorage.instance.saveMasterKey(masterKey);
+
+    return {'needs_device_verification': false};
+  }
+
+  Future<void> verifyDevice({
+    required String userId,
+    required String code,
+    required String masterPassword,
+    required String encryptionKeySalt,
+  }) async {
+    final deviceId = await SecureStorage.instance.getDeviceId();
+
+    final response = await _dio.post(
+      ApiConstants.verifyDevice,
+      data: {
+        'user_id': userId,
+        'code': code,
+        'device_id': deviceId,
+        'device_type': _getDeviceType(),
       },
     );
 
     final token = response.data['access_token'] as String;
     final salt = response.data['encryption_key_salt'] as String;
 
-    // 1. Token'ı kaydet
     await SecureStorage.instance.saveToken(token);
-    await SecureStorage.instance.saveEmail(username);
 
-    // 2. master_key türet ve kaydet
     final masterKey = await EncryptionService.instance.deriveMasterKey(
       masterPassword,
       salt,
@@ -55,7 +98,58 @@ class AuthRepository {
     await SecureStorage.instance.saveMasterKey(masterKey);
   }
 
+  Future<String?> forgotPassword({required String email}) async {
+    final response = await _dio.post(
+      ApiConstants.forgotPassword,
+      data: {'email': email},
+    );
+    return response.data['user_id'] as String?;
+  }
+
+  Future<void> resetPassword({
+    required String userId,
+    required String code,
+    required String newMasterPassword,
+  }) async {
+    final salt = EncryptionService.instance.generateSalt();
+    await _dio.post(
+      ApiConstants.resetPassword,
+      data: {
+        'user_id': userId,
+        'code': code,
+        'new_master_password': newMasterPassword,
+        'new_encryption_key_salt': salt,
+      },
+    );
+  }
+
+  Future<void> changeEmail({required String newEmail}) async {
+    await _dio.post(
+      ApiConstants.changeEmail,
+      data: {'new_email': newEmail},
+    );
+  }
+
+  Future<void> confirmEmailChange({
+    required String code,
+    required String newEmail,
+  }) async {
+    await _dio.post(
+      ApiConstants.confirmEmailChange,
+      data: {'code': code, 'new_email': newEmail},
+    );
+  }
+
   Future<void> logout() async {
     await SecureStorage.instance.clearAll();
+  }
+
+  String _getDeviceType() {
+    if (Platform.isAndroid) return 'android';
+    if (Platform.isIOS) return 'ios';
+    if (Platform.isWindows) return 'windows';
+    if (Platform.isMacOS) return 'macos';
+    if (Platform.isLinux) return 'linux';
+    return 'unknown';
   }
 }
