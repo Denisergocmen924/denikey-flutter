@@ -10,10 +10,11 @@ class SecureStorage {
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
     lOptions: LinuxOptions(),
   );
-  static const _keyToken     = 'access_token';
-  static const _keyMasterKey = 'master_key';
-  static const _keyEmail     = 'email';
-  static const _keyDeviceId  = 'device_id';
+  static const _keyToken        = 'access_token';
+  static const _keyRefreshToken = 'refresh_token';
+  static const _keyMasterKey    = 'master_key';
+  static const _keyEmail        = 'email';
+  static const _keyDeviceId     = 'device_id';
   static final Map<String, String> _memoryStorage = {};
   bool get _isLinux => Platform.isLinux;
 
@@ -29,6 +30,20 @@ class SecureStorage {
   Future<void> deleteToken() async {
     if (_isLinux) { _memoryStorage.remove(_keyToken); return; }
     await _storage.delete(key: _keyToken);
+  }
+
+  // REFRESH TOKEN
+  Future<void> saveRefreshToken(String token) async {
+    if (_isLinux) { _memoryStorage[_keyRefreshToken] = token; return; }
+    await _storage.write(key: _keyRefreshToken, value: token);
+  }
+  Future<String?> getRefreshToken() async {
+    if (_isLinux) return _memoryStorage[_keyRefreshToken];
+    return _storage.read(key: _keyRefreshToken);
+  }
+  Future<void> deleteRefreshToken() async {
+    if (_isLinux) { _memoryStorage.remove(_keyRefreshToken); return; }
+    await _storage.delete(key: _keyRefreshToken);
   }
 
   // MASTER KEY

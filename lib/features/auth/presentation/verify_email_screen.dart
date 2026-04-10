@@ -55,15 +55,20 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           encryptionKeySalt: widget.encryptionKeySalt ?? '',
         );
       } else {
+        final deviceId = await SecureStorage.instance.getDeviceId();
         final response = await DioClient.instance.dio.post(
           ApiConstants.verifyEmail,
           data: {
             'user_id': widget.userId,
             'code': _codeCtrl.text.trim(),
+            'device_id': deviceId,
+            'device_type': AuthRepository().getDeviceType(),
           },
         );
         final token = response.data['access_token'] as String;
+        final refresh = response.data['refresh_token'] as String;
         await SecureStorage.instance.saveToken(token);
+        await SecureStorage.instance.saveRefreshToken(refresh);
       }
 
       if (mounted) context.go('/vault');

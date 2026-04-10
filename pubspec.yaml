@@ -15,9 +15,13 @@ dependencies:
   pointycastle: ^3.9.1
   cryptography: ^2.7.0
   sqflite: ^2.3.3
+  sqflite_common_ffi: ^2.3.4
   connectivity_plus: ^6.0.3
   path: ^1.9.0
   device_info_plus: ^12.4.0
+  local_auth: ^2.3.0
+  shared_preferences: ^2.3.0
+  flutter_local_notifications: ^18.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

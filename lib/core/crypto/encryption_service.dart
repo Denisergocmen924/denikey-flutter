@@ -72,6 +72,27 @@ class EncryptionService {
     return utf8.decode(decrypted);
   }
 
+  Future<String> decryptCombined(String encryptedData, List<int> masterKey) async {
+    final algorithm = AesGcm.with256bits();
+    final secretKey = SecretKey(masterKey);
+
+    final combined = base64Decode(encryptedData);
+    const nonceLength = 12;
+    const macLength = 16;
+
+    final nonce = combined.sublist(0, nonceLength);
+    final cipherText = combined.sublist(nonceLength, combined.length - macLength);
+    final mac = Mac(combined.sublist(combined.length - macLength));
+
+    final secretBox = SecretBox(cipherText, nonce: nonce, mac: mac);
+    final decrypted = await algorithm.decrypt(
+      secretBox,
+      secretKey: secretKey,
+    );
+
+    return utf8.decode(decrypted);
+  }
+
   // Yeni salt üret (register sırasında)
   String generateSalt() {
     final random = Random.secure();

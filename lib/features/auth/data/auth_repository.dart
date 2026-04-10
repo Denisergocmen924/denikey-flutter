@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/storage/secure_storage.dart';
+import '../../../core/cache/cache_service.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/crypto/encryption_service.dart';
 
@@ -14,6 +15,7 @@ class AuthRepository {
     required String masterPassword,
   }) async {
     final salt = EncryptionService.instance.generateSalt();
+    final deviceId = await SecureStorage.instance.getDeviceId();
     final response = await _dio.post(
       ApiConstants.register,
       data: {
@@ -21,6 +23,8 @@ class AuthRepository {
         'email': email,
         'master_password': masterPassword,
         'encryption_key_salt': salt,
+        'device_id': deviceId,
+        'device_type': getDeviceType(),
       },
     );
     return {
@@ -41,7 +45,7 @@ class AuthRepository {
         'username': username,
         'master_password': masterPassword,
         'device_id': deviceId,
-        'device_type': _getDeviceType(),
+        'device_type': getDeviceType(),
       },
     );
 
@@ -54,9 +58,11 @@ class AuthRepository {
     }
 
     final token = response.data['access_token'] as String;
+    final refresh = response.data['refresh_token'] as String;
     final salt = response.data['encryption_key_salt'] as String;
 
     await SecureStorage.instance.saveToken(token);
+    await SecureStorage.instance.saveRefreshToken(refresh);
     await SecureStorage.instance.saveEmail(username);
 
     final masterKey = await EncryptionService.instance.deriveMasterKey(
@@ -82,14 +88,16 @@ class AuthRepository {
         'user_id': userId,
         'code': code,
         'device_id': deviceId,
-        'device_type': _getDeviceType(),
+        'device_type': getDeviceType(),
       },
     );
 
     final token = response.data['access_token'] as String;
+    final refresh = response.data['refresh_token'] as String;
     final salt = response.data['encryption_key_salt'] as String;
 
     await SecureStorage.instance.saveToken(token);
+    await SecureStorage.instance.saveRefreshToken(refresh);
 
     final masterKey = await EncryptionService.instance.deriveMasterKey(
       masterPassword,
@@ -142,9 +150,10 @@ class AuthRepository {
 
   Future<void> logout() async {
     await SecureStorage.instance.clearAll();
+    await CacheService.instance.clearCache();
   }
 
-  String _getDeviceType() {
+  String getDeviceType() {
     if (Platform.isAndroid) return 'android';
     if (Platform.isIOS) return 'ios';
     if (Platform.isWindows) return 'windows';

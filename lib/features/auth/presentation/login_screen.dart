@@ -137,6 +137,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ],
                   ),
+                  Center(
+                    child: TextButton(
+                      onPressed: () => context.push('/forgot-password'),
+                      child: const Text(
+                        'Şifremi Unuttum',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

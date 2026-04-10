@@ -46,6 +46,25 @@ class VaultRepository {
     payload['encrypted_password'] = encrypted['encrypted'];
     payload['iv'] = encrypted['iv'];
 
+    // Custom fields encrypt
+    if (payload.containsKey('custom_fields_data')) {
+      final customFieldsData = payload['custom_fields_data'] as List<dynamic>;
+      final encryptedCustomFields = <Map<String, dynamic>>[];
+      for (final field in customFieldsData) {
+        final fieldMap = Map<String, dynamic>.from(field);
+        final value = fieldMap['value'] as String? ?? '';
+        if (value.isNotEmpty) {
+          final encrypted = await EncryptionService.instance.encrypt(value, masterKey);
+          fieldMap.remove('value');
+          fieldMap['encrypted_value'] = encrypted['encrypted'];
+          fieldMap['iv'] = encrypted['iv'];
+        }
+        encryptedCustomFields.add(fieldMap);
+      }
+      payload.remove('custom_fields_data');
+      payload['custom_fields'] = encryptedCustomFields;
+    }
+
     final response = await _dio.post(ApiConstants.vaultItems, data: payload);
     return Map<String, dynamic>.from(response.data);
   }
@@ -61,22 +80,77 @@ class VaultRepository {
     final encryptedPassword = item['encrypted_password'] as String? ?? '';
     final iv = item['iv'] as String? ?? '';
 
-    if (encryptedPassword.isEmpty || iv.isEmpty) {
-      return {...item, 'decrypted_password': ''};
+    String decryptedPassword = '';
+    if (encryptedPassword.isNotEmpty && iv.isNotEmpty) {
+      decryptedPassword = await EncryptionService.instance.decrypt(
+        encryptedPassword,
+        iv,
+        masterKey,
+      );
     }
 
-    final decrypted = await EncryptionService.instance.decrypt(
-      encryptedPassword,
-      iv,
-      masterKey,
-    );
+    // Custom fields'ı decrypt et
+    final customFields = item['custom_fields'] as List<dynamic>? ?? [];
+    final decryptedCustomFields = <Map<String, dynamic>>[];
+    for (final field in customFields) {
+      final fieldMap = Map<String, dynamic>.from(field);
+      final encryptedValue = fieldMap['encrypted_value'] as String? ?? '';
+      String decryptedValue = '';
+      if (encryptedValue.isNotEmpty) {
+        decryptedValue = await EncryptionService.instance.decryptCombined(
+          encryptedValue,
+          masterKey,
+        );
+      }
+      fieldMap['decrypted_value'] = decryptedValue;
+      decryptedCustomFields.add(fieldMap);
+    }
 
-    return {...item, 'decrypted_password': decrypted};
+    return {
+      ...item,
+      'decrypted_password': decryptedPassword,
+      'custom_fields': decryptedCustomFields,
+    };
   }
 
   Future<Map<String, dynamic>> updateItem(String id, Map<String, dynamic> data) async {
     if (!await isOnline()) throw Exception('offline');
-    final response = await _dio.put(ApiConstants.vaultItem(id), data: data);
+
+    final payload = Map<String, dynamic>.from(data);
+
+    final masterKey = await SecureStorage.instance.getMasterKey();
+    if (masterKey == null) throw Exception('Master key bulunamadı');
+
+    if (payload.containsKey('password')) {
+      final encrypted = await EncryptionService.instance.encrypt(
+        payload['password'] as String,
+        masterKey,
+      );
+      payload.remove('password');
+      payload['encrypted_password'] = encrypted['encrypted'];
+      payload['iv'] = encrypted['iv'];
+    }
+
+    // Custom fields encrypt
+    if (payload.containsKey('custom_fields_data')) {
+      final customFieldsData = payload['custom_fields_data'] as List<dynamic>;
+      final encryptedCustomFields = <Map<String, dynamic>>[];
+      for (final field in customFieldsData) {
+        final fieldMap = Map<String, dynamic>.from(field);
+        final value = fieldMap['value'] as String? ?? '';
+        if (value.isNotEmpty) {
+          final encrypted = await EncryptionService.instance.encrypt(value, masterKey);
+          fieldMap.remove('value');
+          fieldMap['encrypted_value'] = encrypted['encrypted'];
+          fieldMap['iv'] = encrypted['iv'];
+        }
+        encryptedCustomFields.add(fieldMap);
+      }
+      payload.remove('custom_fields_data');
+      payload['custom_fields'] = encryptedCustomFields;
+    }
+
+    final response = await _dio.put(ApiConstants.vaultItem(id), data: payload);
     return Map<String, dynamic>.from(response.data);
   }
 

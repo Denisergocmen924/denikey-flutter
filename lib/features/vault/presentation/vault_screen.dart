@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
-import '../../../core/storage/secure_storage.dart';
 import '../../categories/providers/category_provider.dart';
+import '../../../core/notifications/notification_service.dart';
 
 class VaultScreen extends ConsumerStatefulWidget {
   const VaultScreen({super.key});
@@ -19,6 +19,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     Future.microtask(() {
       ref.read(vaultProvider.notifier).loadItems();
       ref.read(categoryProvider.notifier).loadCategories();
+      NotificationService.instance.scheduleWeeklySecurityReminder();
     });
   }
 
@@ -32,12 +33,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     }
   }
 
-  void _logout() {
-    SecureStorage.instance.clearAll().then((_) {
-      if (mounted) context.go('/login');
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(vaultProvider);
@@ -49,8 +44,9 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Çöp Kutusu',
+            onPressed: () => context.push('/trash'),
           ),
           IconButton(
             icon: const Icon(Icons.category_outlined),
@@ -59,6 +55,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
           ),
         ],
       ),

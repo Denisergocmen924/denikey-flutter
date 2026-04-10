@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
+import '../../item_types/providers/item_type_provider.dart';
 
 class AddVaultItemScreen extends ConsumerStatefulWidget {
   const AddVaultItemScreen({super.key});
@@ -12,34 +13,68 @@ class AddVaultItemScreen extends ConsumerStatefulWidget {
 }
 
 class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
-  // Adım: kategori seç → form
-  bool _categorySelected = false;
+  // Adımlar: 0 = kategori seç, 1 = tip seç, 2 = form
+  int _step = 0;
+
+  // Seçimler
   String? _selectedCategoryId;
   String? _selectedCategoryName;
+  Map<String, dynamic>? _selectedItemType;
 
-  // Form
+  // Dinamik form controller'ları — field id → TextEditingController
+  final Map<String, TextEditingController> _fieldControllers = {};
+  final Map<String, bool> _obscureFields = {};
+
+  // Başlık alanı (her tip için ortak)
   final _titleCtrl = TextEditingController();
-  final _passwordCtrl = TextEditingController();
-  bool _obscurePassword = true;
 
-  // Ek alanlar
+  // Ek özel alanlar
   final List<Map<String, TextEditingController>> _extraFields = [];
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(categoryProvider.notifier).loadCategories());
+    Future.microtask(() {
+      ref.read(categoryProvider.notifier).loadCategories();
+      ref.read(itemTypeProvider.notifier).loadItemTypes();
+    });
   }
 
   @override
   void dispose() {
     _titleCtrl.dispose();
-    _passwordCtrl.dispose();
+    for (final ctrl in _fieldControllers.values) {
+      ctrl.dispose();
+    }
     for (final f in _extraFields) {
       f['key']!.dispose();
       f['value']!.dispose();
     }
     super.dispose();
+  }
+
+  // Item type seçildiğinde controller'ları hazırla
+  void _selectItemType(Map<String, dynamic> itemType) {
+    // Önceki controller'ları temizle
+    for (final ctrl in _fieldControllers.values) {
+      ctrl.dispose();
+    }
+    _fieldControllers.clear();
+    _obscureFields.clear();
+
+    final fields = itemType['fields'] as List<dynamic>? ?? [];
+    for (final field in fields) {
+      final id = field['id'] as String;
+      _fieldControllers[id] = TextEditingController();
+      if (field['field_type'] == 'secret') {
+        _obscureFields[id] = true;
+      }
+    }
+
+    setState(() {
+      _selectedItemType = itemType;
+      _step = 2;
+    });
   }
 
   void _addExtraField() {
@@ -59,48 +94,89 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       return;
     }
 
-    final data = <String, dynamic>{
-      'title': _titleCtrl.text.trim(),
-      'password': _passwordCtrl.text.trim(),
-      if (_selectedCategoryId != null) 'category_id': _selectedCategoryId,
-    };
+    final fields = (_selectedItemType?['fields'] as List<dynamic>? ?? []);
 
-    // Ek alanlar
-    final extraFields = <Map<String, String>>[];
+    // İlk secret alanı → password
+    String password = '';
+    String? firstSecretId;
+    for (final field in fields) {
+      if (field['field_type'] == 'secret') {
+        firstSecretId = field['id'] as String;
+        password = _fieldControllers[firstSecretId]?.text.trim() ?? '';
+        break;
+      }
+    }
+
+    // Diğer alanlar → custom_fields_data
+    final customFieldsData = <Map<String, String>>[];
+    for (final field in fields) {
+      final id = field['id'] as String;
+      if (id == firstSecretId) continue; // zaten password olarak kullanıldı
+      final value = _fieldControllers[id]?.text.trim() ?? '';
+      if (value.isNotEmpty) {
+        customFieldsData.add({
+          'field_name': field['field_name_tr'] as String,
+          'value': value,
+          'field_type': field['field_type'] as String,
+        });
+      }
+    }
+
+    // Ek özel alanlar
     for (final f in _extraFields) {
       final k = f['key']!.text.trim();
       final v = f['value']!.text.trim();
       if (k.isNotEmpty) {
-        extraFields.add({'field_name': k, 'value': v, 'field_type': 'text'});
+        customFieldsData.add({'field_name': k, 'value': v, 'field_type': 'text'});
       }
     }
-    if (extraFields.isNotEmpty) data['custom_fields_data'] = extraFields;
+
+    final data = <String, dynamic>{
+      'title': _titleCtrl.text.trim(),
+      'password': password,
+      if (_selectedCategoryId != null) 'category_id': _selectedCategoryId,
+      if (_selectedItemType != null) 'item_type_id': _selectedItemType!['id'],
+      if (_selectedItemType != null) 'icon': _selectedItemType!['icon'],
+      if (_selectedItemType != null) 'color': _selectedItemType!['color'],
+      if (customFieldsData.isNotEmpty) 'custom_fields_data': customFieldsData,
+    };
 
     await ref.read(vaultProvider.notifier).createItem(data);
     if (mounted) context.pop();
   }
 
+  void _goBack() {
+    if (_step == 2) {
+      setState(() => _step = 1);
+    } else if (_step == 1) {
+      setState(() => _step = 0);
+    } else {
+      context.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final titles = ['Kategori Seç', 'Tür Seç', 'Bilgileri Gir'];
     return Scaffold(
       appBar: AppBar(
-        title: Text(_categorySelected ? 'Şifre Ekle' : 'Kategori Seç'),
+        title: Text(titles[_step]),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (_categorySelected) {
-              setState(() => _categorySelected = false);
-            } else {
-              context.pop();
-            }
-          },
+          onPressed: _goBack,
         ),
       ),
-      body: _categorySelected ? _buildForm() : _buildCategorySelection(),
+      body: [
+        _buildCategorySelection(),
+        _buildItemTypeSelection(),
+        _buildForm(),
+      ][_step],
     );
   }
+
+  // ─── Adım 0: Kategori Seç ───────────────────────────────────────────────
 
   Widget _buildCategorySelection() {
     final state = ref.watch(categoryProvider);
@@ -109,14 +185,12 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // Kategorisiz
-        _categoryTile(
+        _selectionTile(
           icon: Icons.inbox_outlined,
           color: Colors.grey,
           title: 'Kategorisiz',
           subtitle: 'Kategorisizler altında sakla',
           onTap: () {
-            // Kategorisizler kategorisini bul
             final uncategorized = categories.firstWhere(
               (c) => c['name_en'] == 'Uncategorized',
               orElse: () => <String, dynamic>{},
@@ -124,45 +198,45 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
             setState(() {
               _selectedCategoryId = uncategorized['id'] as String?;
               _selectedCategoryName = 'Kategorisizler';
-              _categorySelected = true;
+              _step = 1;
             });
           },
         ),
         const SizedBox(height: 8),
-        // Kategori oluştur
-        _categoryTile(
+        _selectionTile(
           icon: Icons.add_circle_outline,
           color: Colors.deepPurple,
           title: 'Kategori Oluştur',
           subtitle: 'Yeni kategori ekle',
-          onTap: () => _showCreateCategoryDialog(),
+          onTap: _showCreateCategoryDialog,
         ),
         const SizedBox(height: 16),
         if (state.status == CategoryStatus.loading)
           const Center(child: CircularProgressIndicator())
         else ...[
           Text('Kategoriler',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.grey.shade600)),
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade600)),
           const SizedBox(height: 8),
-          ...categories
-            .where((c) => c['name_en'] != 'Uncategorized')
-            .map((cat) {
-              final color = _parseColor(cat['color']);
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _categoryTile(
-                  icon: Icons.folder_outlined,
-                  color: color,
-                  title: cat['name_en'] ?? cat['name_tr'] ?? '',
-                  subtitle: '',
-                  onTap: () => setState(() {
-                    _selectedCategoryId = cat['id'] as String?;
-                    _selectedCategoryName = cat['name_en'] ?? cat['name_tr'];
-                    _categorySelected = true;
-                  }),
-                ),
-              );
-            }),
+          ...categories.where((c) => c['name_en'] != 'Uncategorized').map((cat) {
+            final color = _parseColor(cat['color']);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _selectionTile(
+                icon: Icons.folder_outlined,
+                color: color,
+                title: cat['name_tr'] ?? cat['name_en'] ?? '',
+                subtitle: '',
+                onTap: () => setState(() {
+                  _selectedCategoryId = cat['id'] as String?;
+                  _selectedCategoryName = cat['name_tr'] ?? cat['name_en'];
+                  _step = 1;
+                }),
+              ),
+            );
+          }),
         ],
       ],
     );
@@ -187,12 +261,11 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
             onPressed: () async {
               if (nameCtrl.text.trim().isEmpty) return;
               await ref.read(categoryProvider.notifier).createCategory(
-                nameCtrl.text.trim(),
-                nameCtrl.text.trim(),
-                null,
-                '#534AB7',
-              );
-              // Yeni kategoriyi seç
+                    nameCtrl.text.trim(),
+                    nameCtrl.text.trim(),
+                    null,
+                    '#534AB7',
+                  );
               final cats = ref.read(categoryProvider).categories;
               final newCat = cats.lastWhere(
                 (c) => c['name_en'] == nameCtrl.text.trim(),
@@ -205,7 +278,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                 setState(() {
                   _selectedCategoryId = catId;
                   _selectedCategoryName = catName;
-                  _categorySelected = true;
+                  _step = 1;
                 });
               }
             },
@@ -217,59 +290,89 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     );
   }
 
+  // ─── Adım 1: Öğe Tipi Seç ────────────────────────────────────────────────
+
+  Widget _buildItemTypeSelection() {
+    final state = ref.watch(itemTypeProvider);
+
+    if (state.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.error != null) {
+      return Center(child: Text('Hata: ${state.error}'));
+    }
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text('Tür Seçin',
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade600)),
+        const SizedBox(height: 8),
+        ...state.itemTypes.map((type) {
+          final color = _parseColor(type['color'] as String?);
+          final icon = _materialIcon(type['icon'] as String?);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _selectionTile(
+              icon: icon,
+              color: color,
+              title: type['name_tr'] as String? ?? type['name_en'] as String? ?? '',
+              subtitle: _fieldsSummary(type),
+              onTap: () => _selectItemType(type),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  String _fieldsSummary(Map<String, dynamic> type) {
+    final fields = type['fields'] as List<dynamic>? ?? [];
+    if (fields.isEmpty) return '';
+    final names = fields
+        .take(3)
+        .map((f) => f['field_name_tr'] as String? ?? '')
+        .where((n) => n.isNotEmpty)
+        .join(', ');
+    return fields.length > 3 ? '$names...' : names;
+  }
+
+  // ─── Adım 2: Dinamik Form ─────────────────────────────────────────────────
+
   Widget _buildForm() {
+    final fields = (_selectedItemType?['fields'] as List<dynamic>? ?? [])
+      ..sort((a, b) => (a['sort_order'] as int).compareTo(b['sort_order'] as int));
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Kategori göstergesi
-          if (_selectedCategoryName != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.deepPurple.withAlpha(20),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.deepPurple.withAlpha(50)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.folder_outlined, size: 16, color: Colors.deepPurple),
-                  const SizedBox(width: 8),
-                  Text(_selectedCategoryName!,
-                    style: const TextStyle(color: Colors.deepPurple, fontSize: 13)),
-                ],
-              ),
-            ),
+          // Seçim özeti
+          _selectionSummaryRow(),
+          const SizedBox(height: 16),
 
           // Başlık
           TextField(
             controller: _titleCtrl,
             decoration: const InputDecoration(
-              labelText: 'Başlık',
+              labelText: 'Başlık *',
               hintText: 'Örn: Instagram, Gmail, Netflix',
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
 
-          // Şifre
-          TextField(
-            controller: _passwordCtrl,
-            obscureText: _obscurePassword,
-            decoration: InputDecoration(
-              labelText: 'Şifre',
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
+          // Item type alanları
+          ...fields.map((field) => _buildDynamicField(field)),
 
-          // Ek alanlar
+          const SizedBox(height: 8),
+
+          // Ek özel alanlar
           ..._extraFields.asMap().entries.map((entry) {
             final i = entry.key;
             final f = entry.value;
@@ -284,7 +387,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                         TextField(
                           controller: f['key'],
                           decoration: const InputDecoration(
-                            labelText: 'Başlık',
+                            labelText: 'Alan Adı',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -292,7 +395,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                         TextField(
                           controller: f['value'],
                           decoration: const InputDecoration(
-                            labelText: 'İçerik',
+                            labelText: 'Değer',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -308,7 +411,6 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
             );
           }),
 
-          // Alan ekle butonu
           OutlinedButton.icon(
             onPressed: _addExtraField,
             icon: const Icon(Icons.add),
@@ -317,7 +419,6 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Kaydet
           FilledButton(
             onPressed: _save,
             style: FilledButton.styleFrom(
@@ -331,7 +432,68 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     );
   }
 
-  Widget _categoryTile({
+  Widget _buildDynamicField(Map<String, dynamic> field) {
+    final id = field['id'] as String;
+    final label = field['field_name_tr'] as String? ?? '';
+    final fieldType = field['field_type'] as String? ?? 'text';
+    final isRequired = field['is_required'] as bool? ?? false;
+    final isSecret = fieldType == 'secret';
+    final ctrl = _fieldControllers[id];
+    if (ctrl == null) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: ctrl,
+        obscureText: isSecret ? (_obscureFields[id] ?? true) : false,
+        keyboardType: fieldType == 'number' ? TextInputType.number : TextInputType.text,
+        decoration: InputDecoration(
+          labelText: isRequired ? '$label *' : label,
+          border: const OutlineInputBorder(),
+          suffixIcon: isSecret
+              ? IconButton(
+                  icon: Icon(
+                    (_obscureFields[id] ?? true)
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                  ),
+                  onPressed: () => setState(
+                    () => _obscureFields[id] = !(_obscureFields[id] ?? true),
+                  ),
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _selectionSummaryRow() {
+    final typeColor = _parseColor(_selectedItemType?['color'] as String?);
+    final typeIcon = _materialIcon(_selectedItemType?['icon'] as String?);
+    return Row(
+      children: [
+        if (_selectedCategoryName != null) ...[
+          Icon(Icons.folder_outlined, size: 14, color: Colors.deepPurple),
+          const SizedBox(width: 4),
+          Text(_selectedCategoryName!,
+              style: const TextStyle(color: Colors.deepPurple, fontSize: 12)),
+          const SizedBox(width: 12),
+        ],
+        if (_selectedItemType != null) ...[
+          Icon(typeIcon, size: 14, color: typeColor),
+          const SizedBox(width: 4),
+          Text(
+            _selectedItemType!['name_tr'] as String? ?? '',
+            style: TextStyle(color: typeColor, fontSize: 12),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // ─── Yardımcılar ─────────────────────────────────────────────────────────
+
+  Widget _selectionTile({
     required IconData icon,
     required Color color,
     required String title,
@@ -350,7 +512,9 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           child: Icon(icon, color: color, size: 20),
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: subtitle.isNotEmpty ? Text(subtitle, style: const TextStyle(fontSize: 12)) : null,
+        subtitle: subtitle.isNotEmpty
+            ? Text(subtitle, style: const TextStyle(fontSize: 12))
+            : null,
         trailing: const Icon(Icons.chevron_right, color: Colors.grey),
         onTap: onTap,
       ),
@@ -363,6 +527,27 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       return Color(int.parse('FF${hex.replaceAll('#', '')}', radix: 16));
     } catch (_) {
       return Colors.deepPurple;
+    }
+  }
+
+  IconData _materialIcon(String? name) {
+    switch (name) {
+      case 'lock':
+        return Icons.lock_outline;
+      case 'credit_card':
+        return Icons.credit_card;
+      case 'badge':
+        return Icons.badge_outlined;
+      case 'note':
+        return Icons.note_outlined;
+      case 'wifi':
+        return Icons.wifi;
+      case 'account_balance':
+        return Icons.account_balance_outlined;
+      case 'subscriptions':
+        return Icons.subscriptions_outlined;
+      default:
+        return Icons.category_outlined;
     }
   }
 }

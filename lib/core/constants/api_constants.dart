@@ -1,6 +1,15 @@
+import 'dart:io';
+
 class ApiConstants {
   ApiConstants._();
-  static const String baseUrl = 'http://127.0.0.1:8000';
+
+  static String get baseUrl {
+    if (Platform.isAndroid) {
+      return 'http://10.0.2.2:8000';
+    } else {
+      return 'http://127.0.0.1:8000';
+    }
+  }
 
   // Auth
   static const String register           = '/api/v1/auth/register';
@@ -8,6 +17,7 @@ class ApiConstants {
   static const String verifyEmail        = '/api/v1/auth/verify-email';
   static const String verifyDevice       = '/api/v1/auth/verify-device';
   static const String resendVerification = '/api/v1/auth/resend-verification';
+  static const String refreshToken       = '/api/v1/auth/refresh';
   static const String forgotPassword     = '/api/v1/auth/forgot-password';
   static const String resetPassword      = '/api/v1/auth/reset-password';
   static const String changeEmail        = '/api/v1/auth/change-email';
@@ -23,4 +33,13 @@ class ApiConstants {
 
   // Password generator
   static const String generatePassword = '/api/v1/password/generate';
+
+  // Audit log
+  static const String auditLog = '/api/v1/audit-logs/';
+
+  // Support ticket
+  static const String supportTickets = '/api/v1/support-ticket/';
+
+  // Item types
+  static const String itemTypes = '/api/v1/item-types/';
 }
