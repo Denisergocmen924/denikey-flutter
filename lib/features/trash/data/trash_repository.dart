@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../../core/network/dio_client.dart';
+import '../../../core/constants/api_constants.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
 
@@ -7,7 +8,7 @@ class TrashRepository {
   final Dio _dio = DioClient.instance.dio;
 
   Future<List<Map<String, dynamic>>> getTrashItems() async {
-    final response = await _dio.get('/api/v1/trash/');
+    final response = await _dio.get(ApiConstants.trashItems);
     final items = List<Map<String, dynamic>>.from(response.data);
 
     // Her öğenin vault item şifresini çöz
@@ -34,14 +35,14 @@ class TrashRepository {
   }
 
   Future<void> restoreItem(String trashId) async {
-    await _dio.post('/api/v1/trash/$trashId/restore');
+    await _dio.post(ApiConstants.trashRestore(trashId));
   }
 
   Future<void> deleteItem(String trashId) async {
-    await _dio.delete('/api/v1/trash/$trashId');
+    await _dio.delete(ApiConstants.trashItem(trashId));
   }
 
   Future<void> emptyTrash() async {
-    await _dio.delete('/api/v1/trash/');
+    await _dio.delete(ApiConstants.trashItems);
   }
 }

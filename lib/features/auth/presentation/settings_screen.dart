@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../data/auth_repository.dart';
+import '../providers/profile_provider.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
@@ -14,7 +15,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _repo  = AuthRepository();
+  final _repo = AuthRepository();
   String? _email;
   bool _loggingOut = false;
   bool _biometricAvailable = false;
@@ -25,6 +26,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     super.initState();
     _loadEmail();
     _loadBiometricState();
+    Future.microtask(() => ref.read(profileProvider.notifier).loadProfile());
   }
 
   Future<void> _loadEmail() async {
@@ -35,7 +37,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _loadBiometricState() async {
     final available = await BiometricService.instance.isAvailable();
     final enabled = await BiometricService.instance.isEnabled();
-    if (mounted) setState(() { _biometricAvailable = available; _biometricEnabled = enabled; });
+    if (mounted) {
+      setState(() {
+        _biometricAvailable = available;
+        _biometricEnabled = enabled;
+      });
+    }
   }
 
   Future<void> _toggleBiometric(bool val) async {
@@ -52,9 +59,70 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     context.go('/login');
   }
 
+  Future<void> _showUsernameDialog() async {
+    final profile = ref.read(profileProvider);
+    final ctrl = TextEditingController(text: profile.username ?? '');
+    final formKey = GlobalKey<FormState>();
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Kullanıcı Adı Değiştir'),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: ctrl,
+            decoration: const InputDecoration(
+              labelText: 'Yeni kullanıcı adı',
+              border: OutlineInputBorder(),
+            ),
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Boş bırakılamaz';
+              if (v.length < 3) return 'En az 3 karakter';
+              if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(v)) {
+                return 'Sadece harf, rakam ve _ kullanılabilir';
+              }
+              return null;
+            },
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) Navigator.pop(ctx, true);
+            },
+            child: const Text('Kaydet'),
+          ),
+        ],
+      ),
+    );
+
+    final newUsername = ctrl.text.trim();
+    // Dialog animasyonu bitene kadar dispose'u ertele
+    Future.microtask(ctrl.dispose);
+    if (ok != true) return;
+
+    final success = await ref.read(profileProvider.notifier).updateUsername(newUsername);
+    if (!mounted) return;
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kullanıcı adı güncellendi')),
+      );
+    } else {
+      final err = ref.read(profileProvider).errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(err ?? 'Güncellenemedi')),
+      );
+      ref.read(profileProvider.notifier).reset();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
+    final profile = ref.watch(profileProvider);
+    final displayName = profile.username ?? _email ?? '';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Ayarlar')),
@@ -65,23 +133,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.deepPurple,
-                  child: Icon(Icons.person, size: 32, color: Colors.white),
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.deepPurple.withValues(alpha: 0.3), width: 2),
+                  ),
+                  child: const Icon(Icons.person_outline, size: 32, color: Colors.deepPurple),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Hesabım',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      Text(
+                        displayName,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (_email != null)
+                      if (profile.email != null)
                         Text(
-                          _email!,
+                          profile.email!,
                           style: const TextStyle(fontSize: 13, color: Colors.grey),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -100,6 +174,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               'HESAP',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: const Text('Kullanıcı Adı Değiştir'),
+            subtitle: profile.username != null
+                ? Text(profile.username!, style: const TextStyle(fontSize: 12))
+                : null,
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _showUsernameDialog,
           ),
           ListTile(
             leading: const Icon(Icons.email_outlined),

@@ -32,7 +32,7 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
   Widget build(BuildContext context) {
     final vaultState = ref.watch(vaultProvider);
     final categoryId = widget.category['id'] as String;
-    final categoryName = widget.category['name_en'] ?? widget.category['name_tr'] ?? '';
+    final categoryName = widget.category['name_tr'] ?? widget.category['name_en'] ?? '';
     final color = _parseColor(widget.category['color'] as String?);
 
     // Bu kategoriye ait item'ları filtrele
@@ -54,7 +54,7 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
                       Icon(Icons.lock_open_outlined, size: 64, color: Colors.grey.shade300),
                       const SizedBox(height: 16),
                       Text(
-                        'No passwords in this category',
+                        'Bu kategoride henüz öğe yok',
                         style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
                       ),
                     ],
@@ -78,7 +78,7 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
                           child: Icon(Icons.lock_outline, color: color, size: 20),
                         ),
                         title: Text(
-                          item['title'] ?? 'Untitled',
+                          item['title'] ?? 'İsimsiz',
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(

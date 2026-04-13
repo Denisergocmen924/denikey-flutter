@@ -13,7 +13,8 @@ import '../../features/auth/presentation/lock_screen.dart';
 import '../biometric/biometric_service.dart';
 import '../../features/vault/presentation/vault_screen.dart';
 import '../../features/vault/presentation/vault_item_detail_screen.dart';
-import '../../features/categories/presentation/category_screen.dart';
+import '../../features/vault/presentation/search_screen.dart';
+import '../../features/categories/presentation/library_screen.dart';
 import '../../features/vault/presentation/add_vault_item_screen.dart';
 import '../../features/categories/presentation/category_detail_screen.dart';
 import '../../features/password_generator/presentation/password_generator_screen.dart';
@@ -73,7 +74,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/categories',
-        builder: (context, state) => const CategoryScreen(),
+        builder: (context, state) => const LibraryScreen(),
         routes: [
           GoRoute(
             path: 'detail',
@@ -132,6 +133,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/trash',
         builder: (context, state) => const TrashScreen(),
+      ),
+      GoRoute(
+        path: '/search',
+        builder: (context, state) => const SearchScreen(),
       ),
     ],
   );

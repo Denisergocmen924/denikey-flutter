@@ -42,6 +42,26 @@ class ItemTypeNotifier extends StateNotifier<ItemTypeState> {
       );
     }
   }
+
+  Future<void> createItemType(String nameTr, String icon, String color) async {
+    try {
+      final newType = await _repo.createItemType(nameTr, icon, color);
+      state = state.copyWith(itemTypes: [...state.itemTypes, newType]);
+    } on DioException catch (e) {
+      state = state.copyWith(error: e.response?.data['detail'] ?? 'Oluşturulamadı');
+    }
+  }
+
+  Future<void> deleteItemType(String id) async {
+    try {
+      await _repo.deleteItemType(id);
+      state = state.copyWith(
+        itemTypes: state.itemTypes.where((t) => t['id'] != id).toList(),
+      );
+    } on DioException catch (e) {
+      state = state.copyWith(error: e.response?.data['detail'] ?? 'Silinemedi');
+    }
+  }
 }
 
 final itemTypeProvider = StateNotifierProvider<ItemTypeNotifier, ItemTypeState>(

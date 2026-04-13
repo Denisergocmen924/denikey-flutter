@@ -8,4 +8,17 @@ class ItemTypeRepository {
     final response = await _dio.get('/api/v1/item-types/');
     return List<Map<String, dynamic>>.from(response.data);
   }
+
+  Future<Map<String, dynamic>> createItemType(String nameTr, String icon, String color) async {
+    final response = await _dio.post('/api/v1/item-types/', data: {
+      'name_tr': nameTr,
+      'icon': icon,
+      'color': color,
+    });
+    return Map<String, dynamic>.from(response.data);
+  }
+
+  Future<void> deleteItemType(String id) async {
+    await _dio.delete('/api/v1/item-types/$id');
+  }
 }

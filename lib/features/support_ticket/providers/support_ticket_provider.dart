@@ -7,19 +7,27 @@ enum SupportTicketStatus { idle, loading, success, error }
 class SupportTicketState {
   final SupportTicketStatus status;
   final String? errorMessage;
+  final List<Map<String, dynamic>> tickets;
+  final bool ticketsLoading;
 
   const SupportTicketState({
     this.status = SupportTicketStatus.idle,
     this.errorMessage,
+    this.tickets = const [],
+    this.ticketsLoading = false,
   });
 
   SupportTicketState copyWith({
     SupportTicketStatus? status,
     String? errorMessage,
+    List<Map<String, dynamic>>? tickets,
+    bool? ticketsLoading,
   }) {
     return SupportTicketState(
       status: status ?? this.status,
       errorMessage: errorMessage,
+      tickets: tickets ?? this.tickets,
+      ticketsLoading: ticketsLoading ?? this.ticketsLoading,
     );
   }
 }
@@ -28,6 +36,16 @@ class SupportTicketNotifier extends StateNotifier<SupportTicketState> {
   final _repo = SupportTicketRepository();
 
   SupportTicketNotifier() : super(const SupportTicketState());
+
+  Future<void> loadTickets() async {
+    state = state.copyWith(ticketsLoading: true);
+    try {
+      final tickets = await _repo.getMyTickets();
+      state = state.copyWith(tickets: tickets, ticketsLoading: false);
+    } on DioException catch (_) {
+      state = state.copyWith(ticketsLoading: false);
+    }
+  }
 
   Future<void> createTicket({
     required String category,
@@ -44,6 +62,7 @@ class SupportTicketNotifier extends StateNotifier<SupportTicketState> {
         priority: priority,
       );
       state = state.copyWith(status: SupportTicketStatus.success);
+      await loadTickets();
     } on DioException catch (e) {
       final msg = e.response?.data['detail'] ?? 'Talep gönderilemedi';
       state = state.copyWith(
@@ -53,7 +72,7 @@ class SupportTicketNotifier extends StateNotifier<SupportTicketState> {
     }
   }
 
-  void reset() => state = const SupportTicketState();
+  void reset() => state = state.copyWith(status: SupportTicketStatus.idle, errorMessage: null);
 }
 
 final supportTicketProvider =

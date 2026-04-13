@@ -140,14 +140,11 @@ class VaultRepository {
         final value = fieldMap['value'] as String? ?? '';
         if (value.isNotEmpty) {
           final encrypted = await EncryptionService.instance.encrypt(value, masterKey);
-          fieldMap.remove('value');
-          fieldMap['encrypted_value'] = encrypted['encrypted'];
-          fieldMap['iv'] = encrypted['iv'];
+          fieldMap['value'] = encrypted['encrypted'];
         }
         encryptedCustomFields.add(fieldMap);
       }
-      payload.remove('custom_fields_data');
-      payload['custom_fields'] = encryptedCustomFields;
+      payload['custom_fields_data'] = encryptedCustomFields;
     }
 
     final response = await _dio.put(ApiConstants.vaultItem(id), data: payload);

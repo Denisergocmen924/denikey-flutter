@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
 import '../data/vault_repository.dart';
 import '../../../core/network/dio_client.dart';
+import '../../categories/providers/category_provider.dart';
 import 'password_history_screen.dart';
 
 class VaultItemDetailScreen extends ConsumerStatefulWidget {
@@ -194,6 +194,76 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
     );
   }
 
+  Future<void> _showCategoryPicker() async {
+    final categoryState = ref.read(categoryProvider);
+    if (categoryState.categories.isEmpty) {
+      await ref.read(categoryProvider.notifier).loadCategories();
+    }
+    if (!mounted) return;
+
+    final categories = ref.read(categoryProvider).categories;
+    final currentCategoryId = _fullItem['category_id'] as String?;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+              child: Text('Klasöre Taşı', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+            ListTile(
+              leading: CircleAvatar(
+                radius: 18,
+                backgroundColor: Colors.grey.shade200,
+                child: const Icon(Icons.folder_off_outlined, size: 18, color: Colors.grey),
+              ),
+              title: const Text('Sınıflandırılmamış'),
+              trailing: currentCategoryId == null ? const Icon(Icons.check, color: Colors.deepPurple) : null,
+              onTap: () async {
+                Navigator.pop(ctx);
+                await ref.read(vaultProvider.notifier).updateItem(
+                  _fullItem['id'].toString(),
+                  {'category_id': null},
+                );
+                setState(() => _fullItem['category_id'] = null);
+              },
+            ),
+            ...categories.map((cat) {
+              final catId = cat['id'] as String?;
+              final name = cat['name_tr'] as String? ?? cat['name_en'] ?? '';
+              final isSelected = catId == currentCategoryId;
+              return ListTile(
+                leading: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.deepPurple.withAlpha(25),
+                  child: const Icon(Icons.folder_outlined, size: 18, color: Colors.deepPurple),
+                ),
+                title: Text(name),
+                trailing: isSelected ? const Icon(Icons.check, color: Colors.deepPurple) : null,
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await ref.read(vaultProvider.notifier).updateItem(
+                    _fullItem['id'].toString(),
+                    {'category_id': catId},
+                  );
+                  setState(() => _fullItem['category_id'] = catId);
+                },
+              );
+            }),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _infoTile(String label, String? value, {bool isSecret = false}) {
     if (value == null || value.isEmpty) return const SizedBox.shrink();
     return Padding(
@@ -306,10 +376,50 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
       );
     }
 
+    final categories = ref.watch(categoryProvider).categories;
+    final currentCategoryId = _fullItem['category_id'] as String?;
+    final currentCategory = currentCategoryId != null
+        ? categories.firstWhere(
+            (c) => c['id'] == currentCategoryId,
+            orElse: () => <String, dynamic>{},
+          )
+        : null;
+    final categoryName = currentCategory != null && currentCategory.isNotEmpty
+        ? (currentCategory['name_tr'] as String? ?? currentCategory['name_en'] ?? '')
+        : null;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         const SizedBox(height: 8),
+        // Klasör satırı
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.grey.shade200),
+            ),
+            child: ListTile(
+              leading: Icon(
+                Icons.folder_outlined,
+                color: categoryName != null ? Colors.deepPurple : Colors.grey,
+              ),
+              title: const Text('Klasör', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              subtitle: Text(
+                categoryName ?? 'Sınıflandırılmamış',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: categoryName != null ? Colors.black87 : Colors.grey,
+                ),
+              ),
+              trailing: const Icon(Icons.chevron_right, size: 20),
+              onTap: _showCategoryPicker,
+            ),
+          ),
+        ),
         _infoTile('Şifre', _decryptedPassword, isSecret: true),
         if (_customFields.isNotEmpty) ...[
           const SizedBox(height: 8),

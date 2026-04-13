@@ -13,8 +13,9 @@ class DioClient {
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
         connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 15),
-        headers: {'Content-Type': 'application/json'},
+        receiveTimeout: const Duration(seconds: 30),
+        // Content-Type burada set edilmiyor — her istek türüne göre Dio otomatik belirler.
+        // JSON için interceptor ekliyor, FormData için Dio multipart set eder.
       ),
     );
     d.interceptors.add(_JwtInterceptor(d));
@@ -36,6 +37,10 @@ class _JwtInterceptor extends Interceptor {
     final token = await SecureStorage.instance.getToken();
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
+    }
+    // FormData değilse JSON varsayımı yap
+    if (options.data is! FormData) {
+      options.headers.putIfAbsent('Content-Type', () => 'application/json');
     }
     handler.next(options);
   }

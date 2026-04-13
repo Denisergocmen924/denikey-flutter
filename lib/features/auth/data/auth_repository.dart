@@ -16,17 +16,15 @@ class AuthRepository {
   }) async {
     final salt = EncryptionService.instance.generateSalt();
     final deviceId = await SecureStorage.instance.getDeviceId();
-    final response = await _dio.post(
-      ApiConstants.register,
-      data: {
-        'username': username,
-        'email': email,
-        'master_password': masterPassword,
-        'encryption_key_salt': salt,
-        'device_id': deviceId,
-        'device_type': getDeviceType(),
-      },
-    );
+    final response = await _dio.post(ApiConstants.register, data: {
+      'username': username,
+      'email': email,
+      'master_password': masterPassword,
+      'encryption_key_salt': salt,
+      'device_id': deviceId,
+      'device_type': getDeviceType(),
+    });
+
     return {
       'user_id': response.data['user']['id'],
       'email': response.data['user']['email'] ?? email,
@@ -146,6 +144,18 @@ class AuthRepository {
       ApiConstants.confirmEmailChange,
       data: {'code': code, 'new_email': newEmail},
     );
+  }
+
+  Future<Map<String, dynamic>> getProfile() async {
+    final response = await _dio.get(ApiConstants.updateProfile);
+    return Map<String, dynamic>.from(response.data);
+  }
+
+  Future<Map<String, dynamic>> updateProfile({String? username}) async {
+    final data = <String, dynamic>{};
+    if (username != null) data['username'] = username;
+    final response = await _dio.put(ApiConstants.updateProfile, data: data);
+    return Map<String, dynamic>.from(response.data);
   }
 
   Future<void> logout() async {

@@ -44,6 +44,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Ara',
+            onPressed: () => context.push('/search'),
+          ),
+          IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: 'Çöp Kutusu',
             onPressed: () => context.push('/trash'),
@@ -88,11 +93,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(state.errorMessage ?? 'Error'),
+                      Text(state.errorMessage ?? 'Hata'),
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
-                        child: const Text('Retry'),
+                        child: const Text('Yeniden Dene'),
                       ),
                     ],
                   ),
@@ -105,10 +110,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     children: [
                       Icon(Icons.lock_open_outlined, size: 64, color: Colors.grey),
                       SizedBox(height: 16),
-                      Text('No passwords yet',
+                      Text('Henüz şifre yok',
                         style: TextStyle(fontSize: 16, color: Colors.grey)),
                       SizedBox(height: 8),
-                      Text('Tap + to add a password',
+                      Text('+ ile yeni şifre ekleyin',
                         style: TextStyle(fontSize: 13, color: Colors.grey)),
                     ],
                   ),
@@ -138,7 +143,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                           ),
                         ),
                         title: Text(
-                          item['title'] ?? 'Untitled',
+                          item['title'] ?? 'İsimsiz',
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(

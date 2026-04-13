@@ -63,7 +63,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> register(String username, String email, String password) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      final result = await _repo.register(username: username, email: email, masterPassword: password);
+      final result = await _repo.register(
+        username: username,
+        email: email,
+        masterPassword: password,
+      );
       state = state.copyWith(
         status: AuthStatus.success,
         userId: result['user_id'],

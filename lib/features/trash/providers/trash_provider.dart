@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../data/trash_repository.dart';
+import '../../vault/providers/vault_provider.dart';
 
 enum TrashStatus { idle, loading, success, error }
 
@@ -29,7 +30,8 @@ class TrashState {
 
 class TrashNotifier extends StateNotifier<TrashState> {
   final _repo = TrashRepository();
-  TrashNotifier() : super(const TrashState());
+  final Ref _ref;
+  TrashNotifier(this._ref) : super(const TrashState());
 
   Future<void> load() async {
     state = state.copyWith(status: TrashStatus.loading);
@@ -48,6 +50,7 @@ class TrashNotifier extends StateNotifier<TrashState> {
     try {
       await _repo.restoreItem(trashId);
       await load();
+      await _ref.read(vaultProvider.notifier).loadItems();
     } catch (_) {}
   }
 
@@ -67,5 +70,5 @@ class TrashNotifier extends StateNotifier<TrashState> {
 }
 
 final trashProvider = StateNotifierProvider<TrashNotifier, TrashState>(
-  (ref) => TrashNotifier(),
+  (ref) => TrashNotifier(ref),
 );

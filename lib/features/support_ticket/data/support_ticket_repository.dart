@@ -21,4 +21,9 @@ class SupportTicketRepository {
       },
     );
   }
+
+  Future<List<Map<String, dynamic>>> getMyTickets() async {
+    final response = await _dio.get(ApiConstants.supportTickets);
+    return List<Map<String, dynamic>>.from(response.data);
+  }
 }

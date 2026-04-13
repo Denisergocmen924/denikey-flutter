@@ -42,17 +42,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     ref.listen(authProvider, (_, next) {
       if (next.status == AuthStatus.success) {
+        final userId = next.userId ?? '';
+        final email = next.email ?? '';
         context.go('/verify-email', extra: {
-          'user_id': next.userId ?? '',
-          'email': next.email ?? '',
+          'user_id': userId,
+          'email': email,
+          'master_password': _passwordCtrl.text.trim(),
         });
       }
-      if (next.status == AuthStatus.error) {
+      if (next.status == AuthStatus.error && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(next.errorMessage ?? 'Hata')),
         );
       }
     });
+
+    final isLoading = state.status == AuthStatus.loading;
 
     return Scaffold(
       appBar: AppBar(
@@ -74,12 +79,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 32),
-                  const Icon(Icons.person_add_outlined, size: 56, color: Colors.deepPurple),
+                  const Icon(Icons.shield_outlined, size: 56, color: Colors.deepPurple),
                   const SizedBox(height: 12),
                   const Text(
                     'Hesap Oluştur',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Kimliğiniz gizli kalır.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
                   ),
                   const SizedBox(height: 40),
                   TextFormField(
@@ -148,19 +159,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 28),
                   FilledButton(
-                    onPressed: state.status == AuthStatus.loading ? null : _submit,
+                    onPressed: isLoading ? null : _submit,
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       backgroundColor: Colors.deepPurple,
                     ),
-                    child: state.status == AuthStatus.loading
+                    child: isLoading
                         ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
+                            height: 20, width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
                         : const Text('Kayıt Ol', style: TextStyle(fontSize: 16)),
                   ),
