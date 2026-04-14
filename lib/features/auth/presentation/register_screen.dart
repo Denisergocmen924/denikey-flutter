@@ -39,6 +39,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
+    final cs = Theme.of(context).colorScheme;
 
     ref.listen(authProvider, (_, next) {
       if (next.status == AuthStatus.success) {
@@ -62,8 +63,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kayıt Ol'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/login'),
@@ -78,27 +77,32 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 32),
-                  const Icon(Icons.shield_outlined, size: 56, color: Colors.deepPurple),
+                  const SizedBox(height: 24),
+                  Icon(Icons.shield_outlined, size: 52,
+                    color: cs.primary),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'Hesap Oluştur',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: cs.onSurface,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  const SizedBox(height: 6),
+                  Text(
                     'Kimliğiniz gizli kalır.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                    style: TextStyle(fontSize: 13,
+                      color: cs.onSurfaceVariant),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 36),
                   TextFormField(
                     controller: _usernameCtrl,
                     decoration: const InputDecoration(
                       labelText: 'Kullanıcı Adı',
                       prefixIcon: Icon(Icons.person_outline),
-                      border: OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return 'Kullanıcı adı gerekli';
@@ -109,14 +113,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       labelText: 'E-posta',
                       prefixIcon: Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return 'E-posta gerekli';
@@ -124,16 +127,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   TextFormField(
                     controller: _passwordCtrl,
                     obscureText: _obscure,
                     decoration: InputDecoration(
                       labelText: 'Master Şifre',
                       prefixIcon: const Icon(Icons.key_outlined),
-                      border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                        icon: Icon(_obscure
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined),
                         onPressed: () => setState(() => _obscure = !_obscure),
                       ),
                     ),
@@ -143,14 +147,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   TextFormField(
                     controller: _confirmCtrl,
                     obscureText: _obscure,
                     decoration: const InputDecoration(
                       labelText: 'Şifre Tekrar',
                       prefixIcon: Icon(Icons.key_outlined),
-                      border: OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v != _passwordCtrl.text) return 'Şifreler eşleşmiyor';
@@ -160,16 +163,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   const SizedBox(height: 28),
                   FilledButton(
                     onPressed: isLoading ? null : _submit,
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.deepPurple,
-                    ),
                     child: isLoading
-                        ? const SizedBox(
-                            height: 20, width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Text('Kayıt Ol', style: TextStyle(fontSize: 16)),
+                        ? const SizedBox(height: 22, width: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                        : const Text('Kayıt Ol'),
                   ),
                   const SizedBox(height: 20),
                 ],

@@ -43,9 +43,14 @@ class ItemTypeNotifier extends StateNotifier<ItemTypeState> {
     }
   }
 
-  Future<void> createItemType(String nameTr, String icon, String color) async {
+  Future<void> createItemType(
+    String nameTr,
+    String icon,
+    String color, {
+    List<Map<String, dynamic>>? fields,
+  }) async {
     try {
-      final newType = await _repo.createItemType(nameTr, icon, color);
+      final newType = await _repo.createItemType(nameTr, icon, color, fields: fields);
       state = state.copyWith(itemTypes: [...state.itemTypes, newType]);
     } on DioException catch (e) {
       state = state.copyWith(error: e.response?.data['detail'] ?? 'Oluşturulamadı');

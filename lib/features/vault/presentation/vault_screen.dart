@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../../core/notifications/notification_service.dart';
+import '../../../core/presentation/app_nav_bar.dart';
 
 class VaultScreen extends ConsumerStatefulWidget {
   const VaultScreen({super.key});
@@ -13,6 +14,9 @@ class VaultScreen extends ConsumerStatefulWidget {
 }
 
 class _VaultScreenState extends ConsumerState<VaultScreen> {
+  // null = "Tümü", dolu = seçili kategori id'si
+  String? _selectedCategoryId;
+
   @override
   void initState() {
     super.initState();
@@ -33,15 +37,33 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     }
   }
 
+  Color _parseColor(String? hex) {
+    if (hex == null || hex.isEmpty) return const Color(0xFF534AB7);
+    try {
+      return Color(int.parse('FF${hex.replaceAll('#', '')}', radix: 16));
+    } catch (_) {
+      return const Color(0xFF534AB7);
+    }
+  }
+
+  List<Map<String, dynamic>> _filteredItems(List<Map<String, dynamic>> items) {
+    if (_selectedCategoryId == null) return items;
+    return items.where((item) {
+      final catId = item['category_id']?.toString();
+      return catId == _selectedCategoryId;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(vaultProvider);
+    final catState = ref.watch(categoryProvider);
+    final cs = Theme.of(context).colorScheme;
+    final filtered = _filteredItems(state.items);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('DeniKey'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -54,25 +76,20 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
             onPressed: () => context.push('/trash'),
           ),
           IconButton(
-            icon: const Icon(Icons.category_outlined),
-            onPressed: () => context.push('/categories'),
-          ),
-          IconButton(
             icon: const Icon(Icons.refresh),
+            tooltip: 'Yenile',
             onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push('/settings'),
           ),
         ],
       ),
+      bottomNavigationBar: const AppNavBar(currentIndex: 0),
       body: Column(
         children: [
+          // Çevrimdışı banner
           if (state.isOffline)
             Container(
               width: double.infinity,
-              color: Colors.orange.shade700,
+              color: Colors.orange.shade800,
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               child: const Row(
                 children: [
@@ -83,6 +100,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 ],
               ),
             ),
+
+          // Kategoriler yatay listesi
+          if (catState.categories.isNotEmpty)
+            _CategoryBar(
+              categories: catState.categories,
+              selectedId: _selectedCategoryId,
+              parseColor: _parseColor,
+              onSelect: (id) => setState(() => _selectedCategoryId = id),
+            ),
+
+          // Şifre listesi
           Expanded(
             child: Builder(builder: (context) {
               if (state.status == VaultStatus.loading) {
@@ -93,9 +121,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(state.errorMessage ?? 'Hata'),
+                      Icon(Icons.error_outline, size: 48, color: cs.error),
                       const SizedBox(height: 12),
-                      ElevatedButton(
+                      Text(state.errorMessage ?? 'Hata',
+                        style: TextStyle(color: cs.onSurfaceVariant)),
+                      const SizedBox(height: 16),
+                      FilledButton(
                         onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
                         child: const Text('Yeniden Dene'),
                       ),
@@ -104,17 +135,33 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 );
               }
               if (state.items.isEmpty) {
-                return const Center(
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.lock_open_outlined, size: 64, color: Colors.grey),
-                      SizedBox(height: 16),
+                      Icon(Icons.shield_outlined, size: 72,
+                        color: cs.onSurfaceVariant.withAlpha(80)),
+                      const SizedBox(height: 20),
                       Text('Henüz şifre yok',
-                        style: TextStyle(fontSize: 16, color: Colors.grey)),
-                      SizedBox(height: 8),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600,
+                          color: cs.onSurface)),
+                      const SizedBox(height: 8),
                       Text('+ ile yeni şifre ekleyin',
-                        style: TextStyle(fontSize: 13, color: Colors.grey)),
+                        style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant)),
+                    ],
+                  ),
+                );
+              }
+              if (filtered.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.folder_open_outlined, size: 64,
+                        color: cs.onSurfaceVariant.withAlpha(80)),
+                      const SizedBox(height: 16),
+                      Text('Bu kategoride şifre yok',
+                        style: TextStyle(fontSize: 16, color: cs.onSurfaceVariant)),
                     ],
                   ),
                 );
@@ -122,35 +169,42 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
               return RefreshIndicator(
                 onRefresh: () => ref.read(vaultProvider.notifier).loadItems(),
                 child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: state.items.length,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  itemCount: filtered.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
-                    final item = state.items[index];
+                    final item = filtered[index];
                     return Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade200),
-                      ),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.deepPurple.shade50,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                        leading: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: cs.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           child: Icon(
                             _iconForType(item['item_type']),
-                            color: Colors.deepPurple,
-                            size: 20,
+                            color: cs.onPrimaryContainer,
+                            size: 22,
                           ),
                         ),
                         title: Text(
                           item['title'] ?? 'İsimsiz',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          style: const TextStyle(fontWeight: FontWeight.w600,
+                            fontSize: 15),
                         ),
-                        subtitle: Text(
-                          item['username'] ?? item['url'] ?? '',
-                          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                        ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                        subtitle: item['username'] != null || item['url'] != null
+                          ? Text(
+                              item['username'] ?? item['url'] ?? '',
+                              style: TextStyle(
+                                color: cs.onSurfaceVariant, fontSize: 13),
+                            )
+                          : null,
+                        trailing: Icon(Icons.chevron_right,
+                          color: cs.onSurfaceVariant),
                         onTap: () async {
                           await context.push('/vault/detail', extra: item);
                           ref.read(vaultProvider.notifier).loadItems();
@@ -164,10 +218,121 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: state.isOffline ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İnternet bağlantısı yok.'))) : () => context.push('/add-item').then((_) => ref.read(vaultProvider.notifier).loadItems()),
-        backgroundColor: state.isOffline ? Colors.grey : Colors.deepPurple,
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: state.isOffline
+            ? () => ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('İnternet bağlantısı yok.')))
+            : () => context.push('/add-item').then(
+                (_) => ref.read(vaultProvider.notifier).loadItems()),
+        icon: const Icon(Icons.add),
+        label: const Text('Yeni Şifre',
+          style: TextStyle(fontWeight: FontWeight.w600)),
+      ),
+    );
+  }
+}
+
+// --- Kategoriler yatay bar ---
+
+class _CategoryBar extends StatelessWidget {
+  final List<Map<String, dynamic>> categories;
+  final String? selectedId;
+  final Color Function(String?) parseColor;
+  final void Function(String?) onSelect;
+
+  const _CategoryBar({
+    required this.categories,
+    required this.selectedId,
+    required this.parseColor,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      color: cs.surfaceContainerLow,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 56,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              scrollDirection: Axis.horizontal,
+              children: [
+                // "Tümü" chip
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _CategoryChip(
+                    label: 'Tümü',
+                    color: cs.primary,
+                    isSelected: selectedId == null,
+                    onTap: () => onSelect(null),
+                  ),
+                ),
+                ...categories.map((cat) {
+                  final id = cat['id']?.toString();
+                  final name = cat['name_tr'] ?? cat['name_en'] ?? '';
+                  final color = parseColor(cat['color'] as String?);
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: _CategoryChip(
+                      label: name,
+                      color: color,
+                      isSelected: selectedId == id,
+                      onTap: () => onSelect(id),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+          Divider(height: 1, color: cs.outlineVariant),
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoryChip extends StatelessWidget {
+  final String label;
+  final Color color;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CategoryChip({
+    required this.label,
+    required this.color,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? color : color.withAlpha(30),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? color : color.withAlpha(80),
+            width: 1.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? Colors.white : color,
+          ),
+        ),
       ),
     );
   }

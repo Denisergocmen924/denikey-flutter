@@ -5,7 +5,10 @@ import '../data/auth_repository.dart';
 import '../providers/profile_provider.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/providers/theme_provider.dart';
+import '../../../core/providers/shortcuts_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
+import '../../../core/presentation/app_nav_bar.dart';
+import '../../../core/presentation/app_shortcuts.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -74,7 +77,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             controller: ctrl,
             decoration: const InputDecoration(
               labelText: 'Yeni kullanıcı adı',
-              border: OutlineInputBorder(),
             ),
             validator: (v) {
               if (v == null || v.isEmpty) return 'Boş bırakılamaz';
@@ -99,7 +101,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
 
     final newUsername = ctrl.text.trim();
-    // Dialog animasyonu bitene kadar dispose'u ertele
     Future.microtask(ctrl.dispose);
     if (ok != true) return;
 
@@ -123,25 +124,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final themeMode = ref.watch(themeModeProvider);
     final profile = ref.watch(profileProvider);
     final displayName = profile.username ?? _email ?? '';
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Ayarlar')),
+      bottomNavigationBar: const AppNavBar(currentIndex: 2),
       body: ListView(
         children: [
-          // Kullanıcı bilgisi başlığı
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+          // Kullanıcı bilgisi
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cs.primaryContainer.withAlpha(60),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: cs.outlineVariant),
+            ),
             child: Row(
               children: [
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.withValues(alpha: 0.12),
+                    color: cs.primaryContainer,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.deepPurple.withValues(alpha: 0.3), width: 2),
                   ),
-                  child: const Icon(Icons.person_outline, size: 32, color: Colors.deepPurple),
+                  child: Icon(Icons.person_outline, size: 28,
+                    color: cs.onPrimaryContainer),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -150,13 +159,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       Text(
                         displayName,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 17, fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (profile.email != null)
                         Text(
                           profile.email!,
-                          style: const TextStyle(fontSize: 13, color: Colors.grey),
+                          style: TextStyle(fontSize: 13,
+                            color: cs.onSurfaceVariant),
                           overflow: TextOverflow.ellipsis,
                         ),
                     ],
@@ -165,16 +176,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
             ),
           ),
-          const Divider(),
 
-          // Hesap bölümü
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Text(
-              'HESAP',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
-            ),
-          ),
+          _sectionHeader('HESAP'),
           ListTile(
             leading: const Icon(Icons.person_outline),
             title: const Text('Kullanıcı Adı Değiştir'),
@@ -191,16 +194,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onTap: () => context.push('/change-email'),
           ),
 
-          const Divider(),
+          const Divider(height: 1),
 
-          // Uygulama bölümü
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Text(
-              'UYGULAMA',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
-            ),
-          ),
+          _sectionHeader('UYGULAMA'),
           ListTile(
             leading: const Icon(Icons.password_outlined),
             title: const Text('Şifre Üretici'),
@@ -224,12 +220,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               secondary: const Icon(Icons.fingerprint),
               title: const Text('Biyometrik Kilit'),
               subtitle: const Text(
-                'Uygulama açılışında parmak izi / yüz tanıma',
+                'Parmak izi / yüz tanıma ile kilitle',
                 style: TextStyle(fontSize: 12),
               ),
               value: _biometricEnabled,
               onChanged: _toggleBiometric,
             ),
+          Consumer(
+            builder: (context, ref, _) {
+              final shortcutsEnabled = ref.watch(shortcutsProvider);
+              return SwitchListTile(
+                secondary: const Icon(Icons.keyboard_outlined),
+                title: const Text('Klavye Kısayolları'),
+                subtitle: const Text(
+                  'Ctrl+1/2/3, +, ←→, Esc vb.',
+                  style: TextStyle(fontSize: 12),
+                ),
+                value: shortcutsEnabled,
+                onChanged: (val) =>
+                    ref.read(shortcutsProvider.notifier).toggle(val),
+              );
+            },
+          ),
+          Consumer(
+            builder: (context, ref, _) {
+              final shortcutsEnabled = ref.watch(shortcutsProvider);
+              if (!shortcutsEnabled) return const SizedBox.shrink();
+              return const ShortcutHintCard();
+            },
+          ),
           SwitchListTile(
             secondary: const Icon(Icons.dark_mode_outlined),
             title: const Text('Karanlık Tema'),
@@ -251,31 +270,130 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             },
           ),
 
-          const Divider(),
+          const Divider(height: 1),
+
+          // Nasıl Kullanılır
+          _sectionHeader('NASIL KULLANILIR'),
+          _HelpTile(
+            icon: Icons.shield_outlined,
+            title: 'Şifre Ekleme',
+            content:
+                'Alt menüden "Kasam" sekmesine geçin. Sağ alttaki "+ Yeni Şifre" butonuna dokunun. '
+                'Site adı, kullanıcı adı ve şifrenizi girin; kaydedin.',
+          ),
+          _HelpTile(
+            icon: Icons.key_outlined,
+            title: 'Şifre Üretici',
+            content:
+                'Uygulama → Şifre Üretici ekranından uzunluk, büyük/küçük harf, rakam ve '
+                'özel karakter seçenekleriyle güçlü şifre üretebilirsiniz.',
+          ),
+          _HelpTile(
+            icon: Icons.grid_view_outlined,
+            title: 'Kategoriler ve Türler',
+            content:
+                '"Kütüphane" sekmesinde şifrelerinizi kategorilere ayırabilir, '
+                'yeni öğe türleri oluşturabilirsiniz.',
+          ),
+          _HelpTile(
+            icon: Icons.delete_outline,
+            title: 'Çöp Kutusu',
+            content:
+                'Silinen şifreler 30 gün boyunca Çöp Kutusu\'nda tutulur. '
+                'Kasam ekranının sağ üst köşesindeki çöp kutusu ikonundan erişebilirsiniz.',
+          ),
+          _HelpTile(
+            icon: Icons.lock_outline,
+            title: 'Sıfır Bilgi Güvenliği',
+            content:
+                'DeniKey\'de master şifreniz hiçbir zaman sunucuya gönderilmez ve hiçbir '
+                'yerde saklanmaz. Şifreleriniz cihazınızda Argon2id algoritmasıyla türetilen '
+                'bir anahtarla AES-256-GCM formatında şifrelenir; bu anahtar yalnızca sizin '
+                'cihazınızda bulunur. Sunucuya yalnızca şifreli (encrypted) veri gönderilir. '
+                'Master şifrenizi unutursanız verilerinizi kurtarmanın hiçbir yolu yoktur — '
+                'bu, gerçek sıfır-bilgi güvenliğinin kaçınılmaz sonucudur.',
+          ),
+
+          const Divider(height: 1),
 
           // Çıkış
           ListTile(
             leading: _loggingOut
                 ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
+                    width: 24, height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.logout, color: Colors.red),
             title: const Text('Çıkış Yap', style: TextStyle(color: Colors.red)),
             onTap: _loggingOut ? null : _logout,
           ),
 
           const SizedBox(height: 24),
-          const Center(
+          Center(
             child: Text(
               'DeniKey v1.0.0',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
             ),
           ),
           const SizedBox(height: 16),
         ],
       ),
+    );
+  }
+
+  Widget _sectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
+class _HelpTile extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final String content;
+  const _HelpTile({required this.icon, required this.title, required this.content});
+
+  @override
+  State<_HelpTile> createState() => _HelpTileState();
+}
+
+class _HelpTileState extends State<_HelpTile> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(widget.icon, color: cs.primary),
+          title: Text(widget.title,
+            style: const TextStyle(fontWeight: FontWeight.w500)),
+          trailing: Icon(
+            _expanded ? Icons.expand_less : Icons.expand_more,
+            color: cs.onSurfaceVariant,
+          ),
+          onTap: () => setState(() => _expanded = !_expanded),
+        ),
+        if (_expanded)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(56, 0, 16, 12),
+            child: Text(
+              widget.content,
+              style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant,
+                height: 1.5),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -34,6 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
+    final cs = Theme.of(context).colorScheme;
 
     ref.listen(authProvider, (_, next) {
       if (next.status == AuthStatus.success) {
@@ -54,6 +55,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
 
+    final isLoading = state.status == AuthStatus.loading;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -64,19 +67,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 40),
-                  const Icon(Icons.lock_outline, size: 64, color: Colors.deepPurple),
-                  const SizedBox(height: 16),
-                  const Text(
+                  const SizedBox(height: 48),
+                  Container(
+                    width: 80,
+                    height: 80,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: cs.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.shield,
+                      size: 44, color: cs.onPrimaryContainer),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
                     'DeniKey',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: cs.onSurface,
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  const SizedBox(height: 6),
+                  Text(
                     'Şifreleriniz güvende',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(fontSize: 14,
+                      color: cs.onSurfaceVariant),
                   ),
                   const SizedBox(height: 48),
                   TextFormField(
@@ -84,7 +103,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     decoration: const InputDecoration(
                       labelText: 'Kullanıcı Adı',
                       prefixIcon: Icon(Icons.person_outline),
-                      border: OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return 'Kullanıcı adı gerekli';
@@ -92,16 +110,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   TextFormField(
                     controller: _passwordCtrl,
                     obscureText: _obscure,
                     decoration: InputDecoration(
                       labelText: 'Master Şifre',
                       prefixIcon: const Icon(Icons.key_outlined),
-                      border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                        icon: Icon(_obscure
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined),
                         onPressed: () => setState(() => _obscure = !_obscure),
                       ),
                     ),
@@ -113,21 +132,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 28),
                   FilledButton(
-                    onPressed: state.status == AuthStatus.loading ? null : _submit,
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.deepPurple,
-                    ),
-                    child: state.status == AuthStatus.loading
-                        ? const SizedBox(height: 20, width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('Giriş Yap', style: TextStyle(fontSize: 16)),
+                    onPressed: isLoading ? null : _submit,
+                    child: isLoading
+                        ? const SizedBox(height: 22, width: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                        : const Text('Giriş Yap'),
                   ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Hesabın yok mu?'),
+                      Text('Hesabın yok mu?',
+                        style: TextStyle(color: cs.onSurfaceVariant)),
                       TextButton(
                         onPressed: () {
                           ref.read(authProvider.notifier).reset();
@@ -140,12 +157,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Center(
                     child: TextButton(
                       onPressed: () => context.push('/forgot-password'),
-                      child: const Text(
-                        'Şifremi Unuttum',
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                      child: Text('Şifremi Unuttum',
+                        style: TextStyle(color: cs.onSurfaceVariant)),
                     ),
                   ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),

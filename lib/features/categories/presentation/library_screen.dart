@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/category_provider.dart';
 import '../../item_types/providers/item_type_provider.dart';
+import '../../../core/presentation/app_nav_bar.dart';
 
 class LibraryScreen extends ConsumerStatefulWidget {
   const LibraryScreen({super.key});
@@ -149,7 +150,6 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                 );
                 Navigator.pop(ctx);
               },
-              style: FilledButton.styleFrom(backgroundColor: Colors.deepPurple),
               child: const Text('Ekle'),
             ),
           ],
@@ -192,95 +192,193 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     _selectedColor = _colorPalette[0];
     _selectedIcon = 'category';
 
+    // Sabit alanlar: {name, type, isRequired}
+    final List<Map<String, dynamic>> fixedFields = [];
+
+    final fieldTypes = const [
+      ('text',    'Metin'),
+      ('secret',  'Gizli'),
+      ('number',  'Sayı'),
+      ('date',    'Tarih'),
+    ];
+
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setS) => AlertDialog(
-          title: const Text('Yeni Tür'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Tür Adı',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text('İkon Seç', style: TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _iconOptions.map((e) {
-                    final sel = _selectedIcon == e.key;
-                    return GestureDetector(
-                      onTap: () => setS(() => _selectedIcon = e.key),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: sel
-                              ? _selectedColor.withAlpha(51)
-                              : Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                          border: sel
-                              ? Border.all(color: _selectedColor, width: 2)
-                              : null,
+        builder: (context, setS) {
+          final cs = Theme.of(context).colorScheme;
+          return AlertDialog(
+            title: const Text('Yeni Tür'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: nameCtrl,
+                      decoration: const InputDecoration(labelText: 'Tür Adı'),
+                    ),
+                    const SizedBox(height: 16),
+                    Text('İkon Seç', style: TextStyle(
+                      fontWeight: FontWeight.w600, color: cs.onSurface)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _iconOptions.map((e) {
+                        final sel = _selectedIcon == e.key;
+                        return GestureDetector(
+                          onTap: () => setS(() => _selectedIcon = e.key),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: sel
+                                  ? _selectedColor.withAlpha(51)
+                                  : cs.surfaceContainerHigh,
+                              borderRadius: BorderRadius.circular(8),
+                              border: sel
+                                  ? Border.all(color: _selectedColor, width: 2)
+                                  : null,
+                            ),
+                            child: Icon(e.value,
+                                size: 22,
+                                color: sel ? _selectedColor : cs.onSurfaceVariant),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    Text('Renk Seç', style: TextStyle(
+                      fontWeight: FontWeight.w600, color: cs.onSurface)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _colorPalette.map((c) {
+                        final sel = _selectedColor == c;
+                        return GestureDetector(
+                          onTap: () => setS(() => _selectedColor = c),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: c,
+                              shape: BoxShape.circle,
+                              border: sel
+                                  ? Border.all(color: cs.onSurface, width: 3)
+                                  : null,
+                            ),
+                            child: sel
+                                ? const Icon(Icons.check, color: Colors.white, size: 18)
+                                : null,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Sabit Alanlar',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600, color: cs.onSurface)),
+                        TextButton.icon(
+                          onPressed: () {
+                            setS(() => fixedFields.add({
+                              'field_name': '',
+                              'field_type': 'text',
+                              'is_required': false,
+                            }));
+                          },
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('Alan Ekle'),
                         ),
-                        child: Icon(e.value,
-                            size: 22,
-                            color: sel ? _selectedColor : Colors.grey.shade600),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                const Text('Renk Seç', style: TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _colorPalette.map((c) {
-                    final sel = _selectedColor == c;
-                    return GestureDetector(
-                      onTap: () => setS(() => _selectedColor = c),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: c,
-                          shape: BoxShape.circle,
-                          border: sel ? Border.all(color: Colors.black, width: 3) : null,
+                      ],
+                    ),
+                    if (fixedFields.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Text(
+                          'Alan eklenmedi — varsayılan olarak "Şifre" alanı oluşturulur.',
+                          style: TextStyle(
+                            fontSize: 12, color: cs.onSurfaceVariant),
                         ),
-                        child: sel ? const Icon(Icons.check, color: Colors.white, size: 18) : null,
                       ),
-                    );
-                  }).toList(),
+                    ...fixedFields.asMap().entries.map((entry) {
+                      final i = entry.key;
+                      final f = entry.value;
+                      final ctrl = TextEditingController(text: f['field_name'] as String);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: TextField(
+                                controller: ctrl,
+                                onChanged: (v) => f['field_name'] = v,
+                                decoration: const InputDecoration(
+                                  labelText: 'Alan Adı',
+                                  isDense: true,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 2,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: f['field_type'] as String,
+                                isDense: true,
+                                decoration: const InputDecoration(isDense: true),
+                                items: fieldTypes.map((t) => DropdownMenuItem(
+                                  value: t.$1,
+                                  child: Text(t.$2, style: const TextStyle(fontSize: 13)),
+                                )).toList(),
+                                onChanged: (v) => setS(() => f['field_type'] = v!),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close, size: 18, color: cs.error),
+                              onPressed: () => setS(() => fixedFields.removeAt(i)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
-            FilledButton(
-              onPressed: () {
-                if (nameCtrl.text.trim().isEmpty) return;
-                ref.read(itemTypeProvider.notifier).createItemType(
-                  nameCtrl.text.trim(),
-                  _selectedIcon,
-                  _colorToHex(_selectedColor),
-                );
-                Navigator.pop(ctx);
-              },
-              style: FilledButton.styleFrom(backgroundColor: Colors.deepPurple),
-              child: const Text('Ekle'),
-            ),
-          ],
-        ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+              FilledButton(
+                onPressed: () {
+                  if (nameCtrl.text.trim().isEmpty) return;
+                  final validFields = fixedFields
+                      .where((f) => (f['field_name'] as String).trim().isNotEmpty)
+                      .map((f) => {
+                        'field_name': (f['field_name'] as String).trim(),
+                        'field_type': f['field_type'] as String,
+                        'is_required': f['is_required'] as bool,
+                      })
+                      .toList();
+                  ref.read(itemTypeProvider.notifier).createItemType(
+                    nameCtrl.text.trim(),
+                    _selectedIcon,
+                    _colorToHex(_selectedColor),
+                    fields: validFields.isNotEmpty ? validFields : null,
+                  );
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Ekle'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -322,19 +420,15 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kütüphane'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
           tabs: const [
             Tab(text: 'Kategoriler'),
             Tab(text: 'Türler'),
           ],
         ),
       ),
+      bottomNavigationBar: const AppNavBar(currentIndex: 1),
       body: TabBarView(
         controller: _tabController,
         children: [
@@ -361,8 +455,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
             _showAddItemTypeDialog();
           }
         },
-        backgroundColor: Colors.deepPurple,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -408,11 +501,6 @@ class _CategoriesTab extends StatelessWidget {
         final name = cat['name_tr'] ?? cat['name_en'] ?? '';
 
         return Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.grey.shade200),
-          ),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: color.withAlpha(38),
@@ -480,11 +568,6 @@ class _ItemTypesTab extends StatelessWidget {
         final fields = (type['fields'] as List<dynamic>? ?? []);
 
         return Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.grey.shade200),
-          ),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: color.withAlpha(38),

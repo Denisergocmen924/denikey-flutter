@@ -9,11 +9,17 @@ class ItemTypeRepository {
     return List<Map<String, dynamic>>.from(response.data);
   }
 
-  Future<Map<String, dynamic>> createItemType(String nameTr, String icon, String color) async {
+  Future<Map<String, dynamic>> createItemType(
+    String nameTr,
+    String icon,
+    String color, {
+    List<Map<String, dynamic>>? fields,
+  }) async {
     final response = await _dio.post('/api/v1/item-types/', data: {
       'name_tr': nameTr,
       'icon': icon,
       'color': color,
+      if (fields != null && fields.isNotEmpty) 'fields': fields,
     });
     return Map<String, dynamic>.from(response.data);
   }

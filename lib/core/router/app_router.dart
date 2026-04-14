@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/login_screen.dart';
@@ -10,7 +9,6 @@ import '../../features/auth/presentation/change_email_screen.dart';
 import '../../features/auth/presentation/confirm_email_change_screen.dart';
 import '../../features/auth/presentation/settings_screen.dart';
 import '../../features/auth/presentation/lock_screen.dart';
-import '../biometric/biometric_service.dart';
 import '../../features/vault/presentation/vault_screen.dart';
 import '../../features/vault/presentation/vault_item_detail_screen.dart';
 import '../../features/vault/presentation/search_screen.dart';
@@ -21,7 +19,7 @@ import '../../features/password_generator/presentation/password_generator_screen
 import '../../features/audit_log/presentation/audit_log_screen.dart';
 import '../../features/support_ticket/presentation/support_ticket_screen.dart';
 import '../../features/trash/presentation/trash_screen.dart';
-import '../storage/secure_storage.dart';
+import '../presentation/splash_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -142,43 +140,3 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _checkToken();
-  }
-
-  Future<void> _checkToken() async {
-    final token = await SecureStorage.instance.getToken();
-    if (!mounted) return;
-    if (token == null) {
-      context.go('/login');
-      return;
-    }
-    // Biyometrik etkinse kilit ekranına yönlendir
-    final biometricEnabled = await BiometricService.instance.isEnabled();
-    final biometricAvailable = await BiometricService.instance.isAvailable();
-    if (mounted) {
-      if (biometricEnabled && biometricAvailable) {
-        context.go('/lock');
-      } else {
-        context.go('/vault');
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
-    );
-  }
-}
