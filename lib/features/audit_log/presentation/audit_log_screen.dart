@@ -101,10 +101,10 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
                     label: Text(cat),
                     selected: selected,
                     onSelected: (_) => setState(() => _selectedCategory = cat),
-                    selectedColor: Colors.deepPurple.shade100,
-                    checkmarkColor: Colors.deepPurple,
+                    selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                    checkmarkColor: Theme.of(context).colorScheme.primary,
                     labelStyle: TextStyle(
-                      color: selected ? Colors.deepPurple : null,
+                      color: selected ? Theme.of(context).colorScheme.primary : null,
                       fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),

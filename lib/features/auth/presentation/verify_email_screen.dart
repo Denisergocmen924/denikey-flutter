@@ -133,8 +133,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_title),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Padding(
@@ -148,7 +146,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                     ? Icons.devices_outlined
                     : Icons.mark_email_read_outlined,
                 size: 64,
-                color: Colors.deepPurple,
+                color: const Color(0xFFFF5900),
               ),
               const SizedBox(height: 24),
               Text(
@@ -180,7 +178,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               FilledButton(
                 onPressed: _loading ? null : _verify,
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: _loading

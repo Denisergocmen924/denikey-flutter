@@ -42,13 +42,12 @@ class _LockScreenState extends State<LockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1035),
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.lock_outline, size: 72, color: Colors.deepPurple),
+              const Icon(Icons.lock_outline, size: 72, color: Color(0xFFFF5900)),
               const SizedBox(height: 24),
               const Text(
                 'DeniKey Kilitli',
@@ -65,7 +64,7 @@ class _LockScreenState extends State<LockScreen> {
               ),
               const SizedBox(height: 40),
               if (_loading)
-                const CircularProgressIndicator(color: Colors.deepPurple)
+                const CircularProgressIndicator(color: Color(0xFFFF5900))
               else ...[
                 if (_error != null) ...[
                   Text(_error!, style: const TextStyle(color: Colors.redAccent)),
@@ -76,7 +75,6 @@ class _LockScreenState extends State<LockScreen> {
                   icon: const Icon(Icons.fingerprint),
                   label: const Text('Biyometrik ile Aç'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                   ),
                 ),

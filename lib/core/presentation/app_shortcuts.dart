@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../providers/shortcuts_provider.dart';
 import '../router/app_router.dart';
 
-/// Uygulamanın builder'ına sarılır.
-/// Kısayollar ayardan kapalıysa tüm tuş olayları görmezden gelinir.
-class AppShortcuts extends ConsumerWidget {
+/// HardwareKeyboard global handler kullanır — focus state'ten bağımsız çalışır.
+/// Focus widget'ı alt widget'lar focus aldığında event iletmediği için bu yöntem seçildi.
+class AppShortcuts extends ConsumerStatefulWidget {
   final Widget child;
   const AppShortcuts({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final enabled = ref.watch(shortcutsProvider);
-    final router  = ref.watch(routerProvider); // GoRouter doğrudan Riverpod'dan
-    if (!enabled) return child;
+  ConsumerState<AppShortcuts> createState() => _AppShortcutsState();
+}
 
-    return Focus(
-      autofocus: true,
-      canRequestFocus: true,
-      onKeyEvent: (node, event) => _handleKey(router, event),
-      child: child,
-    );
+class _AppShortcutsState extends ConsumerState<AppShortcuts> {
+  @override
+  void initState() {
+    super.initState();
+    HardwareKeyboard.instance.addHandler(_handleKey);
+  }
+
+  @override
+  void dispose() {
+    HardwareKeyboard.instance.removeHandler(_handleKey);
+    super.dispose();
   }
 
   bool _isTextFieldFocused() {
@@ -30,45 +32,49 @@ class AppShortcuts extends ConsumerWidget {
     return focus?.context?.widget is EditableText;
   }
 
-  KeyEventResult _handleKey(GoRouter router, KeyEvent event) {
-    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+  bool _handleKey(KeyEvent event) {
+    if (event is! KeyDownEvent) return false;
 
+    final enabled = ref.read(shortcutsProvider);
+    if (!enabled) return false;
+
+    final router = ref.read(routerProvider);
     final ctrl   = HardwareKeyboard.instance.isControlPressed;
     final key    = event.logicalKey;
     final inText = _isTextFieldFocused();
-    final loc    = router.state.uri.toString();
+    final loc    = router.routerDelegate.currentConfiguration.uri.toString();
 
     // --- Ctrl kısayolları ---
     if (ctrl && !inText) {
       if (key == LogicalKeyboardKey.digit1) {
-        router.go('/vault');       return KeyEventResult.handled;
+        router.go('/vault');       return true;
       }
       if (key == LogicalKeyboardKey.digit2) {
-        router.go('/categories');  return KeyEventResult.handled;
+        router.go('/categories');  return true;
       }
       if (key == LogicalKeyboardKey.digit3) {
-        router.go('/settings');    return KeyEventResult.handled;
+        router.go('/settings');    return true;
       }
       if (key == LogicalKeyboardKey.keyF) {
-        router.push('/search');    return KeyEventResult.handled;
+        router.push('/search');    return true;
       }
       if (key == LogicalKeyboardKey.keyN) {
-        router.push('/add-item');  return KeyEventResult.handled;
+        router.push('/add-item');  return true;
       }
       if (key == LogicalKeyboardKey.keyG) {
-        router.push('/password-generator'); return KeyEventResult.handled;
+        router.push('/password-generator'); return true;
       }
     }
 
     // --- Ok tuşları: sekmeler arası ---
     if (!inText) {
       if (key == LogicalKeyboardKey.arrowLeft) {
-        if (loc.startsWith('/categories')) { router.go('/vault');      return KeyEventResult.handled; }
-        if (loc.startsWith('/settings'))   { router.go('/categories'); return KeyEventResult.handled; }
+        if (loc.startsWith('/categories')) { router.go('/vault');      return true; }
+        if (loc.startsWith('/settings'))   { router.go('/categories'); return true; }
       }
       if (key == LogicalKeyboardKey.arrowRight) {
-        if (loc.startsWith('/vault'))      { router.go('/categories'); return KeyEventResult.handled; }
-        if (loc.startsWith('/categories')) { router.go('/settings');   return KeyEventResult.handled; }
+        if (loc.startsWith('/vault'))      { router.go('/categories'); return true; }
+        if (loc.startsWith('/categories')) { router.go('/settings');   return true; }
       }
 
       // + → Yeni şifre (kasam ekranı)
@@ -76,20 +82,23 @@ class AppShortcuts extends ConsumerWidget {
           key == LogicalKeyboardKey.numpadAdd ||
           key == LogicalKeyboardKey.equal) {
         if (loc.startsWith('/vault')) {
-          router.push('/add-item'); return KeyEventResult.handled;
+          router.push('/add-item'); return true;
         }
       }
 
       // Escape → Geri
       if (key == LogicalKeyboardKey.escape) {
         if (router.canPop()) {
-          router.pop(); return KeyEventResult.handled;
+          router.pop(); return true;
         }
       }
     }
 
-    return KeyEventResult.ignored;
+    return false;
   }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 /// Kısayol listesi göstermek için yardımcı widget (Ayarlar ekranında kullanılır)

@@ -55,13 +55,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           decoration: const InputDecoration(
             hintText: 'Ara...',
             border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.white70),
+            hintStyle: TextStyle(color: Colors.grey),
           ),
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           onChanged: (v) => setState(() => _query = v),
         ),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
         actions: [
           if (_query.isNotEmpty)
             IconButton(
@@ -107,10 +105,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         final type = item['item_type_name'] as String?;
                         return ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: Colors.deepPurple.withAlpha(25),
+                            backgroundColor: const Color(0xFFFF5900).withAlpha(25),
                             child: Icon(
                               _iconForType(type),
-                              color: Colors.deepPurple,
+                              color: const Color(0xFFFF5900),
                               size: 20,
                             ),
                           ),
@@ -149,7 +147,7 @@ class _HighlightText extends StatelessWidget {
           TextSpan(
             text: text.substring(idx, idx + query.length),
             style: base.copyWith(
-              backgroundColor: Colors.deepPurple.withAlpha(60),
+              backgroundColor: const Color(0xFFFF5900).withAlpha(60),
               fontWeight: FontWeight.bold,
             ),
           ),

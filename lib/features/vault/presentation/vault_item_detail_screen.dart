@@ -225,7 +225,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                 child: const Icon(Icons.folder_off_outlined, size: 18, color: Colors.grey),
               ),
               title: const Text('Sınıflandırılmamış'),
-              trailing: currentCategoryId == null ? const Icon(Icons.check, color: Colors.deepPurple) : null,
+              trailing: currentCategoryId == null ? const Icon(Icons.check, color: Color(0xFFFF5900)) : null,
               onTap: () async {
                 Navigator.pop(ctx);
                 await ref.read(vaultProvider.notifier).updateItem(
@@ -242,11 +242,11 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
               return ListTile(
                 leading: CircleAvatar(
                   radius: 18,
-                  backgroundColor: Colors.deepPurple.withAlpha(25),
-                  child: const Icon(Icons.folder_outlined, size: 18, color: Colors.deepPurple),
+                  backgroundColor: const Color(0xFFFF5900).withAlpha(25),
+                  child: const Icon(Icons.folder_outlined, size: 18, color: Color(0xFFFF5900)),
                 ),
                 title: Text(name),
-                trailing: isSelected ? const Icon(Icons.check, color: Colors.deepPurple) : null,
+                trailing: isSelected ? const Icon(Icons.check, color: Color(0xFFFF5900)) : null,
                 onTap: () async {
                   Navigator.pop(ctx);
                   await ref.read(vaultProvider.notifier).updateItem(
@@ -307,8 +307,6 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
         actions: _isEditing
             ? [
                 TextButton(
@@ -404,7 +402,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             child: ListTile(
               leading: Icon(
                 Icons.folder_outlined,
-                color: categoryName != null ? Colors.deepPurple : Colors.grey,
+                color: categoryName != null ? const Color(0xFFFF5900) : Colors.grey,
               ),
               title: const Text('Klasör', style: TextStyle(fontSize: 12, color: Colors.grey)),
               subtitle: Text(
@@ -517,7 +515,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             onPressed: _addEditCustomField,
             icon: const Icon(Icons.add),
             label: const Text('Alan Ekle'),
-            style: OutlinedButton.styleFrom(foregroundColor: Colors.deepPurple),
+            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFFF5900)),
           ),
           const SizedBox(height: 24),
 
@@ -532,7 +530,6 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
           FilledButton(
             onPressed: _saving ? null : _saveEdit,
             style: FilledButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

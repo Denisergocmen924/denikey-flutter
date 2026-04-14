@@ -98,7 +98,7 @@ class PasswordGeneratorScreen extends ConsumerWidget {
               min: 8,
               max: 64,
               divisions: 56,
-              activeColor: Colors.deepPurple,
+              activeColor: Theme.of(context).colorScheme.primary,
               onChanged: (v) => notifier.setLength(v.round()),
             ),
 
@@ -137,7 +137,6 @@ class PasswordGeneratorScreen extends ConsumerWidget {
               onPressed: state.isLoading ? null : notifier.generate,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Colors.deepPurple,
               ),
               icon: const Icon(Icons.autorenew),
               label: const Text('Şifre Üret', style: TextStyle(fontSize: 16)),
@@ -165,7 +164,7 @@ class _OptionTile extends StatelessWidget {
     return CheckboxListTile(
       title: Text(label),
       value: value,
-      activeColor: Colors.deepPurple,
+      activeColor: Theme.of(context).colorScheme.primary,
       controlAffinity: ListTileControlAffinity.leading,
       onChanged: (_) => onTap(),
     );

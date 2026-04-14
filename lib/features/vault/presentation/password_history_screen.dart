@@ -98,8 +98,6 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.itemTitle} — Geçmiş'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
         actions: [
           if (_history.isNotEmpty)
             IconButton(
@@ -167,11 +165,11 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
           ),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Colors.deepPurple.shade50,
+              backgroundColor: const Color(0xFFFF5900).withAlpha(25),
               child: Text(
                 '${_history.length - i}',
                 style: const TextStyle(
-                    color: Colors.deepPurple, fontWeight: FontWeight.bold),
+                    color: Color(0xFFFF5900), fontWeight: FontWeight.bold),
               ),
             ),
             title: Text(

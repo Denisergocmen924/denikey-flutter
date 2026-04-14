@@ -55,7 +55,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.mark_email_unread_outlined, size: 64, color: Colors.deepPurple),
+                  const Icon(Icons.mark_email_unread_outlined, size: 64, color: Color(0xFFFF5900)),
                   const SizedBox(height: 16),
                   const Text(
                     'Yeni E-posta Adresi',
@@ -88,7 +88,6 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                     onPressed: _loading ? null : _submit,
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.deepPurple,
                     ),
                     child: _loading
                         ? const SizedBox(

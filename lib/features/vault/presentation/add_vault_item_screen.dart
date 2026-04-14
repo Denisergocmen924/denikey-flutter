@@ -161,8 +161,6 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(titles[_step]),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: _goBack,
@@ -205,7 +203,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
         const SizedBox(height: 8),
         _selectionTile(
           icon: Icons.add_circle_outline,
-          color: Colors.deepPurple,
+          color: const Color(0xFFFF5900),
           title: 'Kategori Oluştur',
           subtitle: 'Yeni kategori ekle',
           onTap: _showCreateCategoryDialog,
@@ -264,7 +262,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                     nameCtrl.text.trim(),
                     nameCtrl.text.trim(),
                     null,
-                    '#534AB7',
+                    '#FF5900',
                   );
               final cats = ref.read(categoryProvider).categories;
               final newCat = cats.lastWhere(
@@ -282,7 +280,6 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                 });
               }
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.deepPurple),
             child: const Text('Oluştur'),
           ),
         ],
@@ -415,14 +412,13 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
             onPressed: _addExtraField,
             icon: const Icon(Icons.add),
             label: const Text('Alan Ekle'),
-            style: OutlinedButton.styleFrom(foregroundColor: Colors.deepPurple),
+            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFFF5900)),
           ),
           const SizedBox(height: 24),
 
           FilledButton(
             onPressed: _save,
             style: FilledButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             child: const Text('Kaydet', style: TextStyle(fontSize: 16)),
@@ -473,10 +469,10 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     return Row(
       children: [
         if (_selectedCategoryName != null) ...[
-          Icon(Icons.folder_outlined, size: 14, color: Colors.deepPurple),
+          const Icon(Icons.folder_outlined, size: 14, color: Color(0xFFFF5900)),
           const SizedBox(width: 4),
           Text(_selectedCategoryName!,
-              style: const TextStyle(color: Colors.deepPurple, fontSize: 12)),
+              style: const TextStyle(color: Color(0xFFFF5900), fontSize: 12)),
           const SizedBox(width: 12),
         ],
         if (_selectedItemType != null) ...[
@@ -522,11 +518,11 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   }
 
   Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return Colors.deepPurple;
+    if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
     try {
       return Color(int.parse('FF${hex.replaceAll('#', '')}', radix: 16));
     } catch (_) {
-      return Colors.deepPurple;
+      return const Color(0xFFFF5900);
     }
   }
 

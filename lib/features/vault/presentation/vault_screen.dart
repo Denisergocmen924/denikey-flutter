@@ -38,11 +38,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   }
 
   Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return const Color(0xFF534AB7);
+    if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
     try {
       return Color(int.parse('FF${hex.replaceAll('#', '')}', radix: 16));
     } catch (_) {
-      return const Color(0xFF534AB7);
+      return const Color(0xFFFF5900);
     }
   }
 

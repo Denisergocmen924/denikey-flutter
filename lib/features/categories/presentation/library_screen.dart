@@ -17,7 +17,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
   late final TabController _tabController;
 
   final List<Color> _colorPalette = [
-    const Color(0xFF534AB7),
+    const Color(0xFFFF5900),
     const Color(0xFF185FA5),
     const Color(0xFF0F6E56),
     const Color(0xFF993C1D),
@@ -45,7 +45,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     MapEntry('email', Icons.email_outlined),
   ];
 
-  Color _selectedColor = const Color(0xFF534AB7);
+  Color _selectedColor = const Color(0xFFFF5900);
   String _selectedIcon = 'category';
 
   @override
@@ -70,12 +70,12 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
       '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
 
   Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return Colors.deepPurple;
+    if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
     try {
       final h = hex.replaceAll('#', '');
       return Color(int.parse('FF$h', radix: 16));
     } catch (_) {
-      return Colors.deepPurple;
+      return const Color(0xFFFF5900);
     }
   }
 

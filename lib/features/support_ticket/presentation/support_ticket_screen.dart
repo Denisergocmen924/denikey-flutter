@@ -134,11 +134,11 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      const Icon(Icons.support_agent, size: 16, color: Colors.deepPurple),
+                      Icon(Icons.support_agent, size: 16, color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 6),
-                      const Text(
+                      Text(
                         'Destek Yanıtı',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.deepPurple),
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
                       ),
                       if (repliedAt != null) ...[
                         const Spacer(),
@@ -154,13 +154,13 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEDE9FF),
+                      color: Theme.of(context).colorScheme.primaryContainer.withAlpha(80),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.deepPurple.withAlpha(60)),
+                      border: Border.all(color: Theme.of(context).colorScheme.primary.withAlpha(60)),
                     ),
                     child: Text(
                       adminReply,
-                      style: const TextStyle(fontSize: 14, height: 1.5, color: Color(0xFF3D3690)),
+                      style: TextStyle(fontSize: 14, height: 1.5, color: Theme.of(context).colorScheme.onPrimaryContainer),
                     ),
                   ),
                 ] else ...[
@@ -235,12 +235,12 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple.withAlpha(25),
+                      color: Theme.of(context).colorScheme.primary.withAlpha(25),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '${state.tickets.length}',
-                      style: const TextStyle(fontSize: 12, color: Colors.deepPurple, fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -257,7 +257,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: hasReply ? Colors.deepPurple.withAlpha(80) : Colors.grey.shade200,
+                      color: hasReply ? Theme.of(context).colorScheme.primary.withAlpha(80) : Colors.grey.shade200,
                     ),
                   ),
                   margin: const EdgeInsets.only(bottom: 8),
@@ -267,12 +267,12 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                     leading: CircleAvatar(
                       radius: 20,
                       backgroundColor: hasReply
-                          ? Colors.deepPurple.withAlpha(25)
+                          ? Theme.of(context).colorScheme.primary.withAlpha(25)
                           : Colors.grey.shade100,
                       child: Icon(
                         hasReply ? Icons.mark_email_read_outlined : Icons.mail_outline,
                         size: 20,
-                        color: hasReply ? Colors.deepPurple : Colors.grey,
+                        color: hasReply ? Theme.of(context).colorScheme.primary : Colors.grey,
                       ),
                     ),
                     title: Text(
@@ -285,7 +285,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                       hasReply ? 'Yanıtlandı' : 'Yanıt bekleniyor',
                       style: TextStyle(
                         fontSize: 12,
-                        color: hasReply ? Colors.deepPurple : Colors.grey,
+                        color: hasReply ? Theme.of(context).colorScheme.primary : Colors.grey,
                       ),
                     ),
                     trailing: Container(
@@ -379,7 +379,6 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                     onPressed: state.status == SupportTicketStatus.loading ? null : _submit,
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.deepPurple,
                     ),
                     child: state.status == SupportTicketStatus.loading
                         ? const SizedBox(

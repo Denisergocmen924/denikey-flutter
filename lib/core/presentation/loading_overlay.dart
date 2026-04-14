@@ -17,6 +17,15 @@ class LoadingOverlay extends StatefulWidget {
     loadingOverlayKey.currentState?.hide();
   }
 
+  /// Context gerektirmeden global key üzerinden çağrılabilir (provider'lardan kullanım için)
+  static void showGlobal({String? message}) {
+    loadingOverlayKey.currentState?.show(message: message);
+  }
+
+  static void hideGlobal() {
+    loadingOverlayKey.currentState?.hide();
+  }
+
   @override
   State<LoadingOverlay> createState() => LoadingOverlayState();
 }
@@ -25,7 +34,7 @@ class LoadingOverlayState extends State<LoadingOverlay>
     with SingleTickerProviderStateMixin {
   bool _visible = false;
   String? _message;
-  late final AnimationController _ctrl;
+  late final AnimationController _fadeCtrl;
   late final Animation<double> _fade;
 
   void show({String? message}) {
@@ -34,12 +43,12 @@ class LoadingOverlayState extends State<LoadingOverlay>
       _visible = true;
       _message = message;
     });
-    _ctrl.forward();
+    _fadeCtrl.forward();
   }
 
   void hide() {
     if (!mounted) return;
-    _ctrl.reverse().then((_) {
+    _fadeCtrl.reverse().then((_) {
       if (mounted) setState(() => _visible = false);
     });
   }
@@ -47,16 +56,16 @@ class LoadingOverlayState extends State<LoadingOverlay>
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
+    _fadeCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 220),
     );
-    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _fade = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _fadeCtrl.dispose();
     super.dispose();
   }
 
@@ -84,75 +93,166 @@ class _LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<_LoadingScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _rotCtrl;
+    with TickerProviderStateMixin {
+  late final AnimationController _pulseCtrl;
+  late final AnimationController _breatheCtrl;
+  late final Animation<double> _breatheAnim;
 
   @override
   void initState() {
     super.initState();
-    _rotCtrl = AnimationController(
+    // Yayılan halka animasyonu
+    _pulseCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 2000),
     )..repeat();
+
+    // Kalkan ikonu nefes animasyonu
+    _breatheCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    _breatheAnim = Tween<double>(begin: 0.90, end: 1.10).animate(
+      CurvedAnimation(parent: _breatheCtrl, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
-    _rotCtrl.dispose();
+    _pulseCtrl.dispose();
+    _breatheCtrl.dispose();
     super.dispose();
+  }
+
+  Widget _pulseRing(double progress, double delay, Color color, double maxR) {
+    final p = ((progress + delay) % 1.0);
+    final r = p * maxR;
+    final opacity = (1.0 - p) * 0.45;
+    return SizedBox(
+      width: r * 2,
+      height: r * 2,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: color.withOpacity(opacity),
+            width: 1.5,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    const orange = Color(0xFFFF5900);
+
     return Material(
       color: Colors.transparent,
       child: Container(
-        color: const Color(0xCC090C08), // %80 opaklık
+        color: const Color(0xD9090C08), // %85 opaklık
         alignment: Alignment.center,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Dönen kalkan
-            AnimatedBuilder(
-              animation: _rotCtrl,
-              builder: (_, child) => Transform.rotate(
-                angle: _rotCtrl.value * 2 * 3.14159,
-                child: child,
-              ),
-              child: Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFFFF5900),
-                    width: 3,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.shield_outlined,
-                  color: Color(0xFFFF5900),
-                  size: 32,
+            // Animasyonlu ikon alanı
+            SizedBox(
+              width: 130,
+              height: 130,
+              child: AnimatedBuilder(
+                animation: Listenable.merge([_pulseCtrl, _breatheCtrl]),
+                builder: (_, __) => Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // 3 kademeli yayılan halka
+                    _pulseRing(_pulseCtrl.value, 0.00, orange, 65),
+                    _pulseRing(_pulseCtrl.value, 0.33, orange, 65),
+                    _pulseRing(_pulseCtrl.value, 0.66, orange, 65),
+                    // Nefes alan merkez kalkan
+                    Transform.scale(
+                      scale: _breatheAnim.value,
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: orange.withOpacity(0.08),
+                          border: Border.all(color: orange, width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.shield_outlined,
+                          color: orange,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+            // DeniKey marka yazısı
+            RichText(
+              text: const TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Deni',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w300,
+                      color: Color(0xFFE8EDE9),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'Key',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: orange,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
             if (widget.message != null)
               Text(
                 widget.message!,
                 style: const TextStyle(
                   color: Color(0xFFE8EDE9),
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.3,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
                 ),
               )
             else
-              const Text(
-                'Yükleniyor...',
-                style: TextStyle(
-                  color: Color(0xFF9BABA4),
-                  fontSize: 14,
+              // Animasyonlu üç nokta
+              AnimatedBuilder(
+                animation: _pulseCtrl,
+                builder: (_, __) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(3, (i) {
+                    final phase = ((_pulseCtrl.value * 3.0) - i).clamp(0.0, 1.0);
+                    final opacity = phase < 0.5 ? phase * 2 : (1.0 - phase) * 2;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Opacity(
+                        opacity: 0.25 + 0.75 * opacity,
+                        child: const SizedBox(
+                          width: 6,
+                          height: 6,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xFF9BABA4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
                 ),
               ),
           ],

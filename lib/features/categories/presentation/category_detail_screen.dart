@@ -19,12 +19,12 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
   }
 
   Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return Colors.deepPurple;
+    if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
     try {
       final h = hex.replaceAll('#', '');
       return Color(int.parse('FF$h', radix: 16));
     } catch (_) {
-      return Colors.deepPurple;
+      return const Color(0xFFFF5900);
     }
   }
 

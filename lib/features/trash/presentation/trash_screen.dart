@@ -66,7 +66,6 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Çöp Kutusu'),
-        backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         actions: [
           if (state.items.isNotEmpty)

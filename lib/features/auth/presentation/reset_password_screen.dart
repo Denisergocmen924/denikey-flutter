@@ -74,7 +74,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 16),
-                  const Icon(Icons.verified_outlined, size: 64, color: Colors.deepPurple),
+                  const Icon(Icons.verified_outlined, size: 64, color: Color(0xFFFF5900)),
                   const SizedBox(height: 16),
                   const Text(
                     'Şifrenizi Sıfırlayın',
@@ -147,7 +147,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     onPressed: _loading ? null : _submit,
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.deepPurple,
                     ),
                     child: _loading
                         ? const SizedBox(

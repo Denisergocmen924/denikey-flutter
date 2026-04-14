@@ -56,7 +56,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.lock_reset, size: 64, color: Colors.deepPurple),
+                  const Icon(Icons.lock_reset, size: 64, color: Color(0xFFFF5900)),
                   const SizedBox(height: 16),
                   const Text(
                     'Şifre Sıfırlama',
@@ -89,7 +89,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     onPressed: _loading ? null : _submit,
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.deepPurple,
                     ),
                     child: _loading
                         ? const SizedBox(

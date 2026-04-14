@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../data/auth_repository.dart';
+import '../../../core/presentation/loading_overlay.dart';
 
 enum AuthStatus { idle, loading, success, needsDeviceVerification, error }
 
@@ -42,8 +43,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> login(String username, String password) async {
     state = state.copyWith(status: AuthStatus.loading);
+    LoadingOverlay.showGlobal(message: 'Giriş yapılıyor...');
     try {
       final result = await _repo.login(username: username, masterPassword: password);
+      LoadingOverlay.hideGlobal();
       if (result['needs_device_verification'] == true) {
         state = state.copyWith(
           status: AuthStatus.needsDeviceVerification,
@@ -55,6 +58,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = state.copyWith(status: AuthStatus.success);
       }
     } on DioException catch (e) {
+      LoadingOverlay.hideGlobal();
       final msg = e.response?.data['detail'] ?? 'Giriş başarısız.';
       state = state.copyWith(status: AuthStatus.error, errorMessage: msg.toString());
     }
@@ -62,18 +66,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> register(String username, String email, String password) async {
     state = state.copyWith(status: AuthStatus.loading);
+    LoadingOverlay.showGlobal(message: 'Hesap oluşturuluyor...');
     try {
       final result = await _repo.register(
         username: username,
         email: email,
         masterPassword: password,
       );
+      LoadingOverlay.hideGlobal();
       state = state.copyWith(
         status: AuthStatus.success,
         userId: result['user_id'],
         email: result['email'],
       );
     } on DioException catch (e) {
+      LoadingOverlay.hideGlobal();
       final msg = e.response?.data['detail'] ?? 'Kayıt başarısız.';
       state = state.copyWith(status: AuthStatus.error, errorMessage: msg.toString());
     }
