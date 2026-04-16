@@ -68,6 +68,9 @@ class AuthRepository {
       salt,
     );
     await SecureStorage.instance.saveMasterKey(masterKey);
+    await SecureStorage.instance.saveEncryptionSalt(salt);
+    final blob = await EncryptionService.instance.encrypt('denikey-verify', masterKey);
+    await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
 
     return {'needs_device_verification': false};
   }
@@ -102,6 +105,9 @@ class AuthRepository {
       salt,
     );
     await SecureStorage.instance.saveMasterKey(masterKey);
+    await SecureStorage.instance.saveEncryptionSalt(salt);
+    final blob = await EncryptionService.instance.encrypt('denikey-verify', masterKey);
+    await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
   }
 
   Future<String?> forgotPassword({required String email}) async {
@@ -159,6 +165,10 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
+    // Sunucuya bildir (token geçersizleştir); hata olsa da yerel temizlik yapılır
+    try {
+      await _dio.post(ApiConstants.logout);
+    } catch (_) {}
     await SecureStorage.instance.clearAll();
     await CacheService.instance.clearCache();
   }

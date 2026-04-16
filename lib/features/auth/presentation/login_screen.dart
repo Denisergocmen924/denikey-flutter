@@ -68,16 +68,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 48),
-                  Container(
-                    width: 80,
-                    height: 80,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: cs.primaryContainer,
-                      shape: BoxShape.circle,
+                  Center(
+                    child: Image.asset(
+                      'assets/icon/denikey_logo.png',
+                      width: 160,
                     ),
-                    child: Icon(Icons.shield,
-                      size: 44, color: cs.onPrimaryContainer),
                   ),
                   const SizedBox(height: 20),
                   Text(

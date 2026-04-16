@@ -86,6 +86,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> logout() async {
+    await _repo.logout();
+    state = const AuthState();
+  }
+
   void reset() => state = const AuthState();
 }
 

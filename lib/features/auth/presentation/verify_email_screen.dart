@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,15 +79,20 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             salt,
           );
           await SecureStorage.instance.saveMasterKey(masterKey);
+          await SecureStorage.instance.saveEncryptionSalt(salt);
+          final blob = await EncryptionService.instance.encrypt('denikey-verify', masterKey);
+          await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
         }
       }
 
       if (mounted) context.go('/vault');
+    } on DioException catch (e) {
+      final msg = e.response?.data?['detail']?.toString()
+          ?? e.message
+          ?? 'Sunucuya bağlanılamadı';
+      setState(() { _error = msg; _loading = false; });
     } catch (e) {
-      setState(() {
-        _error = 'Geçersiz veya süresi dolmuş kod';
-        _loading = false;
-      });
+      setState(() { _error = e.toString(); _loading = false; });
     }
   }
 

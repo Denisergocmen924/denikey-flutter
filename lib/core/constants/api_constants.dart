@@ -1,18 +1,8 @@
-import 'dart:io';
-
 class ApiConstants {
   ApiConstants._();
 
-  // Gerçek cihaz için: flutter run --dart-define=REAL_DEVICE=true -d <id>
-  static const bool _isRealDevice = bool.fromEnvironment('REAL_DEVICE');
-
   static String get baseUrl {
-    if (Platform.isAndroid) {
-      return _isRealDevice
-          ? 'http://127.0.0.1:8000'  // Gerçek cihaz + adb reverse
-          : 'http://10.0.2.2:8000';  // Emülatör
-    }
-    return 'http://127.0.0.1:8000';
+    return 'https://denikey-backend-production.up.railway.app';
   }
 
   // Auth
@@ -27,6 +17,7 @@ class ApiConstants {
   static const String changeEmail        = '/api/v1/auth/change-email';
   static const String confirmEmailChange = '/api/v1/auth/confirm-email-change';
   static const String updateProfile      = '/api/v1/auth/profile';
+  static const String logout             = '/api/v1/auth/logout';
 
   // Vault
   static const String vaultItems = '/api/v1/vault/items';

@@ -183,7 +183,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
         location == '/register' || location == '/lock') {
       return;
     }
-    ref.read(routerProvider).go('/lock');
+    ref.read(routerProvider).go('/master-lock');
   }
 
   @override

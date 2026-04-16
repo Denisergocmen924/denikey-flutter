@@ -1,84 +1,100 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
+/// Android: flutter_secure_storage (Android Keystore, şifreli)
+/// Linux:   shared_preferences (geliştirme ortamı, şifrelenmemiş)
 class SecureStorage {
   SecureStorage._();
   static final SecureStorage instance = SecureStorage._();
-  static const _storage = FlutterSecureStorage(
+
+  static const _secureStorage = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
-    lOptions: LinuxOptions(),
   );
-  static const _keyToken        = 'access_token';
-  static const _keyRefreshToken = 'refresh_token';
-  static const _keyMasterKey    = 'master_key';
-  static const _keyEmail        = 'email';
-  static const _keyDeviceId     = 'device_id';
-  static final Map<String, String> _memoryStorage = {};
+
+  static const _keyToken            = 'access_token';
+  static const _keyRefreshToken     = 'refresh_token';
+  static const _keyMasterKey        = 'master_key';
+  static const _keyEmail            = 'email';
+  static const _keyDeviceId         = 'device_id';
+  static const _keyEncryptionSalt   = 'encryption_salt';
+  static const _keyVerificationBlob = 'verification_blob';
+  static const _keyVerificationIv   = 'verification_iv';
+
   bool get _isLinux => Platform.isLinux;
 
+  Future<void> _write(String key, String value) async {
+    if (_isLinux) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(key, value);
+    } else {
+      await _secureStorage.write(key: key, value: value);
+    }
+  }
+
+  Future<String?> _read(String key) async {
+    if (_isLinux) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(key);
+    }
+    return _secureStorage.read(key: key);
+  }
+
+  Future<void> _delete(String key) async {
+    if (_isLinux) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(key);
+    } else {
+      await _secureStorage.delete(key: key);
+    }
+  }
+
   // TOKEN
-  Future<void> saveToken(String token) async {
-    if (_isLinux) { _memoryStorage[_keyToken] = token; return; }
-    await _storage.write(key: _keyToken, value: token);
-  }
-  Future<String?> getToken() async {
-    if (_isLinux) return _memoryStorage[_keyToken];
-    return _storage.read(key: _keyToken);
-  }
-  Future<void> deleteToken() async {
-    if (_isLinux) { _memoryStorage.remove(_keyToken); return; }
-    await _storage.delete(key: _keyToken);
-  }
+  Future<void> saveToken(String token) => _write(_keyToken, token);
+  Future<String?> getToken() => _read(_keyToken);
+  Future<void> deleteToken() => _delete(_keyToken);
 
   // REFRESH TOKEN
-  Future<void> saveRefreshToken(String token) async {
-    if (_isLinux) { _memoryStorage[_keyRefreshToken] = token; return; }
-    await _storage.write(key: _keyRefreshToken, value: token);
-  }
-  Future<String?> getRefreshToken() async {
-    if (_isLinux) return _memoryStorage[_keyRefreshToken];
-    return _storage.read(key: _keyRefreshToken);
-  }
-  Future<void> deleteRefreshToken() async {
-    if (_isLinux) { _memoryStorage.remove(_keyRefreshToken); return; }
-    await _storage.delete(key: _keyRefreshToken);
-  }
+  Future<void> saveRefreshToken(String token) => _write(_keyRefreshToken, token);
+  Future<String?> getRefreshToken() => _read(_keyRefreshToken);
+  Future<void> deleteRefreshToken() => _delete(_keyRefreshToken);
 
   // MASTER KEY
-  Future<void> saveMasterKey(List<int> key) async {
-    final encoded = base64Encode(key);
-    if (_isLinux) { _memoryStorage[_keyMasterKey] = encoded; return; }
-    await _storage.write(key: _keyMasterKey, value: encoded);
-  }
+  Future<void> saveMasterKey(List<int> key) =>
+      _write(_keyMasterKey, base64Encode(key));
   Future<List<int>?> getMasterKey() async {
-    final encoded = _isLinux
-        ? _memoryStorage[_keyMasterKey]
-        : await _storage.read(key: _keyMasterKey);
+    final encoded = await _read(_keyMasterKey);
     if (encoded == null) return null;
     return base64Decode(encoded);
   }
-  Future<void> deleteMasterKey() async {
-    if (_isLinux) { _memoryStorage.remove(_keyMasterKey); return; }
-    await _storage.delete(key: _keyMasterKey);
-  }
+  Future<void> deleteMasterKey() => _delete(_keyMasterKey);
 
   // EMAIL
-  Future<void> saveEmail(String email) async {
-    if (_isLinux) { _memoryStorage[_keyEmail] = email; return; }
-    await _storage.write(key: _keyEmail, value: email);
+  Future<void> saveEmail(String email) => _write(_keyEmail, email);
+  Future<String?> getEmail() => _read(_keyEmail);
+
+  // ENCRYPTION SALT
+  Future<void> saveEncryptionSalt(String salt) =>
+      _write(_keyEncryptionSalt, salt);
+  Future<String?> getEncryptionSalt() => _read(_keyEncryptionSalt);
+
+  // VERIFICATION BLOB
+  Future<void> saveVerificationBlob(String encrypted, String iv) async {
+    await _write(_keyVerificationBlob, encrypted);
+    await _write(_keyVerificationIv, iv);
   }
-  Future<String?> getEmail() async {
-    if (_isLinux) return _memoryStorage[_keyEmail];
-    return _storage.read(key: _keyEmail);
+  Future<Map<String, String>?> getVerificationBlob() async {
+    final encrypted = await _read(_keyVerificationBlob);
+    final iv        = await _read(_keyVerificationIv);
+    if (encrypted == null || iv == null) return null;
+    return {'encrypted': encrypted, 'iv': iv};
   }
 
   // DEVICE ID
   Future<String> getDeviceId() async {
-    final cached = _isLinux
-        ? _memoryStorage[_keyDeviceId]
-        : await _storage.read(key: _keyDeviceId);
+    final cached = await _read(_keyDeviceId);
     if (cached != null) return cached;
 
     final deviceInfo = DeviceInfoPlugin();
@@ -106,17 +122,17 @@ class SecureStorage {
       id = 'fallback-device';
     }
 
-    if (_isLinux) {
-      _memoryStorage[_keyDeviceId] = id;
-    } else {
-      await _storage.write(key: _keyDeviceId, value: id);
-    }
+    await _write(_keyDeviceId, id);
     return id;
   }
 
   // CLEAR ALL
   Future<void> clearAll() async {
-    if (_isLinux) { _memoryStorage.clear(); return; }
-    await _storage.deleteAll();
+    if (_isLinux) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+    } else {
+      await _secureStorage.deleteAll();
+    }
   }
 }

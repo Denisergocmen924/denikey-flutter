@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.denikey" "\0"
-            VALUE "FileDescription", "denikey_app" "\0"
+            VALUE "CompanyName", "DeniKey" "\0"
+            VALUE "FileDescription", "DeniKey - Sıfır Bilgi Şifre Yöneticisi" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "denikey_app" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.denikey. All rights reserved." "\0"
-            VALUE "OriginalFilename", "denikey_app.exe" "\0"
-            VALUE "ProductName", "denikey_app" "\0"
+            VALUE "InternalName", "DeniKey" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 DeniKey. All rights reserved." "\0"
+            VALUE "OriginalFilename", "DeniKey.exe" "\0"
+            VALUE "ProductName", "DeniKey" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

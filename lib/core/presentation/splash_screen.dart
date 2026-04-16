@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../storage/secure_storage.dart';
-import '../biometric/biometric_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -92,15 +91,8 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
     if (token == null) {
       context.go('/login');
-      return;
-    }
-    final biometricEnabled = await BiometricService.instance.isEnabled();
-    final biometricAvailable = await BiometricService.instance.isAvailable();
-    if (!mounted) return;
-    if (biometricEnabled && biometricAvailable) {
-      context.go('/lock');
     } else {
-      context.go('/vault');
+      context.go('/master-lock');
     }
   }
 
@@ -154,26 +146,9 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _shieldFade.value.clamp(0.0, 1.0),
                     child: Transform.scale(
                       scale: _shieldScale.value * _pulse.value,
-                      child: Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _jet,
-                          border: Border.all(color: _orange.withAlpha(180), width: 2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _orange.withAlpha(60),
-                              blurRadius: 32,
-                              spreadRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.shield,
-                          color: _orange,
-                          size: 64,
-                        ),
+                      child: Image.asset(
+                        'assets/icon/denikey_logo.png',
+                        width: 200,
                       ),
                     ),
                   ),
