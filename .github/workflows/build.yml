@@ -3,6 +3,8 @@ name: DeniKey Build
 on:
   push:
     branches: [main]
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -50,10 +52,14 @@ jobs:
           if (Test-Path "windows_setup\install.ps1") {
             Copy-Item "windows_setup\install.ps1" "$releaseDir\install.ps1"
           }
+      - name: Windows ZIP oluştur
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "DeniKey-Windows.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: DeniKey-Windows
-          path: build/windows/x64/runner/Release/
+          path: DeniKey-Windows.zip
 
   build-linux:
     name: Linux Binary
@@ -74,7 +80,61 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter build linux --release
+      - name: Linux tar.gz oluştur
+        run: |
+          tar -czf DeniKey-Linux.tar.gz -C build/linux/x64/release/bundle .
       - uses: actions/upload-artifact@v4
         with:
           name: DeniKey-Linux
-          path: build/linux/x64/release/bundle/
+          path: DeniKey-Linux.tar.gz
+
+  release:
+    name: GitHub Release
+    needs: [build-android, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Android artifact indir
+        uses: actions/download-artifact@v4
+        with:
+          name: DeniKey-Android
+          path: release-files/
+      - name: Windows artifact indir
+        uses: actions/download-artifact@v4
+        with:
+          name: DeniKey-Windows
+          path: release-files/
+      - name: Linux artifact indir
+        uses: actions/download-artifact@v4
+        with:
+          name: DeniKey-Linux
+          path: release-files/
+      - name: Dosyaları yeniden adlandır
+        run: |
+          mv release-files/app-release.apk release-files/DeniKey-Android.apk
+      - name: GitHub Release oluştur
+        uses: softprops/action-gh-release@v2
+        with:
+          name: DeniKey ${{ github.ref_name }}
+          body: |
+            ## DeniKey ${{ github.ref_name }}
+
+            ### İndirme Linkleri
+            | Platform | Dosya |
+            |----------|-------|
+            | Android | `DeniKey-Android.apk` |
+            | Windows | `DeniKey-Windows.zip` |
+            | Linux | `DeniKey-Linux.tar.gz` |
+
+            ### Kurulum
+            - **Android:** APK'yı indir, "Bilinmeyen kaynaklardan yükle" izni ver, kur.
+            - **Windows:** ZIP'i aç, `install.ps1` scriptini yönetici olarak çalıştır.
+            - **Linux:** `tar -xzf DeniKey-Linux.tar.gz` ile aç, `DeniKey` binary'sini çalıştır.
+          files: |
+            release-files/DeniKey-Android.apk
+            release-files/DeniKey-Windows.zip
+            release-files/DeniKey-Linux.tar.gz
+          draft: false
+          prerelease: false
