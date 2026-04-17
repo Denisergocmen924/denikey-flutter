@@ -127,8 +127,8 @@ jobs:
           path: release-files/
       - name: Dosyaları yeniden adlandır
         run: |
-          mv release-files/app-release.apk release-files/DeniKey-Android.apk
-          mv release-files/app-release.aab release-files/DeniKey-Android.aab
+          find release-files -name "app-release.apk" -exec mv {} release-files/DeniKey-Android.apk \;
+          find release-files -name "app-release.aab" -exec mv {} release-files/DeniKey-Android.aab \;
       - name: GitHub Release oluştur
         uses: softprops/action-gh-release@v2
         with:
