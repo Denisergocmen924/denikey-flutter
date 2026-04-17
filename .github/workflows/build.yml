@@ -64,14 +64,16 @@ jobs:
           if (Test-Path "windows_setup\install.ps1") {
             Copy-Item "windows_setup\install.ps1" "$releaseDir\install.ps1"
           }
-      - name: Windows ZIP oluştur
+      - name: Inno Setup kur
+        run: choco install innosetup --yes
+      - name: Installer oluştur
         shell: pwsh
         run: |
-          Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "DeniKey-Windows.zip"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "windows_setup\installer.iss"
       - uses: actions/upload-artifact@v4
         with:
           name: DeniKey-Windows
-          path: DeniKey-Windows.zip
+          path: windows_setup\installer_output\DeniKey-Setup.exe
 
   build-linux:
     name: Linux Binary
@@ -138,17 +140,17 @@ jobs:
             | Platform | Dosya |
             |----------|-------|
             | Android | `DeniKey-Android.apk` |
-            | Windows | `DeniKey-Windows.zip` |
+            | Windows | `DeniKey-Setup.exe` |
             | Linux | `DeniKey-Linux.tar.gz` |
 
             ### Kurulum
             - **Android:** APK'yı indir, "Bilinmeyen kaynaklardan yükle" izni ver, kur.
-            - **Windows:** ZIP'i aç, `install.ps1` scriptini yönetici olarak çalıştır.
+            - **Windows:** `DeniKey-Setup.exe` dosyasını indir ve çalıştır.
             - **Linux:** `tar -xzf DeniKey-Linux.tar.gz` ile aç, `DeniKey` binary'sini çalıştır.
           files: |
             release-files/DeniKey-Android.apk
             release-files/DeniKey-Android.aab
-            release-files/DeniKey-Windows.zip
+            release-files/DeniKey-Setup.exe
             release-files/DeniKey-Linux.tar.gz
           draft: false
           prerelease: false
