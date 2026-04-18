@@ -22,10 +22,9 @@ import '../../features/support_ticket/presentation/support_ticket_screen.dart';
 import '../../features/trash/presentation/trash_screen.dart';
 import '../presentation/splash_screen.dart';
 
-final routerProvider = Provider<GoRouter>((ref) {
-  return GoRouter(
-    initialLocation: '/splash',
-    routes: [
+final router = GoRouter(
+  initialLocation: '/splash',
+  routes: [
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
@@ -142,6 +141,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SearchScreen(),
       ),
     ],
-  );
-});
+);
+
+final routerProvider = Provider<GoRouter>((ref) => router);
 

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../constants/api_constants.dart';
 import '../storage/secure_storage.dart';
+import '../router/app_router.dart';
 
 class DioClient {
   DioClient._();
@@ -97,7 +98,7 @@ class _JwtInterceptor extends Interceptor {
   }
 
   Future<void> _clearSession() async {
-    await SecureStorage.instance.deleteToken();
-    await SecureStorage.instance.deleteRefreshToken();
+    await SecureStorage.instance.clearAll();
+    router.go('/login');
   }
 }
