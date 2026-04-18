@@ -5,6 +5,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/router/app_router.dart';
 import 'core/providers/theme_provider.dart';
+import 'core/providers/auto_lock_provider.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/presentation/loading_overlay.dart';
 import 'core/presentation/app_shortcuts.dart';
@@ -174,6 +175,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
   void onWindowFocus() async {
     if (!_wasBlurred) return;
     _wasBlurred = false;
+    if (!ref.read(autoLockProvider)) return;
     final token = await SecureStorage.instance.getToken();
     if (token == null) return;
     if (!mounted) return;

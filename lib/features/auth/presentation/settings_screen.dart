@@ -6,6 +6,7 @@ import '../providers/profile_provider.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/providers/shortcuts_provider.dart';
+import '../../../core/providers/auto_lock_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
 import '../../../core/presentation/app_shortcuts.dart';
@@ -226,6 +227,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               value: _biometricEnabled,
               onChanged: _toggleBiometric,
             ),
+          Consumer(
+            builder: (context, ref, _) {
+              final autoLock = ref.watch(autoLockProvider);
+              final cs = Theme.of(context).colorScheme;
+              return SwitchListTile(
+                secondary: Icon(
+                  autoLock ? Icons.lock : Icons.lock_open_outlined,
+                  color: autoLock ? cs.primary : null,
+                ),
+                title: const Text('Otomatik Kilit'),
+                subtitle: const Text(
+                  'Uygulamadan çıkınca master şifre iste',
+                  style: TextStyle(fontSize: 12),
+                ),
+                value: autoLock,
+                onChanged: (val) =>
+                    ref.read(autoLockProvider.notifier).toggle(val),
+              );
+            },
+          ),
           Consumer(
             builder: (context, ref, _) {
               final shortcutsEnabled = ref.watch(shortcutsProvider);
