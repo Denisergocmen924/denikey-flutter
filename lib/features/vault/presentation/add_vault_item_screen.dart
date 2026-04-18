@@ -28,6 +28,10 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   // Başlık alanı (her tip için ortak)
   final _titleCtrl = TextEditingController();
 
+  // Form hata mesajları
+  String? _titleError;
+  final Map<String, String?> _fieldErrors = {};
+
   // Ek özel alanlar
   final List<Map<String, TextEditingController>> _extraFields = [];
 
@@ -73,6 +77,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
 
     setState(() {
       _selectedItemType = itemType;
+      _fieldErrors.clear();
       _step = 2;
     });
   }
@@ -87,14 +92,26 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   }
 
   Future<void> _save() async {
+    bool hasError = false;
+
     if (_titleCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Başlık zorunludur')),
-      );
-      return;
+      setState(() => _titleError = 'Başlık boş bırakılamaz');
+      hasError = true;
     }
 
     final fields = (_selectedItemType?['fields'] as List<dynamic>? ?? []);
+
+    for (final field in fields) {
+      final id = field['id'] as String;
+      final isRequired = field['is_required'] as bool? ?? false;
+      if (isRequired && (_fieldControllers[id]?.text.trim().isEmpty ?? true)) {
+        final label = field['field_name_tr'] as String? ?? 'Alan';
+        setState(() => _fieldErrors[id] = '$label boş bırakılamaz');
+        hasError = true;
+      }
+    }
+
+    if (hasError) return;
 
     // İlk secret alanı → password
     String password = '';
@@ -356,10 +373,14 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           // Başlık
           TextField(
             controller: _titleCtrl,
-            decoration: const InputDecoration(
+            onChanged: (_) {
+              if (_titleError != null) setState(() => _titleError = null);
+            },
+            decoration: InputDecoration(
               labelText: 'Başlık *',
               hintText: 'Örn: Instagram, Gmail, Netflix',
-              border: OutlineInputBorder(),
+              errorText: _titleError,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
@@ -443,8 +464,12 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
         controller: ctrl,
         obscureText: isSecret ? (_obscureFields[id] ?? true) : false,
         keyboardType: fieldType == 'number' ? TextInputType.number : TextInputType.text,
+        onChanged: (_) {
+          if (_fieldErrors[id] != null) setState(() => _fieldErrors[id] = null);
+        },
         decoration: InputDecoration(
           labelText: isRequired ? '$label *' : label,
+          errorText: _fieldErrors[id],
           border: const OutlineInputBorder(),
           suffixIcon: isSecret
               ? IconButton(

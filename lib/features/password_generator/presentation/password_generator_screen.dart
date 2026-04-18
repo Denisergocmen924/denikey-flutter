@@ -58,8 +58,23 @@ class PasswordGeneratorScreen extends ConsumerWidget {
                         Clipboard.setData(
                           ClipboardData(text: state.generatedPassword!),
                         );
+                        Future.delayed(const Duration(seconds: 30), () {
+                          Clipboard.setData(const ClipboardData(text: ''));
+                        });
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Şifre kopyalandı')),
+                          SnackBar(
+                            content: const Row(
+                              children: [
+                                Icon(Icons.check_circle_outline,
+                                    color: Colors.white, size: 18),
+                                SizedBox(width: 8),
+                                Text('Şifre kopyalandı, 30 sn sonra silinecek'),
+                              ],
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
                         );
                       },
                     ),

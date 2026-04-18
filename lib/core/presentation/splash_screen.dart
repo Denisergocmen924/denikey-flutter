@@ -17,6 +17,7 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _textCtrl;
   late final AnimationController _lineCtrl;
   late final AnimationController _pulseCtrl;
+  late final AnimationController _ringCtrl;
 
   // Arka plan parlaması
   late final Animation<double> _bgGlow;
@@ -36,6 +37,10 @@ class _SplashScreenState extends State<SplashScreen>
   // Kalkan nabız
   late final Animation<double> _pulse;
 
+  // Logo etrafında genişleyen halka
+  late final Animation<double> _ringScale;
+  late final Animation<double> _ringOpacity;
+
   static const _onyx   = Color(0xFF090C08);
   static const _jet    = Color(0xFF223841);
   static const _orange = Color(0xFFFF5900);
@@ -50,6 +55,7 @@ class _SplashScreenState extends State<SplashScreen>
     _lineCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
     _pulseCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))
       ..repeat(reverse: true);
+    _ringCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
 
     _bgGlow = CurvedAnimation(parent: _bgCtrl, curve: Curves.easeIn);
 
@@ -70,6 +76,11 @@ class _SplashScreenState extends State<SplashScreen>
     _pulse = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
 
+    _ringScale = Tween<double>(begin: 1.0, end: 2.4).animate(
+      CurvedAnimation(parent: _ringCtrl, curve: Curves.easeOut));
+    _ringOpacity = Tween<double>(begin: 0.8, end: 0.0).animate(
+      CurvedAnimation(parent: _ringCtrl, curve: Curves.easeOut));
+
     _runSequence();
   }
 
@@ -78,6 +89,7 @@ class _SplashScreenState extends State<SplashScreen>
     _bgCtrl.forward();
     await Future.delayed(const Duration(milliseconds: 300));
     _shieldCtrl.forward();
+    _ringCtrl.forward();
     await Future.delayed(const Duration(milliseconds: 500));
     _textCtrl.forward();
     await Future.delayed(const Duration(milliseconds: 300));
@@ -103,6 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
     _textCtrl.dispose();
     _lineCtrl.dispose();
     _pulseCtrl.dispose();
+    _ringCtrl.dispose();
     super.dispose();
   }
 
@@ -139,18 +152,44 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Kalkan ikonu
-                AnimatedBuilder(
-                  animation: Listenable.merge([_shieldCtrl, _pulseCtrl]),
-                  builder: (context, child) => Opacity(
-                    opacity: _shieldFade.value.clamp(0.0, 1.0),
-                    child: Transform.scale(
-                      scale: _shieldScale.value * _pulse.value,
-                      child: Image.asset(
-                        'assets/icon/denikey_logo.png',
-                        width: 200,
+                // Kalkan ikonu + halka patlaması
+                SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      AnimatedBuilder(
+                        animation: _ringCtrl,
+                        builder: (_, __) => Opacity(
+                          opacity: _ringOpacity.value,
+                          child: Transform.scale(
+                            scale: _ringScale.value,
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: _orange, width: 2.5),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      AnimatedBuilder(
+                        animation: Listenable.merge([_shieldCtrl, _pulseCtrl]),
+                        builder: (context, child) => Opacity(
+                          opacity: _shieldFade.value.clamp(0.0, 1.0),
+                          child: Transform.scale(
+                            scale: _shieldScale.value * _pulse.value,
+                            child: Image.asset(
+                              'assets/icon/denikey_logo.png',
+                              width: 200,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
