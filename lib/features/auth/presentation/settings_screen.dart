@@ -231,19 +231,49 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             builder: (context, ref, _) {
               final autoLock = ref.watch(autoLockProvider);
               final cs = Theme.of(context).colorScheme;
-              return SwitchListTile(
-                secondary: Icon(
-                  autoLock ? Icons.lock : Icons.lock_open_outlined,
-                  color: autoLock ? cs.primary : null,
-                ),
-                title: const Text('Otomatik Kilit'),
-                subtitle: const Text(
-                  'Uygulamadan çıkınca master şifre iste',
-                  style: TextStyle(fontSize: 12),
-                ),
-                value: autoLock,
-                onChanged: (val) =>
-                    ref.read(autoLockProvider.notifier).toggle(val),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SwitchListTile(
+                    secondary: Icon(
+                      autoLock.enabled ? Icons.lock : Icons.lock_open_outlined,
+                      color: autoLock.enabled ? cs.primary : null,
+                    ),
+                    title: const Text('Otomatik Kilit'),
+                    subtitle: Text(
+                      autoLock.enabled
+                          ? (autoLock.minutes == null
+                              ? 'Süresiz — odaklanmada kilitle'
+                              : '${autoLock.minutes} dk sonra kilitle')
+                          : 'Uygulamadan çıkınca master şifre iste',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    value: autoLock.enabled,
+                    onChanged: (val) =>
+                        ref.read(autoLockProvider.notifier).toggle(val),
+                  ),
+                  if (autoLock.enabled)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(56, 0, 16, 12),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          for (final option in [
+                            null, 1, 2, 5, 10, 20, 30, 60, 120
+                          ])
+                            ChoiceChip(
+                              label: Text(
+                                  option == null ? 'Süresiz' : '$option dk'),
+                              selected: autoLock.minutes == option,
+                              onSelected: (_) => ref
+                                  .read(autoLockProvider.notifier)
+                                  .setMinutes(option),
+                            ),
+                        ],
+                      ),
+                    ),
+                ],
               );
             },
           ),

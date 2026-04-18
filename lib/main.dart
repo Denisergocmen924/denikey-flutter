@@ -149,6 +149,7 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> with WindowListener {
   bool _wasBlurred = false;
+  DateTime? _blurTime;
 
   @override
   void initState() {
@@ -169,13 +170,15 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
   @override
   void onWindowBlur() {
     _wasBlurred = true;
+    _blurTime = DateTime.now();
   }
 
   @override
   void onWindowFocus() async {
     if (!_wasBlurred) return;
     _wasBlurred = false;
-    if (!ref.read(autoLockProvider)) return;
+    final autoLock = ref.read(autoLockProvider);
+    if (!autoLock.enabled) return;
     final token = await SecureStorage.instance.getToken();
     if (token == null) return;
     if (!mounted) return;
@@ -184,6 +187,11 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
     if (location == '/splash' || location == '/login' ||
         location == '/register' || location == '/lock') {
       return;
+    }
+    // Süre kontrolü: minutes null ise süresiz → her zaman kilitle
+    if (autoLock.minutes != null && _blurTime != null) {
+      final elapsed = DateTime.now().difference(_blurTime!).inMinutes;
+      if (elapsed < autoLock.minutes!) return;
     }
     ref.read(routerProvider).go('/master-lock');
   }

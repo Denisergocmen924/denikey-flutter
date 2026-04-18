@@ -458,32 +458,49 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     final ctrl = _fieldControllers[id];
     if (ctrl == null) return const SizedBox.shrink();
 
+    final textField = TextField(
+      controller: ctrl,
+      obscureText: isSecret ? (_obscureFields[id] ?? true) : false,
+      keyboardType: fieldType == 'number' ? TextInputType.number : TextInputType.text,
+      onChanged: (_) {
+        if (_fieldErrors[id] != null) setState(() => _fieldErrors[id] = null);
+      },
+      decoration: InputDecoration(
+        labelText: isRequired ? '$label *' : label,
+        errorText: _fieldErrors[id],
+        border: const OutlineInputBorder(),
+        suffixIcon: isSecret
+            ? IconButton(
+                icon: Icon(
+                  (_obscureFields[id] ?? true)
+                      ? Icons.visibility_off
+                      : Icons.visibility,
+                ),
+                onPressed: () => setState(
+                  () => _obscureFields[id] = !(_obscureFields[id] ?? true),
+                ),
+              )
+            : null,
+      ),
+    );
+
+    if (!isSecret) {
+      return Padding(
+          padding: const EdgeInsets.only(bottom: 12), child: textField);
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: ctrl,
-        obscureText: isSecret ? (_obscureFields[id] ?? true) : false,
-        keyboardType: fieldType == 'number' ? TextInputType.number : TextInputType.text,
-        onChanged: (_) {
-          if (_fieldErrors[id] != null) setState(() => _fieldErrors[id] = null);
-        },
-        decoration: InputDecoration(
-          labelText: isRequired ? '$label *' : label,
-          errorText: _fieldErrors[id],
-          border: const OutlineInputBorder(),
-          suffixIcon: isSecret
-              ? IconButton(
-                  icon: Icon(
-                    (_obscureFields[id] ?? true)
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
-                  onPressed: () => setState(
-                    () => _obscureFields[id] = !(_obscureFields[id] ?? true),
-                  ),
-                )
-              : null,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textField,
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: ctrl,
+            builder: (_, value, __) =>
+                _PasswordStrengthIndicator(password: value.text),
+          ),
+        ],
       ),
     );
   }
@@ -570,5 +587,69 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       default:
         return Icons.category_outlined;
     }
+  }
+}
+
+class _PasswordStrengthIndicator extends StatelessWidget {
+  final String password;
+  const _PasswordStrengthIndicator({required this.password});
+
+  static const _labels = ['Çok Zayıf', 'Zayıf', 'Orta', 'Güçlü', 'Çok Güçlü'];
+  static const _colors = [
+    Color(0xFFE53935),
+    Color(0xFFFF7043),
+    Color(0xFFFFB300),
+    Color(0xFF7CB342),
+    Color(0xFF43A047),
+  ];
+
+  int _level() {
+    if (password.isEmpty) return -1;
+    int score = 0;
+    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
+    if (password.length >= 16) score++;
+    if (RegExp(r'[A-Z]').hasMatch(password)) score++;
+    if (RegExp(r'[a-z]').hasMatch(password)) score++;
+    if (RegExp(r'[0-9]').hasMatch(password)) score++;
+    if (RegExp(r'[^A-Za-z0-9]').hasMatch(password)) score++;
+    if (score <= 1) return 0;
+    if (score <= 3) return 1;
+    if (score == 4) return 2;
+    if (score == 5) return 3;
+    return 4;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final level = _level();
+    if (level < 0) return const SizedBox.shrink();
+    final color = _colors[level];
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: List.generate(5, (i) => Expanded(
+              child: Container(
+                height: 4,
+                margin: EdgeInsets.only(right: i < 4 ? 4 : 0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(2),
+                  color: i <= level ? color : color.withAlpha(40),
+                ),
+              ),
+            )),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _labels[level],
+            style: TextStyle(
+                fontSize: 11, color: color, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
   }
 }
