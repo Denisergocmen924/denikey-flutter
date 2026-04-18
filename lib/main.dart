@@ -26,6 +26,7 @@ void main() async {
     );
     await windowManager.waitUntilReadyToShow(options, () async {
       await windowManager.show();
+      await Future.delayed(const Duration(milliseconds: 150));
       await windowManager.maximize();
       await windowManager.focus();
     });

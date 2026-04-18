@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/vault_provider.dart';
 import '../data/vault_repository.dart';
 import '../../../core/network/dio_client.dart';
@@ -28,6 +30,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   bool _saving = false;
   String? _saveError;
 
+  // Link açma onayı — "bir daha sorma" tercihi
+  bool _linkNoAsk = false;
+
   final _titleCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   // custom fields — her biri {key: ctrl, value: ctrl}
@@ -37,6 +42,12 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   void initState() {
     super.initState();
     _loadItem();
+    _loadLinkPref();
+  }
+
+  Future<void> _loadLinkPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) setState(() => _linkNoAsk = prefs.getBool('link_no_ask') ?? false);
   }
 
   @override
@@ -162,6 +173,51 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
     }
   }
 
+  bool _isUrl(String value) =>
+      value.startsWith('http://') || value.startsWith('https://');
+
+  Future<void> _openLink(String url) async {
+    if (_linkNoAsk) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      return;
+    }
+
+    if (!mounted) return;
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Dış Link'),
+        content: Text(
+          'DeniKey bu bağlantıyı açmak üzere:\n\n$url',
+          style: const TextStyle(fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'cancel'),
+            child: const Text('İzin Verme'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'once'),
+            child: const Text('Bu Seferlik'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, 'noask'),
+            child: const Text('Bir Daha Sorma'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == 'noask') {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('link_no_ask', true);
+      if (mounted) setState(() => _linkNoAsk = true);
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } else if (result == 'once') {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    }
+  }
+
   void _copyToClipboard(String value, String label) {
     Clipboard.setData(ClipboardData(text: value));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -279,7 +335,16 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
           subtitle: Text(
             isSecret && !_showPassword ? '••••••••' : value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: (!isSecret && _isUrl(value))
+                  ? const Color(0xFF4FC3F7)
+                  : null,
+              decoration: (!isSecret && _isUrl(value))
+                  ? TextDecoration.underline
+                  : null,
+            ),
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -288,6 +353,12 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                 IconButton(
                   icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
                   onPressed: () => setState(() => _showPassword = !_showPassword),
+                ),
+              if (!isSecret && _isUrl(value))
+                IconButton(
+                  icon: const Icon(Icons.open_in_new, size: 20),
+                  tooltip: 'Linki Aç',
+                  onPressed: () => _openLink(value),
                 ),
               IconButton(
                 icon: const Icon(Icons.copy, size: 20),

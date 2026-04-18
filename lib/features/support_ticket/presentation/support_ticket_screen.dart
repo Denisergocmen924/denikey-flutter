@@ -123,10 +123,14 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: Theme.of(context).colorScheme.surfaceContainerLow,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(ticket['message'] ?? '', style: const TextStyle(fontSize: 14, height: 1.5)),
+                  child: Text(ticket['message'] ?? '',
+                      style: TextStyle(
+                          fontSize: 14,
+                          height: 1.5,
+                          color: Theme.of(context).colorScheme.onSurface)),
                 ),
 
                 // Admin yanıtı

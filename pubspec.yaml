@@ -23,6 +23,7 @@ dependencies:
   shared_preferences: ^2.3.0
   flutter_local_notifications: ^18.0.0
   window_manager: ^0.3.9
+  url_launcher: ^6.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
