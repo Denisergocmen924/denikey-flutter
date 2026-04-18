@@ -25,8 +25,8 @@ void main() async {
       title: 'DeniKey',
     );
     await windowManager.waitUntilReadyToShow(options, () async {
-      await windowManager.maximize();
       await windowManager.show();
+      await windowManager.maximize();
       await windowManager.focus();
     });
   }
