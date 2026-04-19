@@ -41,6 +41,11 @@ class TrayService with TrayListener {
   }
 
   @override
+  void onTrayIconRightMouseUp() {
+    trayManager.popUpContextMenu();
+  }
+
+  @override
   void onTrayMenuItemClick(MenuItem menuItem) async {
     switch (menuItem.key) {
       case 'show':
