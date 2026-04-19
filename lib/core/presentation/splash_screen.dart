@@ -175,7 +175,7 @@ class _SplashScreenState extends State<SplashScreen>
                     children: [
                       AnimatedBuilder(
                         animation: _ringCtrl,
-                        builder: (_, __) => Opacity(
+                        builder: (ctx, child) => Opacity(
                           opacity: _ringOpacity.value,
                           child: Transform.scale(
                             scale: _ringScale.value,
@@ -281,7 +281,7 @@ class _SplashScreenState extends State<SplashScreen>
             right: 0,
             child: FadeTransition(
               opacity: _bgGlow,
-              child: const Text(
+              child: Text(
                 _version.isEmpty ? '' : 'v$_version',
                 textAlign: TextAlign.center,
                 style: TextStyle(
