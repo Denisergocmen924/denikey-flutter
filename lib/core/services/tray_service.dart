@@ -17,10 +17,11 @@ class TrayService with TrayListener {
       'flutter_assets',
       'assets',
       'icon',
-      'denikey_logo.png',
+      'denikey.ico',
     );
 
     await trayManager.setIcon(iconPath);
+    await trayManager.setToolTip('DeniKey');
     await trayManager.setContextMenu(Menu(items: [
       MenuItem(key: 'show', label: 'DeniKey\'i Aç'),
       MenuItem.separator(),
@@ -28,8 +29,9 @@ class TrayService with TrayListener {
     ]));
   }
 
-  void dispose() {
+  Future<void> destroy() async {
     trayManager.removeListener(this);
+    await trayManager.destroy();
   }
 
   @override
@@ -39,14 +41,14 @@ class TrayService with TrayListener {
   }
 
   @override
-  void onTrayMenuItemClick(MenuItem menuItem) {
+  void onTrayMenuItemClick(MenuItem menuItem) async {
     switch (menuItem.key) {
       case 'show':
         windowManager.show();
         windowManager.focus();
       case 'exit':
-        trayManager.destroy();
-        windowManager.destroy();
+        await destroy();
+        await windowManager.destroy();
     }
   }
 }

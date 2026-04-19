@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -13,8 +14,44 @@ import 'core/presentation/app_shortcuts.dart';
 import 'core/storage/secure_storage.dart';
 import 'core/services/tray_service.dart';
 
+// Tek instance kilidi için sabit port
+const _kSingleInstancePort = 47821;
+
+Future<ServerSocket?> _acquireSingleInstanceLock() async {
+  try {
+    // Bu port'u bind edebildiysek → ilk instance'ız
+    return await ServerSocket.bind(InternetAddress.loopbackIPv4, _kSingleInstancePort);
+  } on SocketException {
+    // Port zaten dolu → başka instance var, onu uyar ve çık
+    try {
+      final socket = await Socket.connect(InternetAddress.loopbackIPv4, _kSingleInstancePort,
+          timeout: const Duration(seconds: 1));
+      socket.write('show');
+      await socket.flush();
+      await socket.close();
+    } catch (_) {}
+    return null;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows) {
+    final server = await _acquireSingleInstanceLock();
+    if (server == null) {
+      // Başka instance var, o pencereyi öne getirdi, bu process çıkıyor
+      exit(0);
+    }
+    // Gelen 'show' mesajlarını dinle (başka instance tetiklediğinde)
+    server.listen((client) {
+      client.listen((_) {
+        windowManager.show();
+        windowManager.focus();
+        client.destroy();
+      });
+    });
+  }
+
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -188,14 +225,13 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       windowManager.removeListener(this);
     }
-    if (Platform.isWindows) TrayService.instance.dispose();
     super.dispose();
   }
 
   @override
   void onWindowClose() async {
     if (!Platform.isWindows) return;
-    // Boyut ve pozisyonu kaydet
+    // Boyut ve pozisyonu kaydet, sonra tamamen kapat
     final size = await windowManager.getSize();
     final pos = await windowManager.getPosition();
     final prefs = await SharedPreferences.getInstance();
@@ -203,8 +239,8 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
     await prefs.setDouble('win_h', size.height);
     await prefs.setDouble('win_x', pos.dx);
     await prefs.setDouble('win_y', pos.dy);
-    // Tray'e gizle
-    await windowManager.hide();
+    await TrayService.instance.destroy();
+    await windowManager.destroy();
   }
 
   @override
