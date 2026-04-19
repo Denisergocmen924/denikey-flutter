@@ -16,6 +16,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
 
   String _category = 'bug';
   String _priority = 'normal';
+  bool _ticketsExpanded = false;
 
   static const _categories = {
     'bug': 'Hata Bildirimi',
@@ -232,23 +233,36 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                 child: CircularProgressIndicator(),
               ))
             else if (state.tickets.isNotEmpty) ...[
-              Row(
-                children: [
-                  const Text('Taleplerim', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withAlpha(25),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '${state.tickets.length}',
-                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
-                    ),
+              InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => setState(() => _ticketsExpanded = !_ticketsExpanded),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      const Text('Taleplerim', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withAlpha(25),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '${state.tickets.length}',
+                          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        _ticketsExpanded ? Icons.expand_less : Icons.expand_more,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
+              if (_ticketsExpanded) ...[
               const SizedBox(height: 10),
               ...state.tickets.map((t) {
                 final status = t['status'] as String? ?? 'open';
@@ -306,6 +320,8 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   ),
                 );
               }),
+              const SizedBox(height: 8),
+              ], // _ticketsExpanded
               const Divider(height: 32),
             ],
 

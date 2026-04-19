@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/router/app_router.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/providers/auto_lock_provider.dart';
@@ -10,6 +11,7 @@ import 'core/notifications/notification_service.dart';
 import 'core/presentation/loading_overlay.dart';
 import 'core/presentation/app_shortcuts.dart';
 import 'core/storage/secure_storage.dart';
+import 'core/services/tray_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,12 +26,33 @@ void main() async {
       titleBarStyle: TitleBarStyle.normal,
       title: 'DeniKey',
     );
+
+    final prefs = await SharedPreferences.getInstance();
+    final savedX = prefs.getDouble('win_x');
+    final savedY = prefs.getDouble('win_y');
+    final savedW = prefs.getDouble('win_w');
+    final savedH = prefs.getDouble('win_h');
+
     await windowManager.waitUntilReadyToShow(options, () async {
-      await windowManager.show();
-      await Future.delayed(const Duration(milliseconds: 150));
-      await windowManager.maximize();
-      await windowManager.focus();
+      if (savedW != null && savedH != null) {
+        await windowManager.setSize(Size(savedW, savedH));
+        if (savedX != null && savedY != null) {
+          await windowManager.setPosition(Offset(savedX, savedY));
+        }
+        await windowManager.show();
+        await windowManager.focus();
+      } else {
+        await windowManager.show();
+        await Future.delayed(const Duration(milliseconds: 150));
+        await windowManager.maximize();
+        await windowManager.focus();
+      }
     });
+
+    if (Platform.isWindows) {
+      await windowManager.setPreventClose(true);
+      await TrayService.instance.init();
+    }
   }
   await NotificationService.instance.initialize();
   runApp(const ProviderScope(child: MyApp()));
@@ -165,7 +188,23 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       windowManager.removeListener(this);
     }
+    if (Platform.isWindows) TrayService.instance.dispose();
     super.dispose();
+  }
+
+  @override
+  void onWindowClose() async {
+    if (!Platform.isWindows) return;
+    // Boyut ve pozisyonu kaydet
+    final size = await windowManager.getSize();
+    final pos = await windowManager.getPosition();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('win_w', size.width);
+    await prefs.setDouble('win_h', size.height);
+    await prefs.setDouble('win_x', pos.dx);
+    await prefs.setDouble('win_y', pos.dy);
+    // Tray'e gizle
+    await windowManager.hide();
   }
 
   @override
