@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/login_screen.dart';
@@ -21,6 +22,7 @@ import '../../features/audit_log/presentation/audit_log_screen.dart';
 import '../../features/support_ticket/presentation/support_ticket_screen.dart';
 import '../../features/trash/presentation/trash_screen.dart';
 import '../presentation/splash_screen.dart';
+import '../../features/auth/presentation/onboarding_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
@@ -28,6 +30,10 @@ final router = GoRouter(
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
         path: '/login',
@@ -140,8 +146,35 @@ final router = GoRouter(
         path: '/search',
         builder: (context, state) => const SearchScreen(),
       ),
+      GoRoute(
+        path: '/privacy-policy',
+        builder: (context, state) => const _PrivacyPolicyPlaceholder(),
+      ),
     ],
 );
 
 final routerProvider = Provider<GoRouter>((ref) => router);
+
+class _PrivacyPolicyPlaceholder extends StatelessWidget {
+  const _PrivacyPolicyPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF090C08),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF090C08),
+        foregroundColor: const Color(0xFFE8EDE9),
+        title: const Text('Gizlilik Politikası'),
+        elevation: 0,
+      ),
+      body: const Center(
+        child: Text(
+          'Yakında',
+          style: TextStyle(color: Color(0xFF9BABA4), fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
 
