@@ -70,6 +70,21 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     }
   }
 
+  Future<bool> deleteAccount({
+    required String username,
+    required String masterPassword,
+  }) async {
+    state = state.copyWith(status: ProfileStatus.loading);
+    try {
+      await _repo.deleteAccount(username: username, masterPassword: masterPassword);
+      return true;
+    } on DioException catch (e) {
+      final msg = e.response?.data['detail'] ?? 'Hesap silinemedi';
+      state = state.copyWith(status: ProfileStatus.error, errorMessage: msg.toString());
+      return false;
+    }
+  }
+
   void reset() => state = state.copyWith(status: ProfileStatus.idle, errorMessage: null);
 }
 

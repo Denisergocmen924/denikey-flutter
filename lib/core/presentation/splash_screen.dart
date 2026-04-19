@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../storage/secure_storage.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -11,6 +13,8 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
+  String _version = '';
+
   // --- Animasyon kontrolcüleri ---
   late final AnimationController _bgCtrl;
   late final AnimationController _shieldCtrl;
@@ -48,6 +52,9 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    PackageInfo.fromPlatform().then((info) {
+      if (mounted) setState(() => _version = info.version);
+    });
 
     _bgCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
     _shieldCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
@@ -99,6 +106,13 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _navigate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final onboardingDone = prefs.getBool('onboarding_done') ?? false;
+    if (!mounted) return;
+    if (!onboardingDone) {
+      context.go('/onboarding');
+      return;
+    }
     final token = await SecureStorage.instance.getToken();
     if (!mounted) return;
     if (token == null) {
@@ -268,7 +282,7 @@ class _SplashScreenState extends State<SplashScreen>
             child: FadeTransition(
               opacity: _bgGlow,
               child: const Text(
-                'v1.0.0',
+                _version.isEmpty ? '' : 'v$_version',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,

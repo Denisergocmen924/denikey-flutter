@@ -164,6 +164,18 @@ class AuthRepository {
     return Map<String, dynamic>.from(response.data);
   }
 
+  Future<void> deleteAccount({
+    required String username,
+    required String masterPassword,
+  }) async {
+    await _dio.delete(
+      ApiConstants.deleteAccount,
+      data: {'username': username, 'master_password': masterPassword},
+    );
+    await SecureStorage.instance.clearAll();
+    await CacheService.instance.clearCache();
+  }
+
   Future<void> logout() async {
     // Sunucuya bildir (token geçersizleştir); hata olsa da yerel temizlik yapılır
     try {

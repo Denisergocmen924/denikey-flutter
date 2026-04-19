@@ -69,7 +69,10 @@ jobs:
       - name: Installer oluştur
         shell: pwsh
         run: |
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "windows_setup\installer.iss"
+          $pubspec = Get-Content pubspec.yaml -Raw
+          $version = [regex]::Match($pubspec, '(?m)^version:\s*([^\+\r\n]+)').Groups[1].Value.Trim()
+          Write-Host "Building installer version: $version"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "windows_setup\installer.iss"
       - uses: actions/upload-artifact@v4
         with:
           name: DeniKey-Windows

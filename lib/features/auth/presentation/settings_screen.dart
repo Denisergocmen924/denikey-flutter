@@ -7,6 +7,7 @@ import '../../../core/storage/secure_storage.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/providers/shortcuts_provider.dart';
 import '../../../core/providers/auto_lock_provider.dart';
+import '../../../core/providers/app_version_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
 import '../../../core/presentation/app_shortcuts.dart';
@@ -22,6 +23,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _repo = AuthRepository();
   String? _email;
   bool _loggingOut = false;
+  bool _deletingAccount = false;
   bool _biometricAvailable = false;
   bool _biometricEnabled = false;
 
@@ -52,6 +54,154 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _toggleBiometric(bool val) async {
     await BiometricService.instance.setEnabled(val);
     setState(() => _biometricEnabled = val);
+  }
+
+  Future<void> _startDeleteAccountFlow() async {
+    // Adım 1: Kullanıcı adı
+    final usernameCtrl = TextEditingController();
+    final usernameOk = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hesabı Sil — Adım 1/4'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir.',
+              style: TextStyle(color: Colors.red, fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: usernameCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Kullanıcı adınızı girin',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              if (usernameCtrl.text.trim().isNotEmpty) Navigator.pop(ctx, true);
+            },
+            child: const Text('Devam'),
+          ),
+        ],
+      ),
+    );
+    final username = usernameCtrl.text.trim();
+    usernameCtrl.dispose();
+    if (usernameOk != true || username.isEmpty) return;
+
+    // Adım 2: Şifre (ilk kez)
+    if (!mounted) return;
+    final pass1Ctrl = TextEditingController();
+    final pass1Ok = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hesabı Sil — Adım 2/4'),
+        content: TextField(
+          controller: pass1Ctrl,
+          obscureText: true,
+          decoration: const InputDecoration(
+            labelText: 'Master şifrenizi girin',
+            border: OutlineInputBorder(),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              if (pass1Ctrl.text.isNotEmpty) Navigator.pop(ctx, true);
+            },
+            child: const Text('Devam'),
+          ),
+        ],
+      ),
+    );
+    final password = pass1Ctrl.text;
+    pass1Ctrl.dispose();
+    if (pass1Ok != true || password.isEmpty) return;
+
+    // Adım 3: 10 saniyelik bekleme
+    if (!mounted) return;
+    final countdownOk = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => _CountdownDialog(),
+    );
+    if (countdownOk != true) return;
+
+    // Adım 4: Şifre (ikinci kez)
+    if (!mounted) return;
+    final pass2Ctrl = TextEditingController();
+    final pass2Ok = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hesabı Sil — Adım 4/4'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Son adım: şifrenizi bir kez daha girin.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: pass2Ctrl,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Master şifrenizi tekrar girin',
+                border: OutlineInputBorder(),
+              ),
+              autofocus: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              if (pass2Ctrl.text.isNotEmpty) Navigator.pop(ctx, true);
+            },
+            child: const Text('Hesabı Kalıcı Sil'),
+          ),
+        ],
+      ),
+    );
+    final password2 = pass2Ctrl.text;
+    pass2Ctrl.dispose();
+    if (pass2Ok != true || password2.isEmpty) return;
+
+    if (!mounted) return;
+    setState(() => _deletingAccount = true);
+    final success = await ref.read(profileProvider.notifier).deleteAccount(
+      username: username,
+      masterPassword: password2,
+    );
+    if (!mounted) return;
+    setState(() => _deletingAccount = false);
+
+    if (success) {
+      context.go('/login');
+    } else {
+      final err = ref.read(profileProvider).errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(err ?? 'Hesap silinemedi'), backgroundColor: Colors.red),
+      );
+      ref.read(profileProvider.notifier).reset();
+    }
   }
 
   Future<void> _logout() async {
@@ -377,12 +527,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: const Text('Çıkış Yap', style: TextStyle(color: Colors.red)),
             onTap: _loggingOut ? null : _logout,
           ),
+          ListTile(
+            leading: _deletingAccount
+                ? const SizedBox(
+                    width: 24, height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red))
+                : const Icon(Icons.delete_forever, color: Colors.red),
+            title: const Text('Hesabı Kalıcı Olarak Sil',
+                style: TextStyle(color: Colors.red)),
+            subtitle: const Text('Tüm veriler silinir, geri alınamaz',
+                style: TextStyle(fontSize: 12, color: Colors.red)),
+            onTap: _deletingAccount ? null : _startDeleteAccountFlow,
+          ),
 
           const SizedBox(height: 24),
           Center(
-            child: Text(
-              'DeniKey v1.0.0',
-              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+            child: ref.watch(appVersionProvider).when(
+              data: (v) => Text(
+                'DeniKey v$v',
+                style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (e, st) => Text(
+                'DeniKey',
+                style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -403,6 +572,85 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
+    );
+  }
+}
+
+class _CountdownDialog extends StatefulWidget {
+  @override
+  State<_CountdownDialog> createState() => _CountdownDialogState();
+}
+
+class _CountdownDialogState extends State<_CountdownDialog> {
+  int _seconds = 10;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick();
+  }
+
+  void _tick() {
+    Future.delayed(const Duration(seconds: 1), () {
+      if (!mounted) return;
+      setState(() => _seconds--);
+      if (_seconds > 0) _tick();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Hesabı Sil — Adım 3/4'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Gerçekten hesabınızı silmek istiyor musunuz?',
+            style: TextStyle(fontSize: 14),
+          ),
+          const SizedBox(height: 24),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.red, width: 3),
+            ),
+            child: Center(
+              child: Text(
+                '$_seconds',
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            _seconds > 0
+                ? '$_seconds saniye beklemeniz gerekiyor...'
+                : 'Devam edebilirsiniz.',
+            style: TextStyle(
+              fontSize: 13,
+              color: _seconds > 0 ? Colors.grey : Colors.red,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('İptal'),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: _seconds > 0 ? null : () => Navigator.pop(context, true),
+          child: const Text('Evet, Devam Et'),
+        ),
+      ],
     );
   }
 }

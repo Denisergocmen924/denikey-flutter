@@ -18,6 +18,7 @@ class ApiConstants {
   static const String confirmEmailChange = '/api/v1/auth/confirm-email-change';
   static const String updateProfile      = '/api/v1/auth/profile';
   static const String logout             = '/api/v1/auth/logout';
+  static const String deleteAccount      = '/api/v1/auth/delete-account';
 
   // Vault
   static const String vaultItems = '/api/v1/vault/items';
