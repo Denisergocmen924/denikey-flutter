@@ -232,6 +232,22 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                 padding: EdgeInsets.all(16),
                 child: CircularProgressIndicator(),
               ))
+            else if (state.ticketsError)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline, size: 16, color: Colors.red),
+                    const SizedBox(width: 8),
+                    const Text('Talepler yüklenemedi', style: TextStyle(color: Colors.red, fontSize: 13)),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () => ref.read(supportTicketProvider.notifier).loadTickets(),
+                      child: const Text('Tekrar Dene'),
+                    ),
+                  ],
+                ),
+              )
             else if (state.tickets.isNotEmpty) ...[
               InkWell(
                 borderRadius: BorderRadius.circular(8),

@@ -322,17 +322,18 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
 
   Widget _infoTile(String label, String? value, {bool isSecret = false}) {
     if (value == null || value.isEmpty) return const SizedBox.shrink();
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Card(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.grey.shade200),
+          side: BorderSide(color: cs.outlineVariant),
         ),
         child: ListTile(
           title: Text(label,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+            style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
           subtitle: Text(
             isSecret && !_showPassword ? '••••••••' : value,
             style: TextStyle(
@@ -340,7 +341,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
               fontWeight: FontWeight.w500,
               color: (!isSecret && _isUrl(value))
                   ? const Color(0xFF4FC3F7)
-                  : null,
+                  : cs.onSurface,
               decoration: (!isSecret && _isUrl(value))
                   ? TextDecoration.underline
                   : null,
@@ -468,25 +469,28 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Colors.grey.shade200),
+              side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
             ),
-            child: ListTile(
-              leading: Icon(
-                Icons.folder_outlined,
-                color: categoryName != null ? const Color(0xFFFF5900) : Colors.grey,
-              ),
-              title: const Text('Klasör', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              subtitle: Text(
-                categoryName ?? 'Sınıflandırılmamış',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: categoryName != null ? Colors.black87 : Colors.grey,
+            child: Builder(builder: (context) {
+              final cs = Theme.of(context).colorScheme;
+              return ListTile(
+                leading: Icon(
+                  Icons.folder_outlined,
+                  color: categoryName != null ? const Color(0xFFFF5900) : cs.onSurfaceVariant,
                 ),
-              ),
-              trailing: const Icon(Icons.chevron_right, size: 20),
-              onTap: _showCategoryPicker,
-            ),
+                title: Text('Klasör', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+                subtitle: Text(
+                  categoryName ?? 'Sınıflandırılmamış',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: categoryName != null ? cs.onSurface : cs.onSurfaceVariant,
+                  ),
+                ),
+                trailing: Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant),
+                onTap: _showCategoryPicker,
+              );
+            }),
           ),
         ),
         _infoTile('Şifre', _decryptedPassword, isSecret: true),
@@ -497,7 +501,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             child: Text('Ek Bilgiler',
               style: TextStyle(fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: Colors.grey.shade600)),
+                color: Theme.of(context).colorScheme.onSurfaceVariant)),
           ),
           ..._customFields.map((field) {
             final fieldName = field['field_name'] as String? ?? '';

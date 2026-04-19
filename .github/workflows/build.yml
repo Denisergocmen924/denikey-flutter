@@ -22,6 +22,17 @@ jobs:
           flutter-version: '3.41.6'
           channel: stable
       - run: flutter pub get
+      - name: Versiyon belirle
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION="${{ github.ref_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          fi
+          echo "name=$VERSION" >> $GITHUB_OUTPUT
+          echo "number=${{ github.run_number }}" >> $GITHUB_OUTPUT
       - name: Keystore oluştur
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/denikey.keystore
@@ -31,8 +42,8 @@ jobs:
           keyAlias=${{ secrets.KEY_ALIAS }}
           storeFile=denikey.keystore
           EOF
-      - run: flutter build apk --release
-      - run: flutter build appbundle --release
+      - run: flutter build apk --release --build-name=${{ steps.version.outputs.name }} --build-number=${{ steps.version.outputs.number }}
+      - run: flutter build appbundle --release --build-name=${{ steps.version.outputs.name }} --build-number=${{ steps.version.outputs.number }}
       - uses: actions/upload-artifact@v4
         with:
           name: DeniKey-Android
@@ -52,7 +63,20 @@ jobs:
           flutter-version: '3.41.6'
           channel: stable
       - run: flutter pub get
-      - run: flutter build windows --release
+      - name: Versiyon belirle
+        id: version
+        shell: pwsh
+        run: |
+          $ref = "${{ github.ref }}"
+          if ($ref -like "refs/tags/v*") {
+            $v = "${{ github.ref_name }}".TrimStart("v")
+          } else {
+            $pubspec = Get-Content pubspec.yaml -Raw
+            $v = [regex]::Match($pubspec, '(?m)^version:\s*([^\+\r\n]+)').Groups[1].Value.Trim()
+          }
+          echo "name=$v" >> $env:GITHUB_OUTPUT
+          echo "number=${{ github.run_number }}" >> $env:GITHUB_OUTPUT
+      - run: flutter build windows --release --build-name=${{ steps.version.outputs.name }} --build-number=${{ steps.version.outputs.number }}
       - name: Kurulum scriptini kopyala ve EXE yeniden adlandır
         shell: pwsh
         run: |
@@ -69,8 +93,7 @@ jobs:
       - name: Installer oluştur
         shell: pwsh
         run: |
-          $pubspec = Get-Content pubspec.yaml -Raw
-          $version = [regex]::Match($pubspec, '(?m)^version:\s*([^\+\r\n]+)').Groups[1].Value.Trim()
+          $version = "${{ steps.version.outputs.name }}"
           Write-Host "Building installer version: $version"
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "windows_setup\installer.iss"
       - uses: actions/upload-artifact@v4
@@ -96,7 +119,18 @@ jobs:
           flutter-version: '3.41.6'
           channel: stable
       - run: flutter pub get
-      - run: flutter build linux --release
+      - name: Versiyon belirle
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION="${{ github.ref_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          fi
+          echo "name=$VERSION" >> $GITHUB_OUTPUT
+          echo "number=${{ github.run_number }}" >> $GITHUB_OUTPUT
+      - run: flutter build linux --release --build-name=${{ steps.version.outputs.name }} --build-number=${{ steps.version.outputs.number }}
       - name: Linux tar.gz oluştur
         run: |
           tar -czf DeniKey-Linux.tar.gz -C build/linux/x64/release/bundle .

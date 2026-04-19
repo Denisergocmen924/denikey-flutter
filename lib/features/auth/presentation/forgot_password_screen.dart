@@ -28,6 +28,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       final userId = await _repo.forgotPassword(email: _emailCtrl.text.trim());
       if (!mounted) return;
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Doğrulama kodu gönderilemedi, tekrar deneyin')),
+        );
+        return;
+      }
       context.push('/reset-password', extra: {
         'user_id': userId,
         'email': _emailCtrl.text.trim(),

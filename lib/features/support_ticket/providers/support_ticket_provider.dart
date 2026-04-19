@@ -9,12 +9,14 @@ class SupportTicketState {
   final String? errorMessage;
   final List<Map<String, dynamic>> tickets;
   final bool ticketsLoading;
+  final bool ticketsError;
 
   const SupportTicketState({
     this.status = SupportTicketStatus.idle,
     this.errorMessage,
     this.tickets = const [],
     this.ticketsLoading = false,
+    this.ticketsError = false,
   });
 
   SupportTicketState copyWith({
@@ -22,12 +24,14 @@ class SupportTicketState {
     String? errorMessage,
     List<Map<String, dynamic>>? tickets,
     bool? ticketsLoading,
+    bool? ticketsError,
   }) {
     return SupportTicketState(
       status: status ?? this.status,
       errorMessage: errorMessage,
       tickets: tickets ?? this.tickets,
       ticketsLoading: ticketsLoading ?? this.ticketsLoading,
+      ticketsError: ticketsError ?? this.ticketsError,
     );
   }
 }
@@ -38,12 +42,12 @@ class SupportTicketNotifier extends StateNotifier<SupportTicketState> {
   SupportTicketNotifier() : super(const SupportTicketState());
 
   Future<void> loadTickets() async {
-    state = state.copyWith(ticketsLoading: true);
+    state = state.copyWith(ticketsLoading: true, ticketsError: false);
     try {
       final tickets = await _repo.getMyTickets();
       state = state.copyWith(tickets: tickets, ticketsLoading: false);
     } on DioException catch (_) {
-      state = state.copyWith(ticketsLoading: false);
+      state = state.copyWith(ticketsLoading: false, ticketsError: true);
     }
   }
 
