@@ -7,6 +7,8 @@ class TrayService with TrayListener {
   TrayService._();
   static final instance = TrayService._();
 
+  bool _rightClickPending = false;
+
   Future<void> init() async {
     if (!Platform.isWindows) return;
     trayManager.addListener(this);
@@ -44,12 +46,18 @@ class TrayService with TrayListener {
 
   @override
   void onTrayIconMouseDown() {
+    // Sağ tık da bu eventi tetikleyebiliyor; sağ tık ise pencereyi açma
+    if (_rightClickPending) {
+      _rightClickPending = false;
+      return;
+    }
     windowManager.show();
     windowManager.focus();
   }
 
   @override
   void onTrayIconRightMouseDown() {
+    _rightClickPending = true;
     trayManager.popUpContextMenu();
   }
 
