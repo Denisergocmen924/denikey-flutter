@@ -16,6 +16,7 @@ import 'core/services/tray_service.dart';
 
 // Tek instance kilidi için sabit port
 const _kSingleInstancePort = 47821;
+ServerSocket? _singleInstanceServer;
 
 Future<ServerSocket?> _acquireSingleInstanceLock() async {
   try {
@@ -37,13 +38,13 @@ Future<ServerSocket?> _acquireSingleInstanceLock() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows) {
-    final server = await _acquireSingleInstanceLock();
-    if (server == null) {
+    _singleInstanceServer = await _acquireSingleInstanceLock();
+    if (_singleInstanceServer == null) {
       // Başka instance var, o pencereyi öne getirdi, bu process çıkıyor
       exit(0);
     }
     // Gelen 'show' mesajlarını dinle (başka instance tetiklediğinde)
-    server.listen((client) {
+    _singleInstanceServer!.listen((client) {
       client.listen((_) {
         windowManager.show();
         windowManager.focus();
@@ -246,6 +247,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
       prefs.setDouble('win_x', pos.dx),
       prefs.setDouble('win_y', pos.dy),
       TrayService.instance.destroy(),
+      _singleInstanceServer?.close() ?? Future.value(),
     ]);
     await windowManager.destroy();
   }

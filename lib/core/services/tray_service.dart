@@ -56,9 +56,10 @@ class TrayService with TrayListener {
   }
 
   @override
-  void onTrayIconRightMouseDown() {
+  void onTrayIconRightMouseDown() async {
     _rightClickPending = true;
-    trayManager.popUpContextMenu();
+    await _setMenu();
+    await trayManager.popUpContextMenu();
   }
 
   @override
