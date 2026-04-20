@@ -29,7 +29,20 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
 
   bool _isTextFieldFocused() {
     final focus = FocusManager.instance.primaryFocus;
-    return focus?.context?.widget is EditableText;
+    if (focus == null) return false;
+    final context = focus.context;
+    if (context == null) return false;
+    if (context.widget is EditableText) return true;
+    // TextField kendi FocusNode'unu oluşturduğunda context.widget TextField olabilir
+    bool found = false;
+    context.visitAncestorElements((element) {
+      if (element.widget is EditableText || element.widget is TextField) {
+        found = true;
+        return false;
+      }
+      return true;
+    });
+    return found;
   }
 
   bool _handleKey(KeyEvent event) {

@@ -5,6 +5,7 @@ import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
+import '../../../core/presentation/desktop_onboarding_dialog.dart';
 
 class VaultScreen extends ConsumerStatefulWidget {
   const VaultScreen({super.key});
@@ -20,10 +21,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    Future.microtask(() async {
       ref.read(vaultProvider.notifier).loadItems();
       ref.read(categoryProvider.notifier).loadCategories();
       NotificationService.instance.scheduleWeeklySecurityReminder();
+      if (mounted) await showDesktopOnboardingIfNeeded(context);
     });
   }
 

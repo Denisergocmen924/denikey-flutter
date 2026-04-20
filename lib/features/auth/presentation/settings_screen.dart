@@ -366,6 +366,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/support-ticket'),
           ),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text('Gizlilik Politikası'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/privacy-policy'),
+          ),
           if (_biometricAvailable)
             SwitchListTile(
               secondary: const Icon(Icons.fingerprint),

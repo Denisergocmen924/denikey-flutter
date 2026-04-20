@@ -23,6 +23,7 @@ import '../../features/support_ticket/presentation/support_ticket_screen.dart';
 import '../../features/trash/presentation/trash_screen.dart';
 import '../presentation/splash_screen.dart';
 import '../../features/auth/presentation/onboarding_screen.dart';
+import '../../features/auth/presentation/privacy_policy_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
@@ -148,33 +149,10 @@ final router = GoRouter(
       ),
       GoRoute(
         path: '/privacy-policy',
-        builder: (context, state) => const _PrivacyPolicyPlaceholder(),
+        builder: (context, state) => const PrivacyPolicyScreen(),
       ),
     ],
 );
 
 final routerProvider = Provider<GoRouter>((ref) => router);
-
-class _PrivacyPolicyPlaceholder extends StatelessWidget {
-  const _PrivacyPolicyPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF090C08),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF090C08),
-        foregroundColor: const Color(0xFFE8EDE9),
-        title: const Text('Gizlilik Politikası'),
-        elevation: 0,
-      ),
-      body: const Center(
-        child: Text(
-          'Yakında',
-          style: TextStyle(color: Color(0xFF9BABA4), fontSize: 16),
-        ),
-      ),
-    );
-  }
-}
 

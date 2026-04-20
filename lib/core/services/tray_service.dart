@@ -20,8 +20,16 @@ class TrayService with TrayListener {
       'denikey.ico',
     );
 
-    await trayManager.setIcon(iconPath);
-    await trayManager.setToolTip('DeniKey');
+    try {
+      await trayManager.setIcon(iconPath);
+      await trayManager.setToolTip('DeniKey');
+      await _setMenu();
+    } catch (e) {
+      // Tray başlatılamadıysa sessizce devam et
+    }
+  }
+
+  Future<void> _setMenu() async {
     await trayManager.setContextMenu(Menu(items: [
       MenuItem(key: 'show', label: 'DeniKey\'i Aç'),
       MenuItem.separator(),
@@ -41,7 +49,7 @@ class TrayService with TrayListener {
   }
 
   @override
-  void onTrayIconRightMouseUp() {
+  void onTrayIconRightMouseDown() {
     trayManager.popUpContextMenu();
   }
 
