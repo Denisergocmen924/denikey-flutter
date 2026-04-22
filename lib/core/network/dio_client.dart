@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import '../constants/api_constants.dart';
 import '../storage/secure_storage.dart';
@@ -27,6 +28,7 @@ class DioClient {
 class _JwtInterceptor extends Interceptor {
   final Dio _dio;
   bool _isRefreshing = false;
+  Completer<String?>? _refreshCompleter;
 
   _JwtInterceptor(this._dio);
 
@@ -51,50 +53,64 @@ class _JwtInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    // Refresh endpoint'inden 401 gelirse sonsuz döngüye girme
-    if (err.response?.statusCode == 401 &&
-        !_isRefreshing &&
-        err.requestOptions.path != ApiConstants.refreshToken) {
-      _isRefreshing = true;
-      try {
-        final refreshToken = await SecureStorage.instance.getRefreshToken();
-        if (refreshToken == null) {
-          await _clearSession();
-          handler.next(err);
-          return;
-        }
-
-        // Yeni token al — interceptor'ı bypass etmek için ayrı Dio instance
-        final refreshDio = Dio(BaseOptions(
-          baseUrl: ApiConstants.baseUrl,
-          headers: {'Content-Type': 'application/json'},
-        ));
-        final response = await refreshDio.post(
-          ApiConstants.refreshToken,
-          data: {'refresh_token': refreshToken},
-        );
-
-        final newAccess = response.data['access_token'] as String;
-        final newRefresh = response.data['refresh_token'] as String;
-        await SecureStorage.instance.saveToken(newAccess);
-        await SecureStorage.instance.saveRefreshToken(newRefresh);
-
-        // Orijinal isteği yeni token ile tekrar gönder
-        final opts = err.requestOptions;
-        opts.headers['Authorization'] = 'Bearer $newAccess';
-        final retryResponse = await _dio.fetch(opts);
-        handler.resolve(retryResponse);
-      } on DioException {
-        // Refresh başarısız — oturumu temizle
-        await _clearSession();
-        handler.next(err);
-      } finally {
-        _isRefreshing = false;
-      }
+    if (err.response?.statusCode != 401 ||
+        err.requestOptions.path == ApiConstants.refreshToken) {
+      handler.next(err);
       return;
     }
 
-    handler.next(err);
+    // Refresh zaten sürüyorsa tamamlanmasını bekle
+    if (_isRefreshing) {
+      final newToken = await _refreshCompleter!.future;
+      if (newToken == null) {
+        handler.next(err);
+        return;
+      }
+      final opts = err.requestOptions;
+      opts.headers['Authorization'] = 'Bearer $newToken';
+      handler.resolve(await _dio.fetch(opts));
+      return;
+    }
+
+    _isRefreshing = true;
+    _refreshCompleter = Completer<String?>();
+
+    try {
+      final refreshToken = await SecureStorage.instance.getRefreshToken();
+      if (refreshToken == null) {
+        _refreshCompleter!.complete(null);
+        await _clearSession();
+        handler.next(err);
+        return;
+      }
+
+      final refreshDio = Dio(BaseOptions(
+        baseUrl: ApiConstants.baseUrl,
+        headers: {'Content-Type': 'application/json'},
+      ));
+      final response = await refreshDio.post(
+        ApiConstants.refreshToken,
+        data: {'refresh_token': refreshToken},
+      );
+
+      final newAccess  = response.data['access_token']  as String;
+      final newRefresh = response.data['refresh_token'] as String;
+      await SecureStorage.instance.saveToken(newAccess);
+      await SecureStorage.instance.saveRefreshToken(newRefresh);
+
+      _refreshCompleter!.complete(newAccess);
+
+      final opts = err.requestOptions;
+      opts.headers['Authorization'] = 'Bearer $newAccess';
+      handler.resolve(await _dio.fetch(opts));
+    } on DioException {
+      _refreshCompleter!.complete(null);
+      await _clearSession();
+      handler.next(err);
+    } finally {
+      _isRefreshing = false;
+      _refreshCompleter = null;
+    }
   }
 
   Future<void> _clearSession() async {
