@@ -232,24 +232,17 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
   @override
   void onWindowClose() async {
     if (!Platform.isWindows) return;
-    // Boyut/pozisyon kaydet ve tray'i yok et — paralel çalıştır
-    final results = await Future.wait([
-      windowManager.getSize(),
-      windowManager.getPosition(),
-      SharedPreferences.getInstance(),
-    ]);
-    final size = results[0] as Size;
-    final pos  = results[1] as Offset;
-    final prefs = results[2] as SharedPreferences;
-    await Future.wait([
-      prefs.setDouble('win_w', size.width),
-      prefs.setDouble('win_h', size.height),
-      prefs.setDouble('win_x', pos.dx),
-      prefs.setDouble('win_y', pos.dy),
-      TrayService.instance.destroy(),
-      _singleInstanceServer?.close() ?? Future.value(),
-    ]);
-    await windowManager.destroy();
+    // Pencere boyutunu kaydet, sonra hemen çık
+    try {
+      final size  = await windowManager.getSize();
+      final pos   = await windowManager.getPosition();
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setDouble('win_w', size.width);
+      prefs.setDouble('win_h', size.height);
+      prefs.setDouble('win_x', pos.dx);
+      prefs.setDouble('win_y', pos.dy);
+    } catch (_) {}
+    exit(0);
   }
 
   @override

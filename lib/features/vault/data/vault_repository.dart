@@ -11,8 +11,15 @@ class VaultRepository {
   final Dio _dio = DioClient.instance.dio;
 
   Future<bool> isOnline() async {
-    // Linux (WSL2) de NetworkManager yok, her zaman online say
-    if (Platform.isLinux) return true;
+    if (Platform.isLinux || Platform.isWindows) {
+      try {
+        final result = await InternetAddress.lookup('google.com')
+            .timeout(const Duration(seconds: 3));
+        return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+      } catch (_) {
+        return false;
+      }
+    }
     final results = await Connectivity().checkConnectivity();
     return results.isNotEmpty && !results.every((r) => r == ConnectivityResult.none);
   }
@@ -22,10 +29,7 @@ class VaultRepository {
     if (online) {
       final response = await _dio.get(ApiConstants.vaultItems);
       final items = List<Map<String, dynamic>>.from(response.data);
-      // Cache sadece Android/iOS'ta çalışır
-      if (!Platform.isLinux) {
-        await CacheService.instance.cacheVaultItems(items);
-      }
+      await CacheService.instance.cacheVaultItems(items);
       return items;
     } else {
       return CacheService.instance.getCachedVaultItems();

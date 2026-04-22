@@ -17,6 +17,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _confirmCtrl  = TextEditingController();
   final _formKey      = GlobalKey<FormState>();
   bool _obscure       = true;
+  DateTime? _birthDate;
 
   @override
   void dispose() {
@@ -27,8 +28,43 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(now.year - 18),
+      firstDate: DateTime(now.year - 120),
+      lastDate: DateTime(now.year - 1),
+      helpText: 'Doğum Tarihinizi Seçin',
+    );
+    if (picked != null) setState(() => _birthDate = picked);
+  }
+
+  int? _age() {
+    if (_birthDate == null) return null;
+    final now = DateTime.now();
+    int age = now.year - _birthDate!.year;
+    if (now.month < _birthDate!.month ||
+        (now.month == _birthDate!.month && now.day < _birthDate!.day)) {
+      age--;
+    }
+    return age;
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_birthDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lütfen doğum tarihinizi seçin')),
+      );
+      return;
+    }
+    if ((_age() ?? 0) < 13) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('DeniKey\'i kullanmak için en az 13 yaşında olmalısınız')),
+      );
+      return;
+    }
     await ref.read(authProvider.notifier).register(
       _usernameCtrl.text.trim(),
       _emailCtrl.text.trim(),
@@ -159,6 +195,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       if (v != _passwordCtrl.text) return 'Şifreler eşleşmiyor';
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 14),
+                  GestureDetector(
+                    onTap: _pickBirthDate,
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Doğum Tarihi',
+                        prefixIcon: Icon(Icons.cake_outlined),
+                      ),
+                      child: Text(
+                        _birthDate == null
+                            ? 'Seçiniz'
+                            : '${_birthDate!.day.toString().padLeft(2, '0')}.'
+                              '${_birthDate!.month.toString().padLeft(2, '0')}.'
+                              '${_birthDate!.year}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: _birthDate == null
+                              ? Theme.of(context).colorScheme.onSurfaceVariant
+                              : Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 28),
                   FilledButton(

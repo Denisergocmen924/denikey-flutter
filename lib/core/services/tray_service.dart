@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' show Platform, exit;
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:path/path.dart' as path;
@@ -69,8 +69,7 @@ class TrayService with TrayListener {
         windowManager.show();
         windowManager.focus();
       case 'exit':
-        await destroy();
-        await windowManager.destroy();
+        exit(0);
     }
   }
 }

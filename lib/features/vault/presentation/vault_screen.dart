@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -93,12 +94,16 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
               width: double.infinity,
               color: Colors.orange.shade800,
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.wifi_off, color: Colors.white, size: 18),
-                  SizedBox(width: 8),
-                  Text('Çevrimdışı mod — Salt okunur',
-                    style: TextStyle(color: Colors.white, fontSize: 13)),
+                  const Icon(Icons.wifi_off, color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    (Platform.isLinux || Platform.isWindows)
+                        ? 'İnternet bağlantısı olmadan kasanıza erişemezsiniz'
+                        : 'Çevrimdışı mod — Salt okunur',
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
                 ],
               ),
             ),
