@@ -68,6 +68,7 @@ class VaultNotifier extends StateNotifier<VaultState> {
       } else {
         state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
       }
+      rethrow;
     }
   }
 

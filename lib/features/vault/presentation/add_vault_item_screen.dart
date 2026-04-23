@@ -158,8 +158,19 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       if (customFieldsData.isNotEmpty) 'custom_fields_data': customFieldsData,
     };
 
-    await ref.read(vaultProvider.notifier).createItem(data);
-    if (mounted) context.pop();
+    try {
+      await ref.read(vaultProvider.notifier).createItem(data);
+      if (mounted) context.pop();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _goBack() {
