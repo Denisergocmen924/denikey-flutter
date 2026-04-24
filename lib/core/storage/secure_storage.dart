@@ -1,17 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
-/// Android: flutter_secure_storage (Android Keystore, şifreli)
-/// Linux:   shared_preferences (geliştirme ortamı, şifrelenmemiş)
+/// Tüm platformlarda flutter_secure_storage kullanılır.
+/// Android: Android Keystore  |  Linux: libsecret (GNOME Keyring)
+/// Windows: DPAPI              |  macOS/iOS: Keychain
 class SecureStorage {
   SecureStorage._();
   static final SecureStorage instance = SecureStorage._();
 
-  static const _secureStorage = FlutterSecureStorage(
+  static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    lOptions: LinuxOptions(),
   );
 
   static const _keyToken            = 'access_token';
@@ -23,33 +24,12 @@ class SecureStorage {
   static const _keyVerificationBlob = 'verification_blob';
   static const _keyVerificationIv   = 'verification_iv';
 
-  bool get _isLinux => Platform.isLinux;
+  Future<void> _write(String key, String value) =>
+      _storage.write(key: key, value: value);
 
-  Future<void> _write(String key, String value) async {
-    if (_isLinux) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(key, value);
-    } else {
-      await _secureStorage.write(key: key, value: value);
-    }
-  }
+  Future<String?> _read(String key) => _storage.read(key: key);
 
-  Future<String?> _read(String key) async {
-    if (_isLinux) {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(key);
-    }
-    return _secureStorage.read(key: key);
-  }
-
-  Future<void> _delete(String key) async {
-    if (_isLinux) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(key);
-    } else {
-      await _secureStorage.delete(key: key);
-    }
-  }
+  Future<void> _delete(String key) => _storage.delete(key: key);
 
   // TOKEN
   Future<void> saveToken(String token) => _write(_keyToken, token);
@@ -127,12 +107,5 @@ class SecureStorage {
   }
 
   // CLEAR ALL
-  Future<void> clearAll() async {
-    if (_isLinux) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
-    } else {
-      await _secureStorage.deleteAll();
-    }
-  }
+  Future<void> clearAll() => _storage.deleteAll();
 }

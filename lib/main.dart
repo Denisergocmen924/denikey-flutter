@@ -271,6 +271,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
       final elapsed = DateTime.now().difference(_blurTime!).inMinutes;
       if (elapsed < autoLock.minutes!) return;
     }
+    await SecureStorage.instance.deleteMasterKey();
     ref.read(routerProvider).go('/master-lock');
   }
 
