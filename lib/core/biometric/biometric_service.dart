@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +32,29 @@ class BiometricService {
   Future<void> setEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_prefKey, value);
+  }
+
+  // Cihazda kayıtlı biyometrik türlerine göre ikon ve etiket döndürür.
+  // Hiçbiri yoksa null döner — buton gösterilmez.
+  Future<({IconData icon, String label})?> getBiometricLabel() async {
+    if (!_isSupported) return null;
+    try {
+      final types = await _auth.getAvailableBiometrics();
+      if (types.contains(BiometricType.face)) {
+        return (icon: Icons.face_outlined, label: 'Yüz Tanıma ile Aç');
+      }
+      if (types.contains(BiometricType.fingerprint) ||
+          types.contains(BiometricType.strong) ||
+          types.contains(BiometricType.weak)) {
+        return (icon: Icons.fingerprint, label: 'Parmak İzi ile Aç');
+      }
+      // Biyometrik yok ama cihaz PIN/desen destekliyorsa
+      final supported = await _auth.isDeviceSupported();
+      if (supported) {
+        return (icon: Icons.pin_outlined, label: 'Cihaz Kilidi ile Aç');
+      }
+    } catch (_) {}
+    return null;
   }
 
   Future<bool> authenticate() async {

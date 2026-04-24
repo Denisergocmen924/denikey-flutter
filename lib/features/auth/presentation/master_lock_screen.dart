@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/biometric/biometric_service.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
 
@@ -16,6 +17,36 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
   bool _obscure  = true;
   bool _loading  = false;
   String? _error;
+  ({IconData icon, String label})? _biometric;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometric();
+  }
+
+  Future<void> _loadBiometric() async {
+    final enabled = await BiometricService.instance.isEnabled();
+    if (!enabled) return;
+    final bio = await BiometricService.instance.getBiometricLabel();
+    if (mounted) setState(() => _biometric = bio);
+  }
+
+  Future<void> _logout() async {
+    await SecureStorage.instance.clearAll();
+    if (mounted) context.go('/login');
+  }
+
+  Future<void> _biometricUnlock() async {
+    setState(() { _loading = true; _error = null; });
+    final ok = await BiometricService.instance.authenticate();
+    if (!mounted) return;
+    if (ok) {
+      context.go('/vault');
+    } else {
+      setState(() { _error = 'Kimlik doğrulama başarısız'; _loading = false; });
+    }
+  }
 
   @override
   void dispose() {
@@ -142,14 +173,20 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                           )
                         : const Text('Kilidi Aç', style: TextStyle(fontSize: 16)),
                   ),
+                  if (_biometric != null) ...[
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: _loading ? null : _biometricUnlock,
+                      icon: Icon(_biometric!.icon),
+                      label: Text(_biometric!.label),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 20),
                   TextButton(
-                    onPressed: _loading
-                        ? null
-                        : () async {
-                            await SecureStorage.instance.clearAll();
-                            if (mounted) context.go('/login');
-                          },
+                    onPressed: _loading ? null : _logout,
                     child: Text(
                       'Farklı hesapla giriş yap',
                       style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),

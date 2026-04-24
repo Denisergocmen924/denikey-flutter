@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/login_screen.dart';
@@ -10,7 +9,6 @@ import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/auth/presentation/change_email_screen.dart';
 import '../../features/auth/presentation/confirm_email_change_screen.dart';
 import '../../features/auth/presentation/settings_screen.dart';
-import '../../features/auth/presentation/lock_screen.dart';
 import '../../features/vault/presentation/vault_screen.dart';
 import '../../features/vault/presentation/vault_item_detail_screen.dart';
 import '../../features/vault/presentation/search_screen.dart';
@@ -137,7 +135,7 @@ final router = GoRouter(
       ),
       GoRoute(
         path: '/lock',
-        builder: (context, state) => const LockScreen(),
+        builder: (context, state) => const MasterLockScreen(),
       ),
       GoRoute(
         path: '/trash',
