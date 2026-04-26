@@ -209,7 +209,7 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState<MyApp> with WindowListener {
+class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindingObserver {
   bool _wasBlurred = false;
   DateTime? _blurTime;
 
@@ -218,6 +218,8 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
     super.initState();
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       windowManager.addListener(this);
+    } else {
+      WidgetsBinding.instance.addObserver(this);
     }
   }
 
@@ -225,8 +227,44 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
   void dispose() {
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       windowManager.removeListener(this);
+    } else {
+      WidgetsBinding.instance.removeObserver(this);
     }
     super.dispose();
+  }
+
+  // Android / iOS yaşam döngüsü
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _wasBlurred = true;
+      _blurTime = DateTime.now();
+    } else if (state == AppLifecycleState.resumed) {
+      _onResume();
+    }
+  }
+
+  Future<void> _onResume() async {
+    if (!_wasBlurred) return;
+    _wasBlurred = false;
+    final autoLock = ref.read(autoLockProvider);
+    if (!autoLock.enabled) return;
+    final token = await SecureStorage.instance.getToken();
+    if (token == null) return;
+    if (!mounted) return;
+    final location = ref.read(routerProvider)
+        .routerDelegate.currentConfiguration.uri.toString();
+    if (location == '/splash' || location == '/login' ||
+        location == '/register' || location == '/lock' ||
+        location == '/master-lock') {
+      return;
+    }
+    if (autoLock.minutes != null && _blurTime != null) {
+      final elapsed = DateTime.now().difference(_blurTime!).inMinutes;
+      if (elapsed < autoLock.minutes!) return;
+    }
+    await SecureStorage.instance.deleteMasterKey();
+    ref.read(routerProvider).go('/master-lock');
   }
 
   @override
@@ -252,28 +290,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
   }
 
   @override
-  void onWindowFocus() async {
-    if (!_wasBlurred) return;
-    _wasBlurred = false;
-    final autoLock = ref.read(autoLockProvider);
-    if (!autoLock.enabled) return;
-    final token = await SecureStorage.instance.getToken();
-    if (token == null) return;
-    if (!mounted) return;
-    // Splash veya login ekranındaysa kilitleme
-    final location = ref.read(routerProvider).state.uri.toString();
-    if (location == '/splash' || location == '/login' ||
-        location == '/register' || location == '/lock') {
-      return;
-    }
-    // Süre kontrolü: minutes null ise süresiz → her zaman kilitle
-    if (autoLock.minutes != null && _blurTime != null) {
-      final elapsed = DateTime.now().difference(_blurTime!).inMinutes;
-      if (elapsed < autoLock.minutes!) return;
-    }
-    await SecureStorage.instance.deleteMasterKey();
-    ref.read(routerProvider).go('/master-lock');
-  }
+  void onWindowFocus() => _onResume();
 
   @override
   Widget build(BuildContext context) {

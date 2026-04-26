@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -433,29 +434,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
             },
           ),
-          Consumer(
-            builder: (context, ref, _) {
-              final shortcutsEnabled = ref.watch(shortcutsProvider);
-              return SwitchListTile(
-                secondary: const Icon(Icons.keyboard_outlined),
-                title: const Text('Klavye Kısayolları'),
-                subtitle: const Text(
-                  'Ctrl+1/2/3, +, ←→, Esc vb.',
-                  style: TextStyle(fontSize: 12),
-                ),
-                value: shortcutsEnabled,
-                onChanged: (val) =>
-                    ref.read(shortcutsProvider.notifier).toggle(val),
-              );
-            },
-          ),
-          Consumer(
-            builder: (context, ref, _) {
-              final shortcutsEnabled = ref.watch(shortcutsProvider);
-              if (!shortcutsEnabled) return const SizedBox.shrink();
-              return const ShortcutHintCard();
-            },
-          ),
+          if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) ...[
+            Consumer(
+              builder: (context, ref, _) {
+                final shortcutsEnabled = ref.watch(shortcutsProvider);
+                return SwitchListTile(
+                  secondary: const Icon(Icons.keyboard_outlined),
+                  title: const Text('Klavye Kısayolları'),
+                  subtitle: const Text(
+                    'Ctrl+1/2/3, +, ←→, Esc vb.',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  value: shortcutsEnabled,
+                  onChanged: (val) =>
+                      ref.read(shortcutsProvider.notifier).toggle(val),
+                );
+              },
+            ),
+            Consumer(
+              builder: (context, ref, _) {
+                final shortcutsEnabled = ref.watch(shortcutsProvider);
+                if (!shortcutsEnabled) return const SizedBox.shrink();
+                return const ShortcutHintCard();
+              },
+            ),
+          ],
           SwitchListTile(
             secondary: const Icon(Icons.dark_mode_outlined),
             title: const Text('Karanlık Tema'),
