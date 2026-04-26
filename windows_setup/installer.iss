@@ -22,7 +22,7 @@ WizardStyle=modern
 PrivilegesRequired=lowest
 
 [Languages]
-Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
+Name: "turkish"; MessagesFile: "Turkish.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Masaüstüne kısayol oluştur"; GroupDescription: "Ek görevler:"; Flags: unchecked
