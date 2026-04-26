@@ -96,7 +96,14 @@ jobs:
         run: |
           $version = "${{ steps.version.outputs.name }}"
           Write-Host "Building installer version: $version"
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "windows_setup\installer.iss"
+          New-Item -ItemType Directory -Force -Path "windows_setup\installer_output" | Out-Null
+          $isccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          Write-Host "ISCC path exists: $(Test-Path $isccPath)"
+          Write-Host "ISS file exists: $(Test-Path 'windows_setup\installer.iss')"
+          Write-Host "Build dir exists: $(Test-Path 'build\windows\x64\runner\Release')"
+          Write-Host "Icon exists: $(Test-Path 'windows\runner\resources\app_icon.ico')"
+          & $isccPath "/DMyAppVersion=$version" "windows_setup\installer.iss"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: startsWith(github.ref, 'refs/tags/v')
         with:
