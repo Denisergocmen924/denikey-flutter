@@ -97,8 +97,17 @@ jobs:
           $version = "${{ steps.version.outputs.name }}"
           Write-Host "Building installer version: $version"
           New-Item -ItemType Directory -Force -Path "windows_setup\installer_output" | Out-Null
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "windows_setup\installer.iss"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $isccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          $proc = Start-Process -FilePath $isccPath `
+            -ArgumentList "/DMyAppVersion=$version", "windows_setup\installer.iss" `
+            -Wait -PassThru -NoNewWindow `
+            -RedirectStandardOutput "iscc_stdout.txt" `
+            -RedirectStandardError  "iscc_stderr.txt"
+          Write-Host "=== ISCC STDOUT ==="
+          Get-Content "iscc_stdout.txt" -ErrorAction SilentlyContinue
+          Write-Host "=== ISCC STDERR ==="
+          Get-Content "iscc_stderr.txt" -ErrorAction SilentlyContinue
+          exit $proc.ExitCode
       - uses: actions/upload-artifact@v4
         if: startsWith(github.ref, 'refs/tags/v')
         with:
