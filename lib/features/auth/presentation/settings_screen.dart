@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../../core/autofill/autofill_server.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../data/auth_repository.dart';
@@ -434,6 +436,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
             },
           ),
+          if (Platform.isWindows) ...[
+            ListTile(
+              leading: const Icon(Icons.extension_outlined),
+              title: const Text('Tarayıcı Autofill'),
+              subtitle: const Text(
+                'Eklentiye yapıştırılacak bağlantı token\'ı',
+                style: TextStyle(fontSize: 12),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.copy_outlined),
+                tooltip: 'Token\'ı kopyala',
+                onPressed: () async {
+                  final token = AutofillServer.instance.sessionToken;
+                  if (token != null && context.mounted) {
+                    await Clipboard.setData(ClipboardData(text: token));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Token kopyalandı')),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
           if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) ...[
             Consumer(
               builder: (context, ref, _) {

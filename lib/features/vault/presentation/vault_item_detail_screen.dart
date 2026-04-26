@@ -35,6 +35,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
 
   final _titleCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  final _urlCtrl = TextEditingController();
   // custom fields — her biri {key: ctrl, value: ctrl}
   final List<Map<String, TextEditingController>> _editCustomFields = [];
 
@@ -54,6 +55,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   void dispose() {
     _titleCtrl.dispose();
     _passwordCtrl.dispose();
+    _urlCtrl.dispose();
     _disposeCustomFieldCtrls();
     super.dispose();
   }
@@ -96,6 +98,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   void _fillControllers() {
     _titleCtrl.text = _fullItem['title'] as String? ?? '';
     _passwordCtrl.text = _decryptedPassword ?? '';
+    _urlCtrl.text = _fullItem['url'] as String? ?? '';
 
     // Mevcut custom field controller'larını temizle
     _disposeCustomFieldCtrls();
@@ -147,6 +150,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
       final data = <String, dynamic>{
         'title': _titleCtrl.text.trim(),
         'password': _passwordCtrl.text.trim(),
+        'url': _urlCtrl.text.trim(),
       };
 
       final customFieldsList = <Map<String, String>>[];
@@ -527,6 +531,19 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             decoration: const InputDecoration(
               labelText: 'Başlık',
               border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // URL
+          TextField(
+            controller: _urlCtrl,
+            keyboardType: TextInputType.url,
+            decoration: const InputDecoration(
+              labelText: 'Web Sitesi (URL)',
+              hintText: 'Örn: https://instagram.com',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.link),
             ),
           ),
           const SizedBox(height: 12),

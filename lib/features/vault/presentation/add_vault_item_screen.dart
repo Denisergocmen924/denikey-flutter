@@ -27,6 +27,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
 
   // Başlık alanı (her tip için ortak)
   final _titleCtrl = TextEditingController();
+  final _urlCtrl = TextEditingController();
 
   // Form hata mesajları
   String? _titleError;
@@ -47,6 +48,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   @override
   void dispose() {
     _titleCtrl.dispose();
+    _urlCtrl.dispose();
     for (final ctrl in _fieldControllers.values) {
       ctrl.dispose();
     }
@@ -156,6 +158,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       if (_selectedItemType != null) 'icon': _selectedItemType!['icon'],
       if (_selectedItemType != null) 'color': _selectedItemType!['color'],
       if (customFieldsData.isNotEmpty) 'custom_fields_data': customFieldsData,
+      if (_urlCtrl.text.trim().isNotEmpty) 'url': _urlCtrl.text.trim(),
     };
 
     try {
@@ -393,6 +396,19 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
               hintText: 'Örn: Instagram, Gmail, Netflix',
               errorText: _titleError,
               border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // URL
+          TextField(
+            controller: _urlCtrl,
+            keyboardType: TextInputType.url,
+            decoration: const InputDecoration(
+              labelText: 'Web Sitesi (URL)',
+              hintText: 'Örn: https://instagram.com',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.link),
             ),
           ),
           const SizedBox(height: 12),
