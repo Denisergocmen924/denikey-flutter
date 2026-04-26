@@ -107,8 +107,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _navigate() async {
     final prefs = await SharedPreferences.getInstance();
-    // TODO(test): onboarding_done geçici olarak false'a zorlandı — test bittikten sonra geri al
-    final onboardingDone = false; // prefs.getBool('onboarding_done') ?? false;
+    final onboardingDone = prefs.getBool('onboarding_done') ?? false;
     if (!mounted) return;
     if (!onboardingDone) {
       context.go('/onboarding');

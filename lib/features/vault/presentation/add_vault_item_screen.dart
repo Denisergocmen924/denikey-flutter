@@ -164,13 +164,12 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     try {
       await ref.read(vaultProvider.notifier).createItem(data);
       if (mounted) context.pop();
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Hata: $e'),
+          const SnackBar(
+            content: Text('Kayıt eklenirken bir hata oluştu.'),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 8),
           ),
         );
       }
