@@ -10,6 +10,7 @@ import '../../../core/storage/secure_storage.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/providers/shortcuts_provider.dart';
 import '../../../core/providers/auto_lock_provider.dart';
+import '../../../core/providers/clipboard_timeout_provider.dart';
 import '../../../core/providers/app_version_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
@@ -432,6 +433,62 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ],
                       ),
                     ),
+                ],
+              );
+            },
+          ),
+          Consumer(
+            builder: (context, ref, _) {
+              final timeout = ref.watch(clipboardTimeoutProvider);
+              final cs = Theme.of(context).colorScheme;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.content_paste_outlined),
+                    title: const Text('Pano Temizleme'),
+                    subtitle: Text(
+                      timeout != null
+                          ? 'Kopyalanan şifre $timeout sn sonra silinir'
+                          : 'Sınırsız — pano otomatik temizlenmez',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(56, 0, 16, 12),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        for (final option in [10, 30, 60])
+                          ChoiceChip(
+                            label: Text('$option sn'),
+                            selected: timeout == option,
+                            onSelected: (_) => ref
+                                .read(clipboardTimeoutProvider.notifier)
+                                .setTimeout(option),
+                          ),
+                        ChoiceChip(
+                          label: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.warning_amber_rounded,
+                                size: 14,
+                                color: timeout == null
+                                    ? cs.onPrimary
+                                    : Colors.orange.shade700),
+                              const SizedBox(width: 4),
+                              const Text('Sınırsız'),
+                            ],
+                          ),
+                          selected: timeout == null,
+                          onSelected: (_) => ref
+                              .read(clipboardTimeoutProvider.notifier)
+                              .setTimeout(null),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               );
             },

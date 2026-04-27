@@ -23,10 +23,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   void initState() {
     super.initState();
     Future.microtask(() async {
-      ref.read(vaultProvider.notifier).loadItems();
+      await ref.read(vaultProvider.notifier).loadItems();
       ref.read(categoryProvider.notifier).loadCategories();
       NotificationService.instance.scheduleWeeklySecurityReminder();
       if (mounted) await showDesktopOnboardingIfNeeded(context);
+      await ref.read(vaultProvider.notifier).createSampleItemIfNeeded();
     });
   }
 
@@ -50,11 +51,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   }
 
   List<Map<String, dynamic>> _filteredItems(List<Map<String, dynamic>> items) {
-    if (_selectedCategoryId == null) return items;
-    return items.where((item) {
-      final catId = item['category_id']?.toString();
-      return catId == _selectedCategoryId;
-    }).toList();
+    List<Map<String, dynamic>> result = items;
+    if (_selectedCategoryId != null) {
+      result = result.where((item) {
+        final catId = item['category_id']?.toString();
+        return catId == _selectedCategoryId;
+      }).toList();
+    }
+    // Favoriler üste
+    final favorites = result.where((i) => i['is_favorite'] == true).toList();
+    final rest = result.where((i) => i['is_favorite'] != true).toList();
+    return [...favorites, ...rest];
   }
 
   @override
@@ -173,49 +180,125 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                   ),
                 );
               }
+              final favorites = filtered.where((i) => i['is_favorite'] == true).toList();
+              final hasFavorites = favorites.isNotEmpty;
+
               return RefreshIndicator(
                 onRefresh: () => ref.read(vaultProvider.notifier).loadItems(),
-                child: ListView.separated(
+                child: ListView.builder(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                  itemCount: filtered.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  itemCount: filtered.length + (hasFavorites ? 2 : 0),
                   itemBuilder: (context, index) {
-                    final item = filtered[index];
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                        leading: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: cs.primaryContainer,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            _iconForType(item['item_type']),
-                            color: cs.onPrimaryContainer,
-                            size: 22,
-                          ),
-                        ),
-                        title: Text(
-                          item['title'] ?? 'İsimsiz',
-                          style: const TextStyle(fontWeight: FontWeight.w600,
-                            fontSize: 15),
-                        ),
-                        subtitle: item['username'] != null || item['url'] != null
-                          ? Text(
-                              item['username'] ?? item['url'] ?? '',
+                    // Favoriler başlığı
+                    if (hasFavorites && index == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Icon(Icons.star, size: 14, color: Colors.amber.shade600),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Favoriler',
                               style: TextStyle(
-                                color: cs.onSurfaceVariant, fontSize: 13),
-                            )
-                          : null,
-                        trailing: Icon(Icons.chevron_right,
-                          color: cs.onSurfaceVariant),
-                        onTap: () async {
-                          await context.push('/vault/detail', extra: item);
-                          ref.read(vaultProvider.notifier).loadItems();
-                        },
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.6,
+                                color: Colors.amber.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    // Diğerleri başlığı
+                    if (hasFavorites && index == favorites.length + 1) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8, bottom: 8),
+                        child: Row(
+                          children: [
+                            Expanded(child: Divider(color: cs.outlineVariant, height: 1)),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: Text(
+                                'Diğerleri',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: cs.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider(color: cs.outlineVariant, height: 1)),
+                          ],
+                        ),
+                      );
+                    }
+
+                    final itemIndex = hasFavorites
+                        ? (index <= favorites.length ? index - 1 : index - 2)
+                        : index;
+                    final item = filtered[itemIndex];
+                    final isFavorite = item['is_favorite'] == true;
+                    final itemId = item['id']?.toString() ?? '';
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Card(
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.only(
+                            left: 16, right: 4, top: 8, bottom: 8),
+                          leading: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: cs.primaryContainer,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              _iconForType(item['item_type']),
+                              color: cs.onPrimaryContainer,
+                              size: 22,
+                            ),
+                          ),
+                          title: Text(
+                            item['title'] ?? 'İsimsiz',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 15),
+                          ),
+                          subtitle: item['username'] != null || item['url'] != null
+                            ? Text(
+                                item['username'] ?? item['url'] ?? '',
+                                style: TextStyle(
+                                  color: cs.onSurfaceVariant, fontSize: 13),
+                              )
+                            : null,
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  isFavorite ? Icons.star : Icons.star_border,
+                                  color: isFavorite
+                                      ? Colors.amber.shade600
+                                      : cs.onSurfaceVariant,
+                                  size: 20,
+                                ),
+                                tooltip: isFavorite
+                                    ? 'Favoriden çıkar'
+                                    : 'Favorilere ekle',
+                                onPressed: () => ref
+                                    .read(vaultProvider.notifier)
+                                    .toggleFavorite(itemId, !isFavorite),
+                              ),
+                              Icon(Icons.chevron_right, color: cs.onSurfaceVariant),
+                              const SizedBox(width: 4),
+                            ],
+                          ),
+                          onTap: () async {
+                            await context.push('/vault/detail', extra: item);
+                            ref.read(vaultProvider.notifier).loadItems();
+                          },
+                        ),
                       ),
                     );
                   },
