@@ -121,6 +121,52 @@ class VaultNotifier extends StateNotifier<VaultState> {
     }
   }
 
+  Future<void> deleteItems(List<String> ids) async {
+    LoadingOverlay.showGlobal(message: '${ids.length} kayıt siliniyor...');
+    try {
+      await Future.wait(ids.map((id) => _repo.deleteItem(id)));
+      await loadItems();
+    } on Exception catch (e) {
+      LoadingOverlay.hideGlobal();
+      if (e.toString().contains('offline')) {
+        state = state.copyWith(errorMessage: 'İnternet bağlantısı yok.');
+      } else {
+        state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
+      }
+    }
+  }
+
+  Future<void> setFavoriteForItems(List<String> ids, bool isFavorite) async {
+    // Optimistik güncelleme
+    final updated = state.items.map((item) {
+      if (ids.contains(item['id']?.toString())) {
+        return {...item, 'is_favorite': isFavorite};
+      }
+      return item;
+    }).toList();
+    state = state.copyWith(items: updated);
+    try {
+      await Future.wait(ids.map((id) => _repo.toggleFavorite(id, isFavorite)));
+    } on Exception catch (_) {
+      await loadItems();
+    }
+  }
+
+  Future<void> moveItemsToCategory(List<String> ids, String? categoryId) async {
+    LoadingOverlay.showGlobal(message: 'Taşınıyor...');
+    try {
+      await Future.wait(ids.map((id) => _repo.moveItemToCategory(id, categoryId)));
+      await loadItems();
+    } on Exception catch (e) {
+      LoadingOverlay.hideGlobal();
+      if (e.toString().contains('offline')) {
+        state = state.copyWith(errorMessage: 'İnternet bağlantısı yok.');
+      } else {
+        state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
+      }
+    }
+  }
+
   Future<void> createSampleItemIfNeeded() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('sample_item_created') == true) return;

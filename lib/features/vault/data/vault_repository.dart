@@ -164,4 +164,9 @@ class VaultRepository {
     if (!await isOnline()) throw Exception('offline');
     await _dio.put(ApiConstants.vaultItem(id), data: {'is_favorite': isFavorite});
   }
+
+  Future<void> moveItemToCategory(String id, String? categoryId) async {
+    if (!await isOnline()) throw Exception('offline');
+    await _dio.put(ApiConstants.vaultItem(id), data: {'category_id': categoryId});
+  }
 }
