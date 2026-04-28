@@ -142,10 +142,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return 'Kullanıcı adı gerekli';
-                      if (v.length < 3) return 'En az 3 karakter';
-                      if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(v)) {
-                        return 'Sadece harf, rakam ve _ kullanılabilir';
-                      }
+                      if (v.trim().length < 3) return 'En az 3 karakter';
+                      if (v.trim().length > 50) return 'En fazla 50 karakter';
                       return null;
                     },
                   ),
