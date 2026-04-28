@@ -500,8 +500,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     WidgetsBinding.instance.platformDispatcher.platformBrightness ==
                         Brightness.dark),
             onChanged: (val) {
-              ref.read(themeModeProvider.notifier).state =
-                  val ? ThemeMode.dark : ThemeMode.light;
+              ref.read(themeModeProvider.notifier).setTheme(
+                  val ? ThemeMode.dark : ThemeMode.light);
             },
           ),
 
@@ -534,7 +534,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             icon: Icons.delete_outline,
             title: 'Çöp Kutusu',
             content:
-                'Silinen şifreler 30 gün boyunca Çöp Kutusu\'nda tutulur. '
+                'Silinen şifreler 7 gün boyunca Çöp Kutusu\'nda tutulur. '
                 'Kasam ekranının sağ üst köşesindeki çöp kutusu ikonundan erişebilirsiniz.',
           ),
           _HelpTile(
