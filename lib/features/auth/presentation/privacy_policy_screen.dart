@@ -12,7 +12,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
         children: [
           Text(
-            'Son güncelleme: Nisan 2025',
+            'Son güncelleme: Nisan 2026',
             style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
           ),
           const SizedBox(height: 20),

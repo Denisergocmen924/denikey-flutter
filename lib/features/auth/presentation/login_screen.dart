@@ -96,11 +96,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextFormField(
                     controller: _usernameCtrl,
                     decoration: const InputDecoration(
-                      labelText: 'Kullanıcı Adı',
+                      labelText: 'Kullanıcı Adı veya E-posta',
                       prefixIcon: Icon(Icons.person_outline),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Kullanıcı adı gerekli';
+                      if (v == null || v.isEmpty) return 'Kullanıcı adı veya e-posta gerekli';
                       if (v.length < 3) return 'En az 3 karakter';
                       return null;
                     },

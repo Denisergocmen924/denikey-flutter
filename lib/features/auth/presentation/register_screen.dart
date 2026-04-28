@@ -81,7 +81,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (next.status == AuthStatus.success) {
         final userId = next.userId ?? '';
         final email = next.email ?? '';
-        context.go('/verify-email', extra: {
+        context.push('/verify-email', extra: {
           'user_id': userId,
           'email': email,
           'master_password': _passwordCtrl.text.trim(),
