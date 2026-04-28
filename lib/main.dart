@@ -266,6 +266,9 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
       final elapsed = DateTime.now().difference(_blurTime!).inMinutes;
       if (elapsed < autoLock.minutes!) return;
     }
+    if (autoLock.minutes != null) {
+      NotificationService.instance.showAutoLockNotification();
+    }
     await SecureStorage.instance.deleteMasterKey();
     ref.read(routerProvider).go('/master-lock');
   }

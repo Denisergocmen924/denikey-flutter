@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/vault_provider.dart';
 import '../data/vault_repository.dart';
 import '../../../core/network/dio_client.dart';
+import '../../../core/providers/clipboard_timeout_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import 'password_history_screen.dart';
 
@@ -223,13 +224,22 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   }
 
   void _copyToClipboard(String value, String label) {
+    final timeout = ref.read(clipboardTimeoutProvider);
     Clipboard.setData(ClipboardData(text: value));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label kopyalandı, 30 saniye sonra silinecek')),
+      SnackBar(
+        content: Text(
+          timeout != null
+              ? '$label kopyalandı, $timeout saniye sonra silinecek'
+              : '$label kopyalandı',
+        ),
+      ),
     );
-    Future.delayed(const Duration(seconds: 30), () {
-      Clipboard.setData(const ClipboardData(text: ''));
-    });
+    if (timeout != null) {
+      Future.delayed(Duration(seconds: timeout), () {
+        Clipboard.setData(const ClipboardData(text: ''));
+      });
+    }
   }
 
   void _confirmDelete() {
@@ -391,6 +401,27 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                 ),
               ]
             : [
+                IconButton(
+                  icon: Icon(
+                    _fullItem['is_favorite'] == true
+                        ? Icons.star
+                        : Icons.star_border,
+                    color: _fullItem['is_favorite'] == true
+                        ? Colors.amber.shade600
+                        : null,
+                  ),
+                  tooltip: _fullItem['is_favorite'] == true
+                      ? 'Favoriden çıkar'
+                      : 'Favorilere ekle',
+                  onPressed: _decrypting ? null : () {
+                    final isFav = _fullItem['is_favorite'] == true;
+                    setState(() => _fullItem['is_favorite'] = !isFav);
+                    ref.read(vaultProvider.notifier).toggleFavorite(
+                      _fullItem['id'].toString(),
+                      !isFav,
+                    );
+                  },
+                ),
                 IconButton(
                   icon: const Icon(Icons.history_outlined),
                   tooltip: 'Şifre Geçmişi',

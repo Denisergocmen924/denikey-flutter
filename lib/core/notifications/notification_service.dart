@@ -58,6 +58,16 @@ class NotificationService {
     await prefs.setInt(_lastReminderKey, now);
   }
 
+  /// Otomatik kilit bildirimi (sadece süre ile kilit açıksa)
+  Future<void> showAutoLockNotification() async {
+    if (!_isSupported) return;
+    await _showNotification(
+      id: 1003,
+      title: 'DeniKey Kilitlendi',
+      body: 'Otomatik kilit devreye girdi. Devam etmek için master şifrenizi girin.',
+    );
+  }
+
   /// Yeni cihaz girişi bildirimi
   Future<void> showNewDeviceAlert() async {
     if (!_isSupported) return;
