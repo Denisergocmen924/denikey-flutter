@@ -1,5 +1,16 @@
 # DeniKey Değişiklik Geçmişi
 
+## [1.0.6] — 2026-04-26
+
+### Düzeltmeler
+- Onboarding bypass kaldırıldı, debug hata mesajı üretim moduna uygun hale getirildi
+
+### CI/CD
+- GitHub Actions artifact'larına retention-days eklendi (main push: 5 gün, tag push: 30 gün)
+- Main push'ta da APK/EXE artifact üretilir
+
+---
+
 ## [Unreleased] — 2026-04-14
 
 ### Yeni Dosyalar
