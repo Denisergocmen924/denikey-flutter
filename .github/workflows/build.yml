@@ -11,6 +11,8 @@ jobs:
   build-android:
     name: Android APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -44,18 +46,40 @@ jobs:
           EOF
       - run: flutter build apk --release --build-name=${{ steps.version.outputs.name }} --build-number=${{ steps.version.outputs.number }}
       - run: flutter build appbundle --release --build-name=${{ steps.version.outputs.name }} --build-number=${{ steps.version.outputs.number }}
-      - uses: actions/upload-artifact@v4
+      - name: Dosyaları yeniden adlandır
         if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk DeniKey-Android.apk
+          cp build/app/outputs/bundle/release/app-release.aab DeniKey-Android.aab
+      - name: GitHub Release'e yükle
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
-          name: DeniKey-Android
-          retention-days: 30
-          path: |
-            build/app/outputs/flutter-apk/app-release.apk
-            build/app/outputs/bundle/release/app-release.aab
+          name: DeniKey ${{ github.ref_name }}
+          draft: true
+          body: |
+            ## DeniKey ${{ github.ref_name }}
+
+            ### İndirme Linkleri
+            | Platform | Dosya |
+            |----------|-------|
+            | Android | `DeniKey-Android.apk` |
+            | Windows | `DeniKey-Setup.exe` |
+            | Linux | `DeniKey-Linux.tar.gz` |
+
+            ### Kurulum
+            - **Android:** APK'yı indir, "Bilinmeyen kaynaklardan yükle" izni ver, kur.
+            - **Windows:** `DeniKey-Setup.exe` dosyasını indir ve çalıştır.
+            - **Linux:** `tar -xzf DeniKey-Linux.tar.gz` ile aç, `DeniKey` binary'sini çalıştır.
+          files: |
+            DeniKey-Android.apk
+            DeniKey-Android.aab
 
   build-windows:
     name: Windows EXE
     runs-on: windows-latest
+    permissions:
+      contents: write
     steps:
       - name: Git long path desteği
         run: git config --global core.longpaths true
@@ -100,16 +124,18 @@ jobs:
           New-Item -ItemType Directory -Force -Path "windows_setup\installer_output" | Out-Null
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "windows_setup\installer.iss"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - uses: actions/upload-artifact@v4
+      - name: GitHub Release'e yükle
         if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
-          name: DeniKey-Windows
-          retention-days: 30
-          path: windows_setup\installer_output\DeniKey-Setup.exe
+          draft: true
+          files: windows_setup/installer_output/DeniKey-Setup.exe
 
   build-linux:
     name: Linux Binary
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Linux bağımlılıkları
@@ -140,62 +166,23 @@ jobs:
       - name: Linux tar.gz oluştur
         run: |
           tar -czf DeniKey-Linux.tar.gz -C build/linux/x64/release/bundle .
-      - uses: actions/upload-artifact@v4
+      - name: GitHub Release'e yükle
         if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
-          name: DeniKey-Linux
-          retention-days: 30
-          path: DeniKey-Linux.tar.gz
+          draft: true
+          files: DeniKey-Linux.tar.gz
 
-  release:
-    name: GitHub Release
+  publish-release:
+    name: Release Yayınla
     needs: [build-android, build-windows, build-linux]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:
-      - name: Android artifact indir
-        uses: actions/download-artifact@v4
-        with:
-          name: DeniKey-Android
-          path: release-files/
-      - name: Windows artifact indir
-        uses: actions/download-artifact@v4
-        with:
-          name: DeniKey-Windows
-          path: release-files/
-      - name: Linux artifact indir
-        uses: actions/download-artifact@v4
-        with:
-          name: DeniKey-Linux
-          path: release-files/
-      - name: Dosyaları yeniden adlandır
-        run: |
-          find release-files -name "app-release.apk" -exec mv {} release-files/DeniKey-Android.apk \;
-          find release-files -name "app-release.aab" -exec mv {} release-files/DeniKey-Android.aab \;
-      - name: GitHub Release oluştur
-        uses: softprops/action-gh-release@v2
-        with:
-          name: DeniKey ${{ github.ref_name }}
-          body: |
-            ## DeniKey ${{ github.ref_name }}
-
-            ### İndirme Linkleri
-            | Platform | Dosya |
-            |----------|-------|
-            | Android | `DeniKey-Android.apk` |
-            | Windows | `DeniKey-Setup.exe` |
-            | Linux | `DeniKey-Linux.tar.gz` |
-
-            ### Kurulum
-            - **Android:** APK'yı indir, "Bilinmeyen kaynaklardan yükle" izni ver, kur.
-            - **Windows:** `DeniKey-Setup.exe` dosyasını indir ve çalıştır.
-            - **Linux:** `tar -xzf DeniKey-Linux.tar.gz` ile aç, `DeniKey` binary'sini çalıştır.
-          files: |
-            release-files/DeniKey-Android.apk
-            release-files/DeniKey-Android.aab
-            release-files/DeniKey-Setup.exe
-            release-files/DeniKey-Linux.tar.gz
-          draft: false
-          prerelease: false
+      - name: Draft release'i yayınla
+        run: gh release edit ${{ github.ref_name }} --draft=false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
