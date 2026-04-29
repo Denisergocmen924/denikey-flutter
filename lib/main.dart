@@ -92,7 +92,8 @@ void main() async {
     if (Platform.isWindows) {
       await windowManager.setPreventClose(true);
       await TrayService.instance.init();
-      await AutofillServer.instance.start();
+      final autofillEnabled = prefs.getBool('autofill_enabled') ?? false;
+      if (autofillEnabled) await AutofillServer.instance.start();
     }
   }
   await NotificationService.instance.initialize();
