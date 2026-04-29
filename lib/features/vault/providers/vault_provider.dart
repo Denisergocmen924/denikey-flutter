@@ -54,6 +54,9 @@ class VaultNotifier extends StateNotifier<VaultState> {
       LoadingOverlay.hideGlobal();
       final msg = e.response?.data['detail'] ?? 'Yüklenemedi.';
       state = state.copyWith(status: VaultStatus.error, errorMessage: msg.toString());
+    } catch (e) {
+      LoadingOverlay.hideGlobal();
+      state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
     }
   }
 
