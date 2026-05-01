@@ -23,6 +23,7 @@ class SecureStorage {
   static const _keyEncryptionSalt   = 'encryption_salt';
   static const _keyVerificationBlob = 'verification_blob';
   static const _keyVerificationIv   = 'verification_iv';
+  static const _keyAutofillToken    = 'autofill_token';
 
   Future<void> _write(String key, String value) =>
       _storage.write(key: key, value: value);
@@ -105,6 +106,11 @@ class SecureStorage {
     await _write(_keyDeviceId, id);
     return id;
   }
+
+  // AUTOFILL TOKEN
+  Future<void> saveAutofillToken(String token) => _write(_keyAutofillToken, token);
+  Future<String?> getAutofillToken() => _read(_keyAutofillToken);
+  Future<void> deleteAutofillToken() => _delete(_keyAutofillToken);
 
   // CLEAR ALL
   Future<void> clearAll() => _storage.deleteAll();

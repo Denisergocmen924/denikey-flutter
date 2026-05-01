@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
@@ -21,9 +22,14 @@ class AutofillServer {
   Future<void> start() async {
     if (_server != null) return;
 
-    _sessionToken = base64Url.encode(
-      List<int>.generate(32, (_) => DateTime.now().microsecondsSinceEpoch % 256),
-    );
+    final saved = await SecureStorage.instance.getAutofillToken();
+    if (saved != null && saved.isNotEmpty) {
+      _sessionToken = saved;
+    } else {
+      final rng = Random.secure();
+      _sessionToken = base64Url.encode(List<int>.generate(32, (_) => rng.nextInt(256)));
+      await SecureStorage.instance.saveAutofillToken(_sessionToken!);
+    }
 
     final router = Router()
       ..get('/status', _handleStatus)
