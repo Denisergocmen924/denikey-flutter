@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,12 +44,20 @@ class VaultNotifier extends StateNotifier<VaultState> {
     LoadingOverlay.showGlobal(message: 'Kasa yükleniyor...');
     try {
       final online = await _repo.isOnline();
-      final items = await _repo.getItems();
+      final items = await _repo
+          .getItems()
+          .timeout(const Duration(seconds: 45));
       LoadingOverlay.hideGlobal();
       state = state.copyWith(
         status: VaultStatus.success,
         items: items,
         isOffline: !online,
+      );
+    } on TimeoutException {
+      LoadingOverlay.hideGlobal();
+      state = state.copyWith(
+        status: VaultStatus.error,
+        errorMessage: 'Sunucu yanıt vermedi. Lütfen tekrar deneyin.',
       );
     } on DioException catch (e) {
       LoadingOverlay.hideGlobal();

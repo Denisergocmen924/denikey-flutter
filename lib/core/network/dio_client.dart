@@ -4,6 +4,12 @@ import '../constants/api_constants.dart';
 import '../storage/secure_storage.dart';
 import '../router/app_router.dart';
 
+// Token yenileme işlemlerinde maksimum bekleme süresi.
+// refreshDio'nun timeout'u olmazsa backend yavaş/kapalı olduğunda
+// vault ekranı sonsuz spinner'da kalır — asla exception atmaz.
+const _kRefreshConnectTimeout  = Duration(seconds: 10);
+const _kRefreshReceiveTimeout  = Duration(seconds: 15);
+
 class DioClient {
   DioClient._();
   static final DioClient instance = DioClient._();
@@ -86,6 +92,8 @@ class _JwtInterceptor extends Interceptor {
 
       final refreshDio = Dio(BaseOptions(
         baseUrl: ApiConstants.baseUrl,
+        connectTimeout: _kRefreshConnectTimeout,
+        receiveTimeout: _kRefreshReceiveTimeout,
         headers: {'Content-Type': 'application/json'},
       ));
       final response = await refreshDio.post(
