@@ -510,14 +510,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       title: const Text('Tarayıcı Otomatik Doldurma'),
                       subtitle: Text(
                         autofill.enabled
-                            ? 'Aktif — Chrome eklentisi bağlanabilir'
-                            : 'Chrome eklentisiyle şifrelerinizi otomatik doldurun',
+                            ? 'Aktif — Chrome/Brave eklentisi bağlanabilir'
+                            : 'Tarayıcı eklentisiyle şifrelerinizi otomatik doldurun',
                         style: const TextStyle(fontSize: 12),
                       ),
                       value: autofill.enabled,
-                      onChanged: (val) => val
-                          ? ref.read(autofillProvider.notifier).enable()
-                          : ref.read(autofillProvider.notifier).disable(),
+                      onChanged: (val) async {
+                        if (val) {
+                          await ref.read(autofillProvider.notifier).enable();
+                          final token = AutofillServer.instance.sessionToken;
+                          if (token != null) {
+                            await Clipboard.setData(ClipboardData(text: token));
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Otomatik doldurma aktif — token panoya kopyalandı'),
+                                ),
+                              );
+                            }
+                          }
+                        } else {
+                          await ref.read(autofillProvider.notifier).disable();
+                        }
+                      },
                     ),
                     if (autofill.enabled)
                       Padding(
@@ -532,26 +547,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Bağlantı Token\'ı',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: cs.primary,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
                               Row(
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      AutofillServer.instance.sessionToken ?? '',
+                                      'Bağlantı Token\'ı',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontFamily: 'monospace',
-                                        color: cs.onSurfaceVariant,
+                                        fontWeight: FontWeight.w700,
+                                        color: cs.primary,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   IconButton(
@@ -559,22 +564,53 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     tooltip: 'Token\'ı kopyala',
                                     onPressed: () async {
                                       final token = AutofillServer.instance.sessionToken;
-                                      if (token != null && context.mounted) {
+                                      if (token != null) {
                                         await Clipboard.setData(ClipboardData(text: token));
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Token kopyalandı')),
-                                        );
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Token kopyalandı')),
+                                          );
+                                        }
                                       }
                                     },
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
                               Text(
-                                'Chrome eklentisini tarayıcınıza yükleyin, ardından bu token\'ı eklentiye yapıştırın. Uygulama her başladığında token yenilenir.',
+                                AutofillServer.instance.sessionToken ?? '',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontFamily: 'monospace',
+                                  color: cs.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'İlk kurulum (bir kez yapılır):',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: cs.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                '1. Tarayıcıda chrome://extensions adresine gidin\n'
+                                '2. Geliştirici modunu açın\n'
+                                '3. "Paketlenmemiş uzantı yükle" ile browser_extension klasörünü seçin\n'
+                                '4. Eklenti ikonuna tıklayın, token\'ı yapıştırın ve kaydedin',
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: cs.onSurfaceVariant,
+                                  height: 1.6,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Token kalıcıdır — uygulama yeniden başlasa bile değişmez. Kurulum yalnızca bir kez yapılır.',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: cs.primary,
                                   height: 1.5,
                                 ),
                               ),

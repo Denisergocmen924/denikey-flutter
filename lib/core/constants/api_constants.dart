@@ -44,4 +44,10 @@ class ApiConstants {
   static const String trashItems = '/api/v1/trash/';
   static String trashItem(String id) => '/api/v1/trash/$id';
   static String trashRestore(String id) => '/api/v1/trash/$id/restore';
+
+  // Version
+  static const String version = '/api/v1/version';
+
+  // GitHub Releases
+  static const String releasesPage = 'https://github.com/Denisergocmen924/denikey-flutter/releases/latest';
 }

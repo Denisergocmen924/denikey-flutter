@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../storage/secure_storage.dart';
+import '../network/dio_client.dart';
+import '../constants/api_constants.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -106,6 +108,21 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _navigate() async {
+    // Zorunlu güncelleme kontrolü — hata olursa sessizce geç
+    try {
+      final info = await PackageInfo.fromPlatform();
+      final response = await DioClient.instance.dio.get(ApiConstants.version);
+      final minimum = response.data['minimum_version'] as String? ?? '';
+      if (minimum.isNotEmpty && _isOutdated(info.version, minimum)) {
+        if (!mounted) return;
+        context.go('/force-update', extra: {
+          'current': info.version,
+          'minimum': minimum,
+        });
+        return;
+      }
+    } catch (_) {}
+
     final prefs = await SharedPreferences.getInstance();
     final onboardingDone = prefs.getBool('onboarding_done') ?? false;
     if (!mounted) return;
@@ -120,6 +137,19 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       context.go('/master-lock');
     }
+  }
+
+  // "1.0.4" < "1.1.0" → true
+  bool _isOutdated(String current, String minimum) {
+    final c = current.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final m = minimum.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    for (int i = 0; i < 3; i++) {
+      final cv = i < c.length ? c[i] : 0;
+      final mv = i < m.length ? m[i] : 0;
+      if (cv < mv) return true;
+      if (cv > mv) return false;
+    }
+    return false;
   }
 
   @override

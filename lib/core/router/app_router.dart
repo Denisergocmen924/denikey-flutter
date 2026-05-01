@@ -20,6 +20,7 @@ import '../../features/audit_log/presentation/audit_log_screen.dart';
 import '../../features/support_ticket/presentation/support_ticket_screen.dart';
 import '../../features/trash/presentation/trash_screen.dart';
 import '../presentation/splash_screen.dart';
+import '../presentation/force_update_screen.dart';
 import '../../features/auth/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/privacy_policy_screen.dart';
 
@@ -29,6 +30,16 @@ final router = GoRouter(
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/force-update',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, String>;
+          return ForceUpdateScreen(
+            currentVersion: extra['current'] ?? '',
+            minimumVersion: extra['minimum'] ?? '',
+          );
+        },
       ),
       GoRoute(
         path: '/onboarding',
