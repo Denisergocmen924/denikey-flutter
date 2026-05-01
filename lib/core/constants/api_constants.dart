@@ -2,7 +2,7 @@ class ApiConstants {
   ApiConstants._();
 
   static String get baseUrl {
-    return 'https://denikey-backend-production.up.railway.app';
+    return 'https://denikey-backend.fly.dev';
   }
 
   // Auth

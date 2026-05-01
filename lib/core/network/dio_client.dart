@@ -8,7 +8,7 @@ import '../router/app_router.dart';
 // refreshDio'nun timeout'u olmazsa backend yavaş/kapalı olduğunda
 // vault ekranı sonsuz spinner'da kalır — asla exception atmaz.
 const _kRefreshConnectTimeout  = Duration(seconds: 10);
-const _kRefreshReceiveTimeout  = Duration(seconds: 15);
+const _kRefreshReceiveTimeout  = Duration(seconds: 35);
 
 class DioClient {
   DioClient._();
@@ -21,7 +21,7 @@ class DioClient {
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
         connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 40),
         // Content-Type burada set edilmiyor — her istek türüne göre Dio otomatik belirler.
         // JSON için interceptor ekliyor, FormData için Dio multipart set eder.
       ),
