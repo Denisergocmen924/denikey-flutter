@@ -58,4 +58,8 @@ class DeviceRepository {
   Future<void> banDevice(String deviceId) async {
     await _dio.patch(ApiConstants.deviceBan(deviceId));
   }
+
+  Future<void> unbanDevice(String deviceId) async {
+    await _dio.patch(ApiConstants.deviceUnban(deviceId));
+  }
 }

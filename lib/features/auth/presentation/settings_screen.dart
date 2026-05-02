@@ -1088,6 +1088,16 @@ class _DeviceTile extends ConsumerWidget {
                     style: TextStyle(color: Colors.red)),
               ]),
             ),
+          if (device.status == 'banned')
+            const PopupMenuItem(
+              value: 'unban',
+              child: Row(children: [
+                Icon(Icons.check_circle_outline, size: 18, color: Colors.green),
+                SizedBox(width: 8),
+                Text('Yasağı Kaldır',
+                    style: TextStyle(color: Colors.green)),
+              ]),
+            ),
         ],
       ),
     );
@@ -1111,6 +1121,13 @@ class _DeviceTile extends ConsumerWidget {
             const SnackBar(
                 content: Text('Cihaz yasaklandı'),
                 backgroundColor: Colors.red),
+          );
+        }
+      } else if (action == 'unban') {
+        await repo.unbanDevice(device.id);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Cihaz yasağı kaldırıldı')),
           );
         }
       }
