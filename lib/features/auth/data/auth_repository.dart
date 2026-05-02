@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/storage/secure_storage.dart';
@@ -36,6 +37,7 @@ class AuthRepository {
     required String masterPassword,
   }) async {
     final deviceId = await SecureStorage.instance.getDeviceId();
+    final deviceName = await getDeviceName();
 
     final response = await _dio.post(
       ApiConstants.login,
@@ -44,6 +46,7 @@ class AuthRepository {
         'master_password': masterPassword,
         'device_id': deviceId,
         'device_type': getDeviceType(),
+        'device_name': deviceName,
       },
     );
 
@@ -82,6 +85,7 @@ class AuthRepository {
     required String encryptionKeySalt,
   }) async {
     final deviceId = await SecureStorage.instance.getDeviceId();
+    final deviceName = await getDeviceName();
 
     final response = await _dio.post(
       ApiConstants.verifyDevice,
@@ -90,6 +94,7 @@ class AuthRepository {
         'code': code,
         'device_id': deviceId,
         'device_type': getDeviceType(),
+        'device_name': deviceName,
       },
     );
 
@@ -192,5 +197,28 @@ class AuthRepository {
     if (Platform.isMacOS) return 'macos';
     if (Platform.isLinux) return 'linux';
     return 'unknown';
+  }
+
+  Future<String> getDeviceName() async {
+    try {
+      final plugin = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final info = await plugin.androidInfo;
+        return '${info.brand} ${info.model}';
+      } else if (Platform.isIOS) {
+        final info = await plugin.iosInfo;
+        return info.name;
+      } else if (Platform.isWindows) {
+        final info = await plugin.windowsInfo;
+        return info.computerName;
+      } else if (Platform.isMacOS) {
+        final info = await plugin.macOsInfo;
+        return info.computerName;
+      } else if (Platform.isLinux) {
+        final info = await plugin.linuxInfo;
+        return info.prettyName;
+      }
+    } catch (_) {}
+    return getDeviceType();
   }
 }

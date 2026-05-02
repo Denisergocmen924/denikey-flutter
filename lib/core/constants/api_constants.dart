@@ -48,6 +48,11 @@ class ApiConstants {
   // Version
   static const String version = '/api/v1/version';
 
+  // Devices
+  static const String devices = '/api/v1/devices';
+  static String deviceRevoke(String id) => '/api/v1/devices/$id';
+  static String deviceBan(String id)    => '/api/v1/devices/$id/ban';
+
   // GitHub Releases
   static const String releasesPage = 'https://github.com/Denisergocmen924/denikey-flutter/releases/latest';
 }

@@ -16,6 +16,8 @@ import '../../../core/providers/app_version_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
 import '../../../core/presentation/app_shortcuts.dart';
+import '../../devices/data/device_repository.dart';
+import '../../devices/providers/device_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -218,6 +220,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     context.go('/login');
   }
 
+  void _showDevicesSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _DevicesSheet(),
+    );
+  }
+
   Future<void> _showUsernameDialog() async {
     final profile = ref.read(profileProvider);
     final ctrl = TextEditingController(text: profile.username ?? '');
@@ -348,6 +359,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: const Text('E-posta Değiştir'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/change-email'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.devices_outlined),
+            title: const Text('Cihazlarım'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _showDevicesSheet,
           ),
 
           const Divider(height: 1),
@@ -576,12 +593,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   ),
                                 ],
                               ),
-                              Text(
-                                AutofillServer.instance.sessionToken ?? '',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontFamily: 'monospace',
-                                  color: cs.onSurfaceVariant,
+                              GestureDetector(
+                                onTap: () async {
+                                  final token = AutofillServer.instance.sessionToken;
+                                  if (token != null) {
+                                    await Clipboard.setData(ClipboardData(text: token));
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Token kopyalandı')),
+                                      );
+                                    }
+                                  }
+                                },
+                                child: Text(
+                                  AutofillServer.instance.sessionToken ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontFamily: 'monospace',
+                                    color: Color(0xFF4FC3F7),
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Color(0xFF4FC3F7),
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -890,6 +922,298 @@ class _HelpTileState extends State<_HelpTile> {
             ),
           ),
       ],
+    );
+  }
+}
+
+// ─── Cihazlarım alt sayfa ────────────────────────────────────────────────────
+
+class _DevicesSheet extends ConsumerStatefulWidget {
+  const _DevicesSheet();
+
+  @override
+  ConsumerState<_DevicesSheet> createState() => _DevicesSheetState();
+}
+
+class _DevicesSheetState extends ConsumerState<_DevicesSheet> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.refresh(devicesProvider));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final devicesAsync = ref.watch(devicesProvider);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.92,
+      builder: (_, controller) => Container(
+        decoration: BoxDecoration(
+          color: cs.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 4),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: cs.onSurfaceVariant.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(Icons.devices_outlined, color: cs.primary),
+                  const SizedBox(width: 10),
+                  Text('Cihazlarım',
+                      style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: cs.onSurface)),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'Yenile',
+                    onPressed: () => ref.invalidate(devicesProvider),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: devicesAsync.when(
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(
+                  child: Text('Cihazlar yüklenemedi',
+                      style: TextStyle(color: cs.error)),
+                ),
+                data: (devices) => devices.isEmpty
+                    ? Center(
+                        child: Text('Kayıtlı cihaz yok',
+                            style: TextStyle(color: cs.onSurfaceVariant)),
+                      )
+                    : ListView.builder(
+                        controller: controller,
+                        itemCount: devices.length,
+                        itemBuilder: (_, i) =>
+                            _DeviceTile(device: devices[i]),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeviceTile extends ConsumerWidget {
+  final DeviceModel device;
+  const _DeviceTile({required this.device});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    final isActive = device.status == 'active' &&
+        device.lastActiveAt != null &&
+        DateTime.now().difference(device.lastActiveAt!).inMinutes < 5;
+    final isBanned = device.status == 'banned';
+
+    final indicatorColor = isBanned
+        ? Colors.red
+        : isActive
+            ? Colors.green
+            : Colors.orange;
+
+    final statusLabel = isBanned
+        ? 'Yasaklı'
+        : isActive
+            ? 'Aktif'
+            : 'Pasif';
+
+    return ListTile(
+      leading: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Icon(_deviceIcon(device.deviceType), size: 28,
+              color: cs.onSurfaceVariant),
+          Positioned(
+            right: -4,
+            bottom: -4,
+            child: _StatusDot(color: indicatorColor, pulse: isActive),
+          ),
+        ],
+      ),
+      title: Text(device.label,
+          style: const TextStyle(fontWeight: FontWeight.w500)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(statusLabel,
+              style: TextStyle(fontSize: 11, color: indicatorColor)),
+          if (device.lastActiveAt != null)
+            Text(_formatDate(device.lastActiveAt!),
+                style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
+        ],
+      ),
+      trailing: PopupMenuButton<String>(
+        icon: const Icon(Icons.more_vert),
+        onSelected: (val) => _onAction(context, ref, val),
+        itemBuilder: (_) => [
+          if (device.status != 'revoked' && device.status != 'banned')
+            const PopupMenuItem(
+              value: 'revoke',
+              child: Row(children: [
+                Icon(Icons.logout, size: 18),
+                SizedBox(width: 8),
+                Text('Oturumu Sonlandır'),
+              ]),
+            ),
+          if (device.status != 'banned')
+            const PopupMenuItem(
+              value: 'ban',
+              child: Row(children: [
+                Icon(Icons.block, size: 18, color: Colors.red),
+                SizedBox(width: 8),
+                Text('Cihazı Yasakla',
+                    style: TextStyle(color: Colors.red)),
+              ]),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _onAction(
+      BuildContext context, WidgetRef ref, String action) async {
+    final repo = ref.read(deviceRepositoryProvider);
+    try {
+      if (action == 'revoke') {
+        await repo.revokeDevice(device.id);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Oturum sonlandırıldı')),
+          );
+        }
+      } else if (action == 'ban') {
+        await repo.banDevice(device.id);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Cihaz yasaklandı'),
+                backgroundColor: Colors.red),
+          );
+        }
+      }
+      ref.invalidate(devicesProvider);
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('İşlem başarısız'),
+              backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  IconData _deviceIcon(String? type) {
+    switch (type) {
+      case 'android':
+        return Icons.phone_android;
+      case 'ios':
+        return Icons.phone_iphone;
+      case 'windows':
+        return Icons.computer;
+      case 'macos':
+        return Icons.laptop_mac;
+      case 'linux':
+        return Icons.computer;
+      default:
+        return Icons.devices;
+    }
+  }
+
+  String _formatDate(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'Az önce';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} dakika önce';
+    if (diff.inHours < 24) return '${diff.inHours} saat önce';
+    return '${diff.inDays} gün önce';
+  }
+}
+
+class _StatusDot extends StatefulWidget {
+  final Color color;
+  final bool pulse;
+  const _StatusDot({required this.color, required this.pulse});
+
+  @override
+  State<_StatusDot> createState() => _StatusDotState();
+}
+
+class _StatusDotState extends State<_StatusDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _anim = Tween<double>(begin: 0.4, end: 1.0).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
+    if (widget.pulse) _ctrl.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.pulse) {
+      return Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+          color: widget.color,
+          shape: BoxShape.circle,
+          border: Border.all(
+              color: Theme.of(context).colorScheme.surface, width: 1.5),
+        ),
+      );
+    }
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (_, child) => Opacity(
+        opacity: _anim.value,
+        child: Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            color: widget.color,
+            shape: BoxShape.circle,
+            border: Border.all(
+                color: Theme.of(context).colorScheme.surface, width: 1.5),
+          ),
+        ),
+      ),
     );
   }
 }
