@@ -53,6 +53,7 @@ class ApiConstants {
   static String deviceRevoke(String id) => '/api/v1/devices/$id';
   static String deviceBan(String id)    => '/api/v1/devices/$id/ban';
 
-  // GitHub Releases
-  static const String releasesPage = 'https://github.com/Denisergocmen924/denikey-flutter/releases/latest';
+  // GitHub Releases (public repo)
+  static const String releasesPage         = 'https://github.com/Denisergocmen924/denikey-releases/releases/latest';
+  static const String releasesDownloadBase = 'https://github.com/Denisergocmen924/denikey-releases/releases/download';
 }

@@ -1,8 +1,12 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/api_constants.dart';
 
-class ForceUpdateScreen extends StatelessWidget {
+class ForceUpdateScreen extends StatefulWidget {
   final String currentVersion;
   final String minimumVersion;
 
@@ -12,10 +16,66 @@ class ForceUpdateScreen extends StatelessWidget {
     required this.minimumVersion,
   });
 
+  @override
+  State<ForceUpdateScreen> createState() => _ForceUpdateScreenState();
+}
+
+class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
   static const _onyx   = Color(0xFF090C08);
   static const _orange = Color(0xFFFF5900);
   static const _cream  = Color(0xFFE8EDE9);
   static const _muted  = Color(0xFF9BABA4);
+
+  bool _downloading = false;
+  double _progress  = 0;
+  String? _error;
+
+  String get _downloadUrl {
+    final v = widget.minimumVersion;
+    if (Platform.isAndroid) {
+      return '${ApiConstants.releasesDownloadBase}/v$v/DeniKey-Android.apk';
+    } else if (Platform.isWindows) {
+      return '${ApiConstants.releasesDownloadBase}/v$v/DeniKey-Setup.exe';
+    }
+    return ApiConstants.releasesPage;
+  }
+
+  Future<void> _update() async {
+    if (Platform.isLinux) {
+      await launchUrl(Uri.parse(ApiConstants.releasesPage), mode: LaunchMode.externalApplication);
+      return;
+    }
+
+    setState(() {
+      _downloading = true;
+      _progress    = 0;
+      _error       = null;
+    });
+
+    try {
+      final dir      = await getTemporaryDirectory();
+      final fileName = Platform.isAndroid ? 'DeniKey-Update.apk' : 'DeniKey-Setup.exe';
+      final savePath = '${dir.path}/$fileName';
+
+      await Dio().download(
+        _downloadUrl,
+        savePath,
+        onReceiveProgress: (received, total) {
+          if (total > 0) setState(() => _progress = received / total);
+        },
+      );
+
+      if (Platform.isAndroid) {
+        await OpenFile.open(savePath);
+      } else if (Platform.isWindows) {
+        await Process.run(savePath, [], runInShell: true);
+      }
+    } catch (_) {
+      setState(() => _error = 'İndirme başarısız oldu. Tekrar deneyin.');
+    } finally {
+      if (mounted) setState(() => _downloading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +91,6 @@ class ForceUpdateScreen extends StatelessWidget {
               children: [
                 const Spacer(),
 
-                // İkon
                 Container(
                   width: 88,
                   height: 88,
@@ -49,7 +108,6 @@ class ForceUpdateScreen extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                // Başlık
                 const Text(
                   'Güncelleme Gerekli',
                   style: TextStyle(
@@ -63,7 +121,6 @@ class ForceUpdateScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // Açıklama
                 const Text(
                   'Bu sürüm artık desteklenmiyor.\nDevam etmek için lütfen uygulamayı güncelleyin.',
                   style: TextStyle(
@@ -76,7 +133,6 @@ class ForceUpdateScreen extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                // Versiyon bilgisi kutusu
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   decoration: BoxDecoration(
@@ -89,13 +145,13 @@ class ForceUpdateScreen extends StatelessWidget {
                     children: [
                       _VersionBadge(
                         label: 'Mevcut sürüm',
-                        version: currentVersion,
+                        version: widget.currentVersion,
                         color: Colors.redAccent,
                       ),
                       Container(width: 1, height: 40, color: Colors.white12),
                       _VersionBadge(
                         label: 'Gerekli sürüm',
-                        version: minimumVersion,
+                        version: widget.minimumVersion,
                         color: Colors.greenAccent,
                       ),
                     ],
@@ -104,43 +160,58 @@ class ForceUpdateScreen extends StatelessWidget {
 
                 const SizedBox(height: 40),
 
-                // Güncelle butonu
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _orange,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                if (_downloading) ...[
+                  LinearProgressIndicator(
+                    value: _progress,
+                    backgroundColor: Colors.white12,
+                    valueColor: const AlwaysStoppedAnimation(_orange),
+                    borderRadius: BorderRadius.circular(4),
+                    minHeight: 6,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'İndiriliyor... %${(_progress * 100).toInt()}',
+                    style: const TextStyle(color: _muted, fontSize: 13),
+                  ),
+                ] else ...[
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _orange,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
-                    ),
-                    icon: const Icon(Icons.download_outlined),
-                    label: const Text(
-                      'Güncelle',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                      icon: const Icon(Icons.download_outlined),
+                      label: const Text(
+                        'Güncelle',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                    onPressed: () => launchUrl(
-                      Uri.parse(ApiConstants.releasesPage),
-                      mode: LaunchMode.externalApplication,
+                      onPressed: _update,
                     ),
                   ),
-                ),
+                  if (_error != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _error!,
+                      style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ],
 
                 const SizedBox(height: 16),
 
-                // Alt not
                 const Text(
                   'Bu bir hata değildir.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: _muted,
-                  ),
+                  style: TextStyle(fontSize: 12, color: _muted),
                 ),
 
                 const Spacer(),
@@ -168,18 +239,11 @@ class _VersionBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, color: Color(0xFF9BABA4)),
-        ),
+        Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFF9BABA4))),
         const SizedBox(height: 4),
         Text(
           'v$version',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: color,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: color),
         ),
       ],
     );

@@ -186,3 +186,30 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
+
+  publish-to-public:
+    name: Public Repoya Kopyala
+    needs: [publish-release]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Release dosyalarını indir
+        run: |
+          gh release download ${{ github.ref_name }} \
+            --pattern "DeniKey-Android.apk" \
+            --pattern "DeniKey-Setup.exe" \
+            --pattern "DeniKey-Linux.tar.gz"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+      - name: denikey-releases reposuna yükle
+        run: |
+          gh release create ${{ github.ref_name }} \
+            DeniKey-Android.apk \
+            DeniKey-Setup.exe \
+            DeniKey-Linux.tar.gz \
+            --repo Denisergocmen924/denikey-releases \
+            --title "DeniKey ${{ github.ref_name }}" \
+            --notes "DeniKey ${{ github.ref_name }} sürümü"
+        env:
+          GH_TOKEN: ${{ secrets.RELEASES_REPO_TOKEN }}
