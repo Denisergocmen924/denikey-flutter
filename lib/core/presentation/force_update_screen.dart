@@ -68,7 +68,13 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
       if (Platform.isAndroid) {
         final result = await OpenFile.open(savePath);
         if (result.type != ResultType.done) {
-          setState(() => _error = 'Kurulum başlatılamadı: ${result.message}');
+          final isPermission = result.message.contains('REQUEST_INSTALL_PACKAGES') ||
+              result.message.toLowerCase().contains('permission');
+          if (isPermission && mounted) {
+            _showInstallPermissionDialog();
+          } else {
+            setState(() => _error = 'Kurulum başlatılamadı: ${result.message}');
+          }
         }
       } else if (Platform.isWindows) {
         // launchUrl → ShellExecute → UAC gerekirse otomatik tetiklenir.
@@ -85,6 +91,47 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
     } finally {
       if (mounted) setState(() => _downloading = false);
     }
+  }
+
+  void _showInstallPermissionDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('İzin Gerekiyor'),
+        content: const Text(
+          'APK yükleyebilmek için "Bilinmeyen uygulamaları yükle" iznini vermeniz gerekiyor.\n\n'
+          'Ayarlar → Uygulamalar → DeniKey → Bilinmeyen uygulamaları yükle → İzin Ver\n\n'
+          'İzni verdikten sonra "Güncelle" butonuna tekrar basın.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final uri = Uri.parse(
+                'intent:#Intent;action=android.settings.MANAGE_UNKNOWN_APP_SOURCES;'
+                'data=package%3Acom.denikey.denikey_app;end',
+              );
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              } else {
+                final fallback = Uri.parse(
+                  'intent:#Intent;action=android.settings.APPLICATION_DETAILS_SETTINGS;'
+                  'data=package%3Acom.denikey.denikey_app;end',
+                );
+                if (await canLaunchUrl(fallback)) {
+                  await launchUrl(fallback, mode: LaunchMode.externalApplication);
+                }
+              }
+            },
+            child: const Text('Ayarları Aç'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Anladım'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -218,11 +265,6 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
                 ],
 
                 const SizedBox(height: 16),
-
-                const Text(
-                  'Bu bir hata değildir.',
-                  style: TextStyle(fontSize: 12, color: _muted),
-                ),
 
                 const Spacer(),
               ],
