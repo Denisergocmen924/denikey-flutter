@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../core/autofill/autofill_server.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../data/auth_repository.dart';
@@ -11,7 +10,6 @@ import '../../../core/providers/theme_provider.dart';
 import '../../../core/providers/shortcuts_provider.dart';
 import '../../../core/providers/auto_lock_provider.dart';
 import '../../../core/providers/clipboard_timeout_provider.dart';
-import '../../../core/providers/autofill_provider.dart';
 import '../../../core/providers/app_version_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
@@ -398,10 +396,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             SwitchListTile(
               secondary: const Icon(Icons.fingerprint),
               title: const Text('Biyometrik Kilit'),
-              subtitle: const Text(
-                'Parmak izi / yüz tanıma ile kilitle',
-                style: TextStyle(fontSize: 12),
-              ),
               value: _biometricEnabled,
               onChanged: _toggleBiometric,
             ),
@@ -511,149 +505,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
             },
           ),
-          if (Platform.isWindows)
-            Consumer(
-              builder: (context, ref, _) {
-                final autofill = ref.watch(autofillProvider);
-                final cs = Theme.of(context).colorScheme;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SwitchListTile(
-                      secondary: Icon(
-                        Icons.extension_outlined,
-                        color: autofill.enabled ? cs.primary : null,
-                      ),
-                      title: const Text('Tarayıcı Otomatik Doldurma'),
-                      subtitle: Text(
-                        autofill.enabled
-                            ? 'Aktif — Chrome/Brave eklentisi bağlanabilir'
-                            : 'Tarayıcı eklentisiyle şifrelerinizi otomatik doldurun',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      value: autofill.enabled,
-                      onChanged: (val) async {
-                        if (val) {
-                          await ref.read(autofillProvider.notifier).enable();
-                          final token = AutofillServer.instance.sessionToken;
-                          if (token != null) {
-                            await Clipboard.setData(ClipboardData(text: token));
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Otomatik doldurma aktif — token panoya kopyalandı'),
-                                ),
-                              );
-                            }
-                          }
-                        } else {
-                          await ref.read(autofillProvider.notifier).disable();
-                        }
-                      },
-                    ),
-                    if (autofill.enabled)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: cs.primaryContainer.withAlpha(60),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: cs.outlineVariant),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Bağlantı Token\'ı',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: cs.primary,
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.copy_outlined, size: 18),
-                                    tooltip: 'Token\'ı kopyala',
-                                    onPressed: () async {
-                                      final token = AutofillServer.instance.sessionToken;
-                                      if (token != null) {
-                                        await Clipboard.setData(ClipboardData(text: token));
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Token kopyalandı')),
-                                          );
-                                        }
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  final token = AutofillServer.instance.sessionToken;
-                                  if (token != null) {
-                                    await Clipboard.setData(ClipboardData(text: token));
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Token kopyalandı')),
-                                      );
-                                    }
-                                  }
-                                },
-                                child: Text(
-                                  AutofillServer.instance.sessionToken ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontFamily: 'monospace',
-                                    color: Color(0xFF4FC3F7),
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Color(0xFF4FC3F7),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'İlk kurulum (bir kez yapılır):',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: cs.onSurface,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                '1. Tarayıcıda chrome://extensions adresine gidin\n'
-                                '2. Geliştirici modunu açın\n'
-                                '3. "Paketlenmemiş uzantı yükle" ile browser_extension klasörünü seçin\n'
-                                '4. Eklenti ikonuna tıklayın, token\'ı yapıştırın ve kaydedin',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: cs.onSurfaceVariant,
-                                  height: 1.6,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Token kalıcıdır — uygulama yeniden başlasa bile değişmez. Kurulum yalnızca bir kez yapılır.',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: cs.primary,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
           if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) ...[
             Consumer(
               builder: (context, ref, _) {

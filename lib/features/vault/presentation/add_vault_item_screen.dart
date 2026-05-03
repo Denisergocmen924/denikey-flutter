@@ -72,9 +72,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     for (final field in fields) {
       final id = field['id'] as String;
       _fieldControllers[id] = TextEditingController();
-      if (field['field_type'] == 'secret') {
-        _obscureFields[id] = true;
-      }
+      _obscureFields[id] = field['field_type'] == 'secret';
     }
 
     setState(() {
@@ -487,7 +485,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
 
     final textField = TextField(
       controller: ctrl,
-      obscureText: isSecret ? (_obscureFields[id] ?? true) : false,
+      obscureText: _obscureFields[id] ?? false,
       keyboardType: fieldType == 'number' ? TextInputType.number : TextInputType.text,
       onChanged: (_) {
         if (_fieldErrors[id] != null) setState(() => _fieldErrors[id] = null);
@@ -496,18 +494,16 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
         labelText: isRequired ? '$label *' : label,
         errorText: _fieldErrors[id],
         border: const OutlineInputBorder(),
-        suffixIcon: isSecret
-            ? IconButton(
-                icon: Icon(
-                  (_obscureFields[id] ?? true)
-                      ? Icons.visibility_off
-                      : Icons.visibility,
-                ),
-                onPressed: () => setState(
-                  () => _obscureFields[id] = !(_obscureFields[id] ?? true),
-                ),
-              )
-            : null,
+        suffixIcon: IconButton(
+          icon: Icon(
+            (_obscureFields[id] ?? false)
+                ? Icons.visibility_off
+                : Icons.visibility,
+          ),
+          onPressed: () => setState(
+            () => _obscureFields[id] = !(_obscureFields[id] ?? false),
+          ),
+        ),
       ),
     );
 

@@ -14,7 +14,6 @@ import 'core/presentation/loading_overlay.dart';
 import 'core/presentation/app_shortcuts.dart';
 import 'core/storage/secure_storage.dart';
 import 'core/services/tray_service.dart';
-import 'core/autofill/autofill_server.dart';
 
 // Tek instance kilidi için sabit port
 const _kSingleInstancePort = 47821;
@@ -92,8 +91,6 @@ void main() async {
     if (Platform.isWindows) {
       await windowManager.setPreventClose(true);
       await TrayService.instance.init();
-      final autofillEnabled = prefs.getBool('autofill_enabled') ?? false;
-      if (autofillEnabled) await AutofillServer.instance.start();
     }
   }
   await NotificationService.instance.initialize();

@@ -51,8 +51,7 @@ class NotificationService {
     await _showNotification(
       id: 1001,
       title: 'DeniKey Güvenlik Hatırlatıcısı',
-      body: 'Şifrelerinizi düzenli güncellemeniz güvenliğinizi artırır. '
-          'Uzun süredir değiştirilmemiş şifrelerinizi kontrol edin.',
+      body: 'Eski şifrelerinizi kontrol edin ve güncelleyin.',
     );
 
     await prefs.setInt(_lastReminderKey, now);
