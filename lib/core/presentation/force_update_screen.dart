@@ -66,12 +66,22 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
       );
 
       if (Platform.isAndroid) {
-        await OpenFile.open(savePath);
+        final result = await OpenFile.open(savePath);
+        if (result.type != ResultType.done) {
+          setState(() => _error = 'Kurulum başlatılamadı: ${result.message}');
+        }
       } else if (Platform.isWindows) {
-        await Process.run(savePath, [], runInShell: true);
+        // launchUrl → ShellExecute → UAC gerekirse otomatik tetiklenir.
+        final launched = await launchUrl(
+          Uri.file(savePath),
+          mode: LaunchMode.externalApplication,
+        );
+        if (!launched) {
+          setState(() => _error = 'Kurulum başlatılamadı. Dosya: $savePath');
+        }
       }
-    } catch (_) {
-      setState(() => _error = 'İndirme başarısız oldu. Tekrar deneyin.');
+    } catch (e) {
+      setState(() => _error = 'İndirme başarısız: $e');
     } finally {
       if (mounted) setState(() => _downloading = false);
     }

@@ -46,7 +46,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     LoadingOverlay.showGlobal(message: 'Giriş yapılıyor...');
     try {
       final result = await _repo.login(username: username, masterPassword: password);
-      LoadingOverlay.hideGlobal();
       if (result['needs_device_verification'] == true) {
         state = state.copyWith(
           status: AuthStatus.needsDeviceVerification,
@@ -57,10 +56,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       } else {
         state = state.copyWith(status: AuthStatus.success);
       }
-    } on DioException catch (e) {
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: _extractError(e, 'Giriş başarısız.'),
+      );
+    } finally {
       LoadingOverlay.hideGlobal();
-      final msg = e.response?.data['detail'] ?? 'Giriş başarısız.';
-      state = state.copyWith(status: AuthStatus.error, errorMessage: msg.toString());
     }
   }
 
@@ -73,17 +75,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
         email: email,
         masterPassword: password,
       );
-      LoadingOverlay.hideGlobal();
       state = state.copyWith(
         status: AuthStatus.success,
         userId: result['user_id'],
         email: result['email'],
       );
-    } on DioException catch (e) {
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: _extractError(e, 'Kayıt başarısız.'),
+      );
+    } finally {
       LoadingOverlay.hideGlobal();
-      final msg = e.response?.data['detail'] ?? 'Kayıt başarısız.';
-      state = state.copyWith(status: AuthStatus.error, errorMessage: msg.toString());
     }
+  }
+
+  String _extractError(Object e, String fallback) {
+    if (e is DioException) {
+      final data = e.response?.data;
+      if (data is Map) return (data['detail'] ?? fallback).toString();
+    }
+    return fallback;
   }
 
   Future<void> logout() async {
