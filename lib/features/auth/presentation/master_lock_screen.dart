@@ -42,6 +42,15 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
     final ok = await BiometricService.instance.authenticate();
     if (!mounted) return;
     if (ok) {
+      final masterKey = await SecureStorage.instance.getMasterKey();
+      if (!mounted) return;
+      if (masterKey == null) {
+        setState(() {
+          _error = 'Lütfen bir kez master şifrenizi girin';
+          _loading = false;
+        });
+        return;
+      }
       context.go('/vault');
     } else {
       setState(() { _error = 'Kimlik doğrulama başarısız'; _loading = false; });
