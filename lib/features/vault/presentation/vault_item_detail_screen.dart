@@ -541,7 +541,8 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
           ..._customFields.map((field) {
             final fieldName = field['field_name'] as String? ?? '';
             final fieldValue = field['decrypted_value'] as String? ?? '';
-            return _infoTile(fieldName, fieldValue);
+            final isSecret = field['field_type'] == 'secret';
+            return _infoTile(fieldName, fieldValue, isSecret: isSecret);
           }),
         ],
       ],

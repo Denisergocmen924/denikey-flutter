@@ -342,7 +342,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     ? () async {}
                     : () => ref.read(vaultProvider.notifier).loadItems(),
                 child: ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
                   itemCount: filtered.length + (hasFavorites ? 2 : 0),
                   itemBuilder: (context, index) {
                     if (hasFavorites && index == 0) {
