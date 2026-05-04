@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import '../data/auth_repository.dart';
 import '../../../core/presentation/loading_overlay.dart';
 
-enum AuthStatus { idle, loading, success, needsDeviceVerification, error }
+enum AuthStatus { idle, loading, success, needsDeviceVerification, deviceBanned, error }
 
 class AuthState {
   final AuthStatus status;
@@ -57,6 +57,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = state.copyWith(status: AuthStatus.success);
       }
     } catch (e) {
+      if (e is DioException && e.response?.statusCode == 403) {
+        final detail = (e.response?.data as Map?)?['detail']?.toString() ?? '';
+        if (detail.contains('cihaz kullanılamıyor')) {
+          state = state.copyWith(status: AuthStatus.deviceBanned);
+          return;
+        }
+      }
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: _extractError(e, 'Giriş başarısız.'),

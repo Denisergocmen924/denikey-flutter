@@ -48,6 +48,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           'master_password': next.masterPassword,
         });
       }
+      if (next.status == AuthStatus.deviceBanned) {
+        context.push('/device-banned');
+      }
       if (next.status == AuthStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(next.errorMessage ?? 'Hata')),

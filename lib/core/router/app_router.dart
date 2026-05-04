@@ -23,6 +23,7 @@ import '../presentation/splash_screen.dart';
 import '../presentation/force_update_screen.dart';
 import '../../features/auth/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/privacy_policy_screen.dart';
+import '../../features/auth/presentation/device_banned_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
@@ -159,6 +160,10 @@ final router = GoRouter(
       GoRoute(
         path: '/privacy-policy',
         builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: '/device-banned',
+        builder: (context, state) => const DeviceBannedScreen(),
       ),
     ],
 );
