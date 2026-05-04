@@ -6,6 +6,7 @@ import '../../../core/storage/secure_storage.dart';
 import '../../../core/cache/cache_service.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/crypto/encryption_service.dart';
+import '../../../core/biometric/biometric_service.dart';
 
 class AuthRepository {
   final Dio _dio = DioClient.instance.dio;
@@ -72,6 +73,7 @@ class AuthRepository {
     );
     await SecureStorage.instance.saveMasterKey(masterKey);
     await SecureStorage.instance.saveEncryptionSalt(salt);
+    await BiometricService.instance.saveMasterPasswordTimestamp();
     final blob = await EncryptionService.instance.encrypt('denikey-verify', masterKey);
     await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
 

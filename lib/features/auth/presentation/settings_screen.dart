@@ -31,6 +31,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _deletingAccount = false;
   bool _biometricAvailable = false;
   bool _biometricEnabled = false;
+  int _biometricRemainingDays = 0;
 
   @override
   void initState() {
@@ -48,17 +49,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _loadBiometricState() async {
     final available = await BiometricService.instance.isAvailable();
     final enabled = await BiometricService.instance.isEnabled();
+    final days = enabled ? await BiometricService.instance.remainingDays() : 0;
     if (mounted) {
       setState(() {
         _biometricAvailable = available;
         _biometricEnabled = enabled;
+        _biometricRemainingDays = days;
       });
     }
   }
 
   Future<void> _toggleBiometric(bool val) async {
     await BiometricService.instance.setEnabled(val);
-    setState(() => _biometricEnabled = val);
+    final days = val ? await BiometricService.instance.remainingDays() : 0;
+    setState(() {
+      _biometricEnabled = val;
+      _biometricRemainingDays = days;
+    });
   }
 
   Future<void> _startDeleteAccountFlow() async {
@@ -392,13 +399,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/privacy-policy'),
           ),
-          if (_biometricAvailable)
+          if (_biometricAvailable) ...[
             SwitchListTile(
               secondary: const Icon(Icons.fingerprint),
               title: const Text('Biyometrik Kilit'),
+              subtitle: Text(
+                _biometricEnabled
+                    ? (_biometricRemainingDays > 1
+                        ? 'Aktif  ·  $_biometricRemainingDays gün sonra şifre istenecek'
+                        : _biometricRemainingDays == 1
+                            ? 'Aktif  ·  Yarın şifre istenecek'
+                            : 'Master şifre gerekiyor — kilidi açınca yenilenir')
+                    : 'Parmak izi veya yüz tanıma ile hızlı erişin.\nGüvenliğiniz için 7 günde bir master şifreniz istenecektir.',
+                style: const TextStyle(fontSize: 12),
+              ),
               value: _biometricEnabled,
               onChanged: _toggleBiometric,
             ),
+          ],
           Consumer(
             builder: (context, ref, _) {
               final autoLock = ref.watch(autoLockProvider);

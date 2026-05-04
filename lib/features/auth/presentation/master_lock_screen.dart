@@ -18,6 +18,8 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
   bool _loading  = false;
   String? _error;
   ({IconData icon, String label})? _biometric;
+  bool _biometricExpired = false;
+  int _remainingDays = 0;
 
   @override
   void initState() {
@@ -28,8 +30,14 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
   Future<void> _loadBiometric() async {
     final enabled = await BiometricService.instance.isEnabled();
     if (!enabled) return;
+    final expired = await BiometricService.instance.isMasterPasswordExpired();
+    if (expired) {
+      if (mounted) setState(() => _biometricExpired = true);
+      return;
+    }
     final bio = await BiometricService.instance.getBiometricLabel();
-    if (mounted) setState(() => _biometric = bio);
+    final days = await BiometricService.instance.remainingDays();
+    if (mounted) setState(() { _biometric = bio; _remainingDays = days; });
   }
 
   Future<void> _logout() async {
@@ -95,8 +103,9 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
         return;
       }
 
-      // Doğru şifre — master key'i güncelle ve vault'a geç
+      // Doğru şifre — master key'i güncelle, TTL'i yenile ve vault'a geç
       await SecureStorage.instance.saveMasterKey(masterKey);
+      await BiometricService.instance.saveMasterPasswordTimestamp();
       if (mounted) context.go('/vault');
     } catch (_) {
       setState(() { _error = 'Yanlış master şifre'; _loading = false; });
@@ -136,7 +145,9 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Devam etmek için master şifrenizi girin',
+                    _biometricExpired
+                        ? '7 günlük biyometrik süreniz doldu.\nGüvenliğiniz için master şifrenizi girin.'
+                        : 'Devam etmek için master şifrenizi girin',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -190,6 +201,18 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                       label: Text(_biometric!.label),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Text(
+                        _remainingDays > 1
+                            ? '$_remainingDays gün sonra şifre istenecek'
+                            : 'Yarın şifre istenecek',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: cs.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ],

@@ -9,6 +9,8 @@ class BiometricService {
 
   final LocalAuthentication _auth = LocalAuthentication();
   static const _prefKey = 'biometric_enabled';
+  static const _prefKeyTimestamp = 'biometric_master_ts';
+  static const _ttlDays = 7;
 
   // Linux'ta local_auth desteklenmez — her zaman false döndür
   bool get _isSupported => !Platform.isLinux;
@@ -30,6 +32,29 @@ class BiometricService {
   Future<void> setEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_prefKey, value);
+  }
+
+  Future<void> saveMasterPasswordTimestamp() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_prefKeyTimestamp, DateTime.now().millisecondsSinceEpoch);
+  }
+
+  Future<bool> isMasterPasswordExpired() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ts = prefs.getInt(_prefKeyTimestamp);
+    if (ts == null) return true;
+    final entered = DateTime.fromMillisecondsSinceEpoch(ts);
+    return DateTime.now().difference(entered) >= const Duration(days: _ttlDays);
+  }
+
+  Future<int> remainingDays() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ts = prefs.getInt(_prefKeyTimestamp);
+    if (ts == null) return 0;
+    final entered = DateTime.fromMillisecondsSinceEpoch(ts);
+    final expiry = entered.add(const Duration(days: _ttlDays));
+    final remaining = expiry.difference(DateTime.now()).inDays;
+    return remaining.clamp(0, _ttlDays);
   }
 
   // Cihazda kayıtlı biyometrik türlerine göre ikon ve etiket döndürür.
