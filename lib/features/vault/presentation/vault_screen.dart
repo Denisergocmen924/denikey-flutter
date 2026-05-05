@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
-import '../../../core/notifications/notification_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
 import '../../../core/presentation/desktop_onboarding_dialog.dart';
 
@@ -26,7 +25,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     Future.microtask(() async {
       await ref.read(vaultProvider.notifier).loadItems();
       ref.read(categoryProvider.notifier).loadCategories();
-      NotificationService.instance.scheduleWeeklySecurityReminder();
       if (mounted) await showDesktopOnboardingIfNeeded(context);
       await ref.read(vaultProvider.notifier).createSampleItemIfNeeded();
     });

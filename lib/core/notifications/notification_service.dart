@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
   NotificationService._();
   static final NotificationService instance = NotificationService._();
 
   final _plugin = FlutterLocalNotificationsPlugin();
-  static const _lastReminderKey = 'last_security_reminder';
 
   // Linux'ta flutter_local_notifications desteği yok
   bool get _isSupported => Platform.isAndroid || Platform.isIOS;
@@ -35,26 +33,6 @@ class NotificationService {
               AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
     }
-  }
-
-  /// Haftalık güvenlik hatırlatıcısı — son bildirimden 7 gün geçtiyse göster
-  Future<void> scheduleWeeklySecurityReminder() async {
-    if (!_isSupported) return;
-
-    final prefs = await SharedPreferences.getInstance();
-    final lastMs = prefs.getInt(_lastReminderKey) ?? 0;
-    final now = DateTime.now().millisecondsSinceEpoch;
-    const weekMs = 7 * 24 * 60 * 60 * 1000;
-
-    if (now - lastMs < weekMs) return; // Henüz 7 gün geçmedi
-
-    await _showNotification(
-      id: 1001,
-      title: 'DeniKey Güvenlik Hatırlatıcısı',
-      body: 'Eski şifrelerinizi kontrol edin ve güncelleyin.',
-    );
-
-    await prefs.setInt(_lastReminderKey, now);
   }
 
   /// Otomatik kilit bildirimi (sadece süre ile kilit açıksa)
