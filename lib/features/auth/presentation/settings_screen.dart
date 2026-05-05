@@ -573,6 +573,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           // Nasıl Kullanılır
           _sectionHeader('NASIL KULLANILIR'),
+          ListTile(
+            leading: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: const Color(0xFFFF5900).withAlpha(25),
+              ),
+              child: const Icon(Icons.play_circle_outline_rounded,
+                  color: Color(0xFFFF5900), size: 20),
+            ),
+            title: const Text('Uygulamayı Keşfet',
+                style: TextStyle(fontWeight: FontWeight.w600)),
+            subtitle: const Text('Tüm özelliklere genel bakış'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/onboarding', extra: true),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
           _HelpTile(
             icon: Icons.shield_outlined,
             title: 'Şifre Ekleme',

@@ -44,7 +44,9 @@ final router = GoRouter(
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (context, state) => OnboardingScreen(
+          isReplay: state.extra as bool? ?? false,
+        ),
       ),
       GoRoute(
         path: '/login',
