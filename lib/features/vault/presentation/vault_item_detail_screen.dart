@@ -23,6 +23,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   String? _decryptedPassword;
   bool _decrypting = true;
   bool _showPassword = false;
+  final Map<int, bool> _showCustomField = {}; // her custom field için ayrı görünürlük
   List<dynamic> _customFields = [];
   Map<String, dynamic> _fullItem = {};
 
@@ -39,6 +40,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   final _urlCtrl = TextEditingController();
   // custom fields — her biri {key: ctrl, value: ctrl}
   final List<Map<String, TextEditingController>> _editCustomFields = [];
+  final List<String> _editFieldTypes = []; // _editCustomFields ile paralel, field_type saklar
 
   @override
   void initState() {
@@ -104,6 +106,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
     // Mevcut custom field controller'larını temizle
     _disposeCustomFieldCtrls();
     _editCustomFields.clear();
+    _editFieldTypes.clear();
 
     // Mevcut custom field'ları yükle
     for (final field in _customFields) {
@@ -111,6 +114,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
         'key': TextEditingController(text: field['field_name'] as String? ?? ''),
         'value': TextEditingController(text: field['decrypted_value'] as String? ?? ''),
       });
+      _editFieldTypes.add(field['field_type'] as String? ?? 'text');
     }
   }
 
@@ -120,6 +124,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
         'key': TextEditingController(),
         'value': TextEditingController(),
       });
+      _editFieldTypes.add('text');
     });
   }
 
@@ -128,6 +133,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
       _editCustomFields[index]['key']!.dispose();
       _editCustomFields[index]['value']!.dispose();
       _editCustomFields.removeAt(index);
+      if (index < _editFieldTypes.length) _editFieldTypes.removeAt(index);
     });
   }
 
@@ -155,11 +161,13 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
       };
 
       final customFieldsList = <Map<String, String>>[];
-      for (final f in _editCustomFields) {
+      for (int i = 0; i < _editCustomFields.length; i++) {
+        final f = _editCustomFields[i];
         final k = f['key']!.text.trim();
         final v = f['value']!.text.trim();
         if (k.isNotEmpty) {
-          customFieldsList.add({'field_name': k, 'value': v, 'field_type': 'text'});
+          final ft = i < _editFieldTypes.length ? _editFieldTypes[i] : 'text';
+          customFieldsList.add({'field_name': k, 'value': v, 'field_type': ft});
         }
       }
       data['custom_fields_data'] = customFieldsList;
@@ -334,7 +342,11 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
     );
   }
 
-  Widget _infoTile(String label, String? value, {bool isSecret = false}) {
+  Widget _infoTile(String label, String? value, {
+    bool isSecret = false,
+    bool showSecret = false,
+    VoidCallback? onToggleSecret,
+  }) {
     if (value == null || value.isEmpty) return const SizedBox.shrink();
     final cs = Theme.of(context).colorScheme;
     return Padding(
@@ -349,7 +361,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
           title: Text(label,
             style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
           subtitle: Text(
-            isSecret && !_showPassword ? '••••••••' : value,
+            isSecret && !showSecret ? '••••••••' : value,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -366,8 +378,8 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             children: [
               if (isSecret)
                 IconButton(
-                  icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _showPassword = !_showPassword),
+                  icon: Icon(showSecret ? Icons.visibility_off : Icons.visibility),
+                  onPressed: onToggleSecret,
                 ),
               if (!isSecret && _isUrl(value))
                 IconButton(
@@ -528,7 +540,11 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             }),
           ),
         ),
-        _infoTile('Şifre', _decryptedPassword, isSecret: true),
+        _infoTile('Şifre', _decryptedPassword,
+          isSecret: true,
+          showSecret: _showPassword,
+          onToggleSecret: () => setState(() => _showPassword = !_showPassword),
+        ),
         if (_customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
           Padding(
@@ -538,11 +554,18 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).colorScheme.onSurfaceVariant)),
           ),
-          ..._customFields.map((field) {
+          ..._customFields.asMap().entries.map((entry) {
+            final i = entry.key;
+            final field = entry.value;
             final fieldName = field['field_name'] as String? ?? '';
             final fieldValue = field['decrypted_value'] as String? ?? '';
             final isSecret = field['field_type'] == 'secret';
-            return _infoTile(fieldName, fieldValue, isSecret: isSecret);
+            return _infoTile(fieldName, fieldValue,
+              isSecret: isSecret,
+              showSecret: _showCustomField[i] ?? false,
+              onToggleSecret: () => setState(() =>
+                _showCustomField[i] = !(_showCustomField[i] ?? false)),
+            );
           }),
         ],
       ],
@@ -599,6 +622,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
           ..._editCustomFields.asMap().entries.map((entry) {
             final i = entry.key;
             final f = entry.value;
+            final fieldType = i < _editFieldTypes.length ? _editFieldTypes[i] : 'text';
+            final isFieldSecret = fieldType == 'secret';
+            final showFieldValue = _showCustomField[i] ?? false;
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Row(
@@ -617,9 +643,41 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                         const SizedBox(height: 8),
                         TextField(
                           controller: f['value'],
-                          decoration: const InputDecoration(
+                          obscureText: isFieldSecret && !showFieldValue,
+                          decoration: InputDecoration(
                             labelText: 'İçerik',
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
+                            suffixIcon: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Gizli/açık toggle (field_type değiştirir)
+                                IconButton(
+                                  tooltip: isFieldSecret ? 'Gizli alan' : 'Normal alan',
+                                  icon: Icon(
+                                    isFieldSecret ? Icons.lock_outline : Icons.lock_open_outlined,
+                                    size: 20,
+                                    color: isFieldSecret
+                                        ? Theme.of(context).colorScheme.primary
+                                        : null,
+                                  ),
+                                  onPressed: () => setState(() {
+                                    if (i < _editFieldTypes.length) {
+                                      _editFieldTypes[i] = isFieldSecret ? 'text' : 'secret';
+                                    }
+                                  }),
+                                ),
+                                // Değeri göster/gizle (sadece gizli alanlarda)
+                                if (isFieldSecret)
+                                  IconButton(
+                                    icon: Icon(
+                                      showFieldValue ? Icons.visibility_off : Icons.visibility,
+                                      size: 20,
+                                    ),
+                                    onPressed: () => setState(() =>
+                                      _showCustomField[i] = !showFieldValue),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
