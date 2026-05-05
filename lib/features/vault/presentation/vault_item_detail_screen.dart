@@ -647,36 +647,17 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                           decoration: InputDecoration(
                             labelText: 'İçerik',
                             border: const OutlineInputBorder(),
-                            suffixIcon: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Gizli/açık toggle (field_type değiştirir)
-                                IconButton(
-                                  tooltip: isFieldSecret ? 'Gizli alan' : 'Normal alan',
-                                  icon: Icon(
-                                    isFieldSecret ? Icons.lock_outline : Icons.lock_open_outlined,
-                                    size: 20,
-                                    color: isFieldSecret
-                                        ? Theme.of(context).colorScheme.primary
-                                        : null,
-                                  ),
-                                  onPressed: () => setState(() {
-                                    if (i < _editFieldTypes.length) {
-                                      _editFieldTypes[i] = isFieldSecret ? 'text' : 'secret';
-                                    }
-                                  }),
-                                ),
-                                // Değeri göster/gizle (sadece gizli alanlarda)
-                                if (isFieldSecret)
-                                  IconButton(
-                                    icon: Icon(
-                                      showFieldValue ? Icons.visibility_off : Icons.visibility,
-                                      size: 20,
-                                    ),
-                                    onPressed: () => setState(() =>
-                                      _showCustomField[i] = !showFieldValue),
-                                  ),
-                              ],
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                isFieldSecret ? Icons.visibility_off : Icons.visibility,
+                              ),
+                              onPressed: () => setState(() {
+                                final nowSecret = !isFieldSecret;
+                                if (i < _editFieldTypes.length) {
+                                  _editFieldTypes[i] = nowSecret ? 'secret' : 'text';
+                                }
+                                _showCustomField[i] = !nowSecret;
+                              }),
                             ),
                           ),
                         ),
