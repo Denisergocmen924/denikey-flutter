@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/api_constants.dart';
 
@@ -29,6 +31,18 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
   bool _downloading = false;
   double _progress  = 0;
   String? _error;
+  int _androidSdk   = 0; // 0 = henüz bilinmiyor veya Android değil
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isAndroid) _loadAndroidSdk();
+  }
+
+  Future<void> _loadAndroidSdk() async {
+    final info = await DeviceInfoPlugin().androidInfo;
+    if (mounted) setState(() => _androidSdk = info.version.sdkInt);
+  }
 
   String get _downloadUrl {
     final v = widget.minimumVersion;
@@ -44,6 +58,15 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
     if (Platform.isLinux) {
       await launchUrl(Uri.parse(ApiConstants.releasesPage), mode: LaunchMode.externalApplication);
       return;
+    }
+
+    // Android 8+ → indirmeden önce izni kontrol et
+    if (Platform.isAndroid && _androidSdk >= 26) {
+      final status = await Permission.requestInstallPackages.status;
+      if (!status.isGranted) {
+        if (mounted) _showInstallPermissionDialog();
+        return;
+      }
     }
 
     setState(() {
@@ -68,16 +91,9 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
       if (Platform.isAndroid) {
         final result = await OpenFile.open(savePath);
         if (result.type != ResultType.done) {
-          final isPermission = result.message.contains('REQUEST_INSTALL_PACKAGES') ||
-              result.message.toLowerCase().contains('permission');
-          if (isPermission && mounted) {
-            _showInstallPermissionDialog();
-          } else {
-            setState(() => _error = 'Kurulum başlatılamadı: ${result.message}');
-          }
+          setState(() => _error = 'Kurulum başlatılamadı: ${result.message}');
         }
       } else if (Platform.isWindows) {
-        // launchUrl → ShellExecute → UAC gerekirse otomatik tetiklenir.
         final launched = await launchUrl(
           Uri.file(savePath),
           mode: LaunchMode.externalApplication,
@@ -94,6 +110,7 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
   }
 
   void _showInstallPermissionDialog() {
+    final canOpenSettings = _androidSdk >= 26;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -104,27 +121,27 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
           'İzni verdikten sonra "Güncelle" butonuna tekrar basın.',
         ),
         actions: [
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final uri = Uri.parse(
-                'intent:#Intent;action=android.settings.MANAGE_UNKNOWN_APP_SOURCES;'
-                'data=package%3Acom.denikey.denikey_app;end',
-              );
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              } else {
-                final fallback = Uri.parse(
-                  'intent:#Intent;action=android.settings.APPLICATION_DETAILS_SETTINGS;'
-                  'data=package%3Acom.denikey.denikey_app;end',
-                );
-                if (await canLaunchUrl(fallback)) {
-                  await launchUrl(fallback, mode: LaunchMode.externalApplication);
+          if (canOpenSettings)
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                try {
+                  final uri = Uri.parse(
+                    'intent:#Intent;action=android.settings.MANAGE_UNKNOWN_APP_SOURCES;'
+                    'data=package%3Acom.denikey.denikey_app;end',
+                  );
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } catch (_) {
+                  try {
+                    await launchUrl(
+                      Uri.parse('package:com.denikey.denikey_app'),
+                      mode: LaunchMode.externalApplication,
+                    );
+                  } catch (_) {}
                 }
-              }
-            },
-            child: const Text('Ayarları Aç'),
-          ),
+              },
+              child: const Text('Ayarları Aç'),
+            ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Anladım'),
