@@ -18,6 +18,8 @@ import 'core/services/tray_service.dart';
 // Tek instance kilidi için sabit port
 const _kSingleInstancePort = 47821;
 ServerSocket? _singleInstanceServer;
+bool _windowReady = false;
+bool _pendingShow = false;
 
 Future<ServerSocket?> _acquireSingleInstanceLock() async {
   try {
@@ -26,14 +28,34 @@ Future<ServerSocket?> _acquireSingleInstanceLock() async {
   } on SocketException {
     // Port zaten dolu → başka instance var, onu uyar ve çık
     try {
-      final socket = await Socket.connect(InternetAddress.loopbackIPv4, _kSingleInstancePort,
-          timeout: const Duration(seconds: 1));
+      final socket = await Socket.connect(
+        InternetAddress.loopbackIPv4,
+        _kSingleInstancePort,
+        timeout: const Duration(seconds: 2),
+      );
       socket.write('show');
       await socket.flush();
       await socket.close();
     } catch (_) {}
     return null;
   }
+}
+
+void _listenForSecondInstance() {
+  _singleInstanceServer?.listen((client) {
+    client.listen(
+      (_) {
+        if (_windowReady) {
+          windowManager.show();
+          windowManager.focus();
+        } else {
+          _pendingShow = true;
+        }
+        client.destroy();
+      },
+      onError: (_) => client.destroy(),
+    );
+  });
 }
 
 void main() async {
@@ -44,14 +66,6 @@ void main() async {
       // Başka instance var, o pencereyi öne getirdi, bu process çıkıyor
       exit(0);
     }
-    // Gelen 'show' mesajlarını dinle (başka instance tetiklediğinde)
-    _singleInstanceServer!.listen((client) {
-      client.listen((_) {
-        windowManager.show();
-        windowManager.focus();
-        client.destroy();
-      });
-    });
   }
 
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
@@ -91,6 +105,14 @@ void main() async {
     if (Platform.isWindows) {
       await windowManager.setPreventClose(true);
       await TrayService.instance.init();
+      // windowManager hazır olduktan sonra listener'ı başlat
+      _windowReady = true;
+      if (_pendingShow) {
+        _pendingShow = false;
+        await windowManager.show();
+        await windowManager.focus();
+      }
+      _listenForSecondInstance();
     }
   }
   await NotificationService.instance.initialize();
