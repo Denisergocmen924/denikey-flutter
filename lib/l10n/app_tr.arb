@@ -1,0 +1,716 @@
+{
+  "@@locale": "tr",
+
+  "loginTagline": "Şifreleriniz güvende",
+  "loginUsernameLabel": "Kullanıcı Adı veya E-posta",
+  "loginUsernameError": "Kullanıcı adı veya e-posta gerekli",
+  "loginUsernameMinError": "En az 3 karakter",
+  "loginPasswordLabel": "Master Şifre",
+  "loginPasswordError": "Şifre gerekli",
+  "loginPasswordMinError": "En az 6 karakter",
+  "loginSubmitButton": "Giriş Yap",
+  "loginNoAccountQuestion": "Hesabın yok mu?",
+  "loginRegisterButton": "Kayıt Ol",
+  "loginForgotButton": "Şifremi Unuttum",
+  "loginError": "Hata",
+
+  "registerAppBarTitle": "Kayıt Ol",
+  "registerHeading": "Hesap Oluştur",
+  "registerSubheading": "Kimliğiniz gizli kalır.",
+  "registerUsernameLabel": "Kullanıcı Adı",
+  "registerUsernameError": "Kullanıcı adı gerekli",
+  "registerUsernameMinError": "En az 3 karakter",
+  "registerUsernameMaxError": "En fazla 50 karakter",
+  "registerEmailLabel": "E-posta",
+  "registerEmailError": "E-posta gerekli",
+  "registerEmailFormatError": "Geçerli e-posta girin",
+  "registerPasswordLabel": "Master Şifre",
+  "registerPasswordError": "Şifre gerekli",
+  "registerPasswordMinError": "En az 6 karakter",
+  "registerConfirmLabel": "Şifre Tekrar",
+  "registerConfirmError": "Şifreler eşleşmiyor",
+  "registerBirthdateLabel": "Doğum Tarihi",
+  "registerBirthdateHelper": "Doğum Tarihinizi Seçin",
+  "registerBirthdateSelect": "Seçiniz",
+  "registerBirthdateMissing": "Lütfen doğum tarihinizi seçin",
+  "registerAgeRestriction": "DeniKey'i kullanmak için en az 13 yaşında olmalısınız",
+  "registerSubmitButton": "Kayıt Ol",
+  "registerError": "Hata",
+
+  "verifyEmailTitle": "E-posta Doğrulama",
+  "verifyDeviceTitle": "Cihaz Doğrulama",
+  "verifyEmailSubtitle": "{email} adresine gönderilen\n6 haneli kodu girin",
+  "@verifyEmailSubtitle": {
+    "placeholders": {
+      "email": { "type": "String" }
+    }
+  },
+  "verifyDeviceSubtitle": "Bu cihazdan ilk kez giriş yapıyorsunuz.\n{email} adresine gönderilen 6 haneli kodu girin.",
+  "@verifyDeviceSubtitle": {
+    "placeholders": {
+      "email": { "type": "String" }
+    }
+  },
+  "verifySpamWarning": "Spam/Gereksiz klasörünü kontrol edin",
+  "verifyCodeError": "Lütfen 6 haneli kodu girin",
+  "verifySubmitButton": "Doğrula",
+  "verifyResendButton": "Kodu tekrar gönder",
+  "verifySendSuccess": "Kod tekrar gönderildi",
+  "verifySendError": "Kod gönderilemedi",
+
+  "forgotPasswordTitle": "Şifremi Unuttum",
+  "forgotPasswordHeading": "Şifre Sıfırlama",
+  "forgotPasswordDescription": "Kayıtlı e-posta adresinize doğrulama kodu gönderilecek.",
+  "forgotPasswordEmailLabel": "E-posta",
+  "forgotPasswordEmailError": "E-posta gerekli",
+  "forgotPasswordEmailFormatError": "Geçerli bir e-posta girin",
+  "forgotPasswordSubmitButton": "Kod Gönder",
+  "forgotPasswordError": "Doğrulama kodu gönderilemedi, tekrar deneyin",
+  "forgotPasswordApiError": "Bir hata oluştu",
+
+  "resetPasswordTitle": "Yeni Şifre Belirle",
+  "resetPasswordHeading": "Şifrenizi Sıfırlayın",
+  "resetPasswordDescription": "{email} adresine gönderilen kodu ve yeni şifrenizi girin.",
+  "@resetPasswordDescription": {
+    "placeholders": {
+      "email": { "type": "String" }
+    }
+  },
+  "resetPasswordCodeLabel": "Doğrulama Kodu",
+  "resetPasswordCodeError": "Kod gerekli",
+  "resetPasswordCodeMinError": "6 haneli kodu girin",
+  "resetPasswordNewLabel": "Yeni Master Şifre",
+  "resetPasswordNewError": "Şifre gerekli",
+  "resetPasswordNewMinError": "En az 8 karakter",
+  "resetPasswordConfirmLabel": "Şifre Tekrar",
+  "resetPasswordConfirmError": "Şifre tekrarı gerekli",
+  "resetPasswordConfirmMismatch": "Şifreler eşleşmiyor",
+  "resetPasswordSubmitButton": "Şifremi Sıfırla",
+  "resetPasswordSuccess": "Şifreniz başarıyla sıfırlandı",
+  "resetPasswordApiError": "Bir hata oluştu",
+
+  "changeEmailTitle": "E-posta Değiştir",
+  "changeEmailHeading": "Yeni E-posta Adresi",
+  "changeEmailDescription": "Yeni e-posta adresinize doğrulama kodu gönderilecek.",
+  "changeEmailLabel": "Yeni E-posta",
+  "changeEmailError": "E-posta gerekli",
+  "changeEmailFormatError": "Geçerli bir e-posta girin",
+  "changeEmailSubmitButton": "Kod Gönder",
+  "changeEmailApiError": "Bir hata oluştu",
+
+  "confirmEmailChangeTitle": "E-posta Doğrulama",
+  "confirmEmailChangeHeading": "Kodu Doğrulayın",
+  "confirmEmailChangeDescription": "{newEmail} adresine gönderilen 6 haneli kodu girin.",
+  "@confirmEmailChangeDescription": {
+    "placeholders": {
+      "newEmail": { "type": "String" }
+    }
+  },
+  "confirmEmailChangeCodeLabel": "Doğrulama Kodu",
+  "confirmEmailChangeCodeError": "Kod gerekli",
+  "confirmEmailChangeCodeMinError": "6 haneli kodu girin",
+  "confirmEmailChangeSubmitButton": "Onayla",
+  "confirmEmailChangeSuccess": "E-posta adresiniz başarıyla güncellendi",
+  "confirmEmailChangeApiError": "Bir hata oluştu",
+
+  "masterLockTitle": "DeniKey Kilitli",
+  "masterLockPassword": "Devam etmek için master şifrenizi girin",
+  "masterLockBiometricExpired": "7 günlük biyometrik süreniz doldu.\nGüvenliğiniz için master şifrenizi girin.",
+  "masterLockPasswordLabel": "Master Şifre",
+  "masterLockPasswordError": "Şifre gerekli",
+  "masterLockWrongPassword": "Yanlış master şifre",
+  "masterLockAuthFailed": "Kimlik doğrulama başarısız",
+  "masterLockBiometricNeeded": "Lütfen bir kez master şifrenizi girin",
+  "masterLockButton": "Kilidi Aç",
+  "masterLockBiometricDaysRemaining": "{days} gün sonra şifre istenecek",
+  "@masterLockBiometricDaysRemaining": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "masterLockBiometricTomorrow": "Yarın şifre istenecek",
+  "masterLockDifferentAccount": "Farklı hesapla giriş yap",
+
+  "lockTitle": "DeniKey Kilitli",
+  "lockDescription": "Devam etmek için kimliğinizi doğrulayın",
+  "lockBiometricButton": "Biyometrik ile Aç",
+  "lockLogoutButton": "Çıkış Yap",
+  "lockAuthFailed": "Kimlik doğrulama başarısız",
+
+  "deviceBannedTitle": "Cihaz Yasaklandı",
+  "deviceBannedDescription": "Bu hesap için bu cihaz kullanılamıyor.\nHesap sahibi tarafından erişiminiz kısıtlanmıştır.",
+  "deviceBannedBackButton": "Geri Dön",
+
+  "settingsTitle": "Ayarlar",
+  "settingsAccountSection": "HESAP",
+  "settingsUsernameChange": "Kullanıcı Adı Değiştir",
+  "settingsEmailChange": "E-posta Değiştir",
+  "settingsMyDevices": "Cihazlarım",
+  "settingsAppSection": "UYGULAMA",
+  "settingsLanguage": "Dil",
+  "settingsPasswordGenerator": "Şifre Üretici",
+  "settingsAuditLog": "Aktivite Geçmişi",
+  "settingsSupportTicket": "Destek Talebi",
+  "settingsPrivacyPolicy": "Gizlilik Politikası",
+  "settingsBiometricLock": "Biyometrik Kilit",
+  "settingsBiometricActive": "Aktif  ·  {days} gün sonra şifre istenecek",
+  "@settingsBiometricActive": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "settingsBiometricActiveTomorrow": "Aktif  ·  Yarın şifre istenecek",
+  "settingsBiometricExpired": "Master şifre gerekiyor — kilidi açınca yenilenir",
+  "settingsBiometricDescription": "Parmak izi veya yüz tanıma ile hızlı erişin.\nGüvenliğiniz için 7 günde bir master şifreniz istenecektir.",
+  "settingsAutoLock": "Otomatik Kilit",
+  "settingsAutoLockEnabled": "{minutes} dk sonra kilitle",
+  "@settingsAutoLockEnabled": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "settingsAutoLockFocusLoss": "Süresiz — odaklanmada kilitle",
+  "settingsAutoLockDisabled": "Uygulamadan çıkınca master şifre iste",
+  "settingsClipboardTimeout": "Pano Temizleme",
+  "settingsClipboardTimeoutActive": "Kopyalanan şifre {timeout} sn sonra silinir",
+  "@settingsClipboardTimeoutActive": {
+    "placeholders": {
+      "timeout": { "type": "int" }
+    }
+  },
+  "settingsClipboardTimeoutDisabled": "Sınırsız — pano otomatik temizlenmez",
+  "settingsKeyboardShortcuts": "Klavye Kısayolları",
+  "settingsKeyboardHint": "Ctrl+1/2/3, +, ←→, Esc vb.",
+  "settingsDarkMode": "Karanlık Tema",
+  "settingsDarkModeSystem": "Sistem ayarına göre",
+  "settingsDarkModeEnabled": "Açık",
+  "settingsDarkModeDisabled": "Kapalı",
+  "settingsHowToUse": "NASIL KULLANILIR",
+  "settingsDiscoverApp": "Uygulamayı Keşfet",
+  "settingsDiscoverAppDescription": "Tüm özelliklere genel bakış",
+  "settingsHelp": "Yardım",
+  "settingsHelpAddPassword": "Şifre Ekleme",
+  "settingsHelpAddPasswordContent": "Alt menüden \"Kasam\" sekmesine geçin. Sağ alttaki \"+ Yeni Şifre\" butonuna dokunun. Site adı, kullanıcı adı ve şifrenizi girin; kaydedin.",
+  "settingsHelpPasswordGenerator": "Şifre Üretici",
+  "settingsHelpPasswordGeneratorContent": "Uygulama → Şifre Üretici ekranından uzunluk, büyük/küçük harf, rakam ve özel karakter seçenekleriyle güçlü şifre üretebilirsiniz.",
+  "settingsHelpCategories": "Kategoriler ve Türler",
+  "settingsHelpCategoriesContent": "\"Kütüphane\" sekmesinde şifrelerinizi kategorilere ayırabilir, yeni öğe türleri oluşturabilirsiniz.",
+  "settingsHelpTrash": "Çöp Kutusu",
+  "settingsHelpTrashContent": "Silinen şifreler 7 gün boyunca Çöp Kutusu'nda tutulur. Kasam ekranının sağ üst köşesindeki çöp kutusu ikonundan erişebilirsiniz.",
+  "settingsHelpZeroKnowledge": "Sıfır Bilgi Güvenliği",
+  "settingsHelpZeroKnowledgeContent": "DeniKey'de master şifreniz hiçbir zaman sunucuya gönderilmez ve hiçbir yerde saklanmaz. Şifreleriniz cihazınızda Argon2id algoritmasıyla türetilen bir anahtarla AES-256-GCM formatında şifrelenir; bu anahtar yalnızca sizin cihazınızda bulunur. Sunucuya yalnızca şifreli (encrypted) veri gönderilir. Master şifrenizi unutursanız verilerinizi kurtarmanın hiçbir yolu yoktur — bu, gerçek sıfır-bilgi güvenliğinin kaçınılmaz sonucudur.",
+  "settingsLogout": "Çıkış Yap",
+  "settingsDeleteAccount": "Hesabı Kalıcı Olarak Sil",
+  "settingsDeleteAccountWarning": "Tüm veriler silinir, geri alınamaz",
+  "settingsVersion": "DeniKey v{version}",
+  "@settingsVersion": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
+  "settingsDevicesTitle": "Cihazlarım",
+  "settingsDevicesEmpty": "Kayıtlı cihaz yok",
+  "settingsDevicesError": "Cihazlar yüklenemedi",
+  "settingsDeviceRefresh": "Yenile",
+  "settingsDeviceStatusActive": "Aktif",
+  "settingsDeviceStatusPassive": "Pasif",
+  "settingsDeviceStatusBanned": "Yasaklı",
+  "settingsDeviceRevoke": "Oturumu Sonlandır",
+  "settingsDeviceRevokeSuccess": "Oturum sonlandırıldı",
+  "settingsDeviceBan": "Cihazı Yasakla",
+  "settingsDeviceBanSuccess": "Cihaz yasaklandı",
+  "settingsDeviceUnban": "Yasağı Kaldır",
+  "settingsDeviceUnbanSuccess": "Cihaz yasağı kaldırıldı",
+  "settingsDeviceActionFailed": "İşlem başarısız",
+  "settingsUsernameChangeTitle": "Kullanıcı Adı Değiştir",
+  "settingsUsernameChangeHint": "Yeni kullanıcı adı",
+  "settingsUsernameChangeError": "Boş bırakılamaz",
+  "settingsUsernameChangeMinError": "En az 3 karakter",
+  "settingsUsernameChangePatternError": "Sadece harf, rakam ve _ kullanılabilir",
+  "settingsUsernameChangeSaved": "Kullanıcı adı güncellendi",
+  "settingsUsernameChangeFailed": "Güncellenemedi",
+  "settingsDeleteAccountStep1": "Hesabı Sil — Adım 1/4",
+  "settingsDeleteAccountWarningContent": "Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir.",
+  "settingsDeleteAccountUsernameHint": "Kullanıcı adınızı girin",
+  "settingsDeleteAccountStep2": "Hesabı Sil — Adım 2/4",
+  "settingsDeleteAccountPasswordHint": "Master şifrenizi girin",
+  "settingsDeleteAccountStep3": "Hesabı Sil — Adım 3/4",
+  "settingsDeleteAccountConfirm": "Gerçekten hesabınızı silmek istiyor musunuz?",
+  "settingsDeleteAccountCountdownWait": "{seconds} saniye beklemeniz gerekiyor...",
+  "@settingsDeleteAccountCountdownWait": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "settingsDeleteAccountCountdownReady": "Devam edebilirsiniz.",
+  "settingsDeleteAccountYesConfirm": "Evet, Devam Et",
+  "settingsDeleteAccountStep4": "Hesabı Sil — Adım 4/4",
+  "settingsDeleteAccountFinalMessage": "Son adım: şifrenizi bir kez daha girin.",
+  "settingsDeleteAccountPasswordConfirmHint": "Master şifrenizi tekrar girin",
+  "settingsDeleteAccountFinalButton": "Hesabı Kalıcı Sil",
+  "settingsDeleteAccountFailed": "Hesap silinemedi",
+  "settingsDeleteAccountCancel": "İptal",
+  "settingsDeleteAccountContinue": "Devam",
+
+  "privacyPolicyTitle": "Gizlilik Politikası",
+  "privacyPolicyLastUpdate": "Son güncelleme: Nisan 2026",
+  "privacyPolicySection1Title": "1. Giriş",
+  "privacyPolicySection1Body": "DeniKey (\"uygulama\", \"biz\", \"hizmet\"), sıfır-bilgi (zero-knowledge) mimarisiyle çalışan bir şifre yöneticisidir. Bu Gizlilik Politikası, uygulamayı kullanırken hangi verilerin toplandığını, nasıl işlendiğini ve haklarınızı açıklamaktadır.",
+  "privacyPolicySection2Title": "2. Toplanan Veriler",
+  "privacyPolicySection2Body": "• E-posta adresi ve kullanıcı adı — hesap oluşturma ve kimlik doğrulama için.\n• Master şifrenizin türetilmiş doğrulama değeri (hash) — düz metin asla saklanmaz.\n• Şifrelenmiş kasa verileri — cihazınızda AES-256-GCM ile şifrelendikten sonra sunucuya gönderilir; içeriği yalnızca siz okuyabilirsiniz.\n• Oturum tokenları ve cihaz kimliği — çoklu cihaz yönetimi için.\n• Denetim kayıtları (audit log) — hesap güvenliğinizi izlemeniz için, yalnızca sizin erişiminize açıktır.",
+  "privacyPolicySection3Title": "3. Sıfır Bilgi Mimarisi",
+  "privacyPolicySection3Body": "DeniKey, master şifrenizi hiçbir zaman sunucuya göndermez ve hiçbir yerde saklamaz. Kasa verileriniz cihazınızda, Argon2id algoritmasıyla türetilen bir anahtar ile AES-256-GCM formatında şifrelenir. Sunucularımız yalnızca şifreli (encrypted) veri depolar; içeriğinize teknik olarak erişim imkânımız yoktur.\n\nMaster şifrenizi unutursanız verilerinizi kurtarmanın hiçbir yolu yoktur — bu, gerçek sıfır-bilgi güvenliğinin kaçınılmaz sonucudur.",
+  "privacyPolicySection4Title": "4. Verilerin Kullanımı",
+  "privacyPolicySection4Body": "Topladığımız veriler yalnızca şu amaçlarla kullanılır:\n• Hesabınızın oluşturulması ve yönetilmesi\n• Kimlik doğrulama ve oturum güvenliği\n• E-posta doğrulama ve şifre sıfırlama bildirimleri\n• Destek taleplerinize yanıt verilmesi\n\nVerileriniz üçüncü taraflarla paylaşılmaz, reklam amacıyla kullanılmaz.",
+  "privacyPolicySection5Title": "5. Veri Güvenliği",
+  "privacyPolicySection5Body": "• Tüm iletişim HTTPS/TLS üzerinden şifrelenmiş biçimde gerçekleşir.\n• Kasa verileri sunucuda şifreli olarak saklanır.\n• Şifreler Argon2id (memory: 64 MB, iterations: 3, parallelism: 2) ile türetilir; kaba kuvvet saldırılarına karşı dayanıklıdır.\n• JWT tokenlar kısa ömürlüdür ve yenileme mekanizması ile yönetilir.",
+  "privacyPolicySection6Title": "6. Hesap Silme",
+  "privacyPolicySection6Body": "Hesabınızı istediğiniz zaman Ayarlar → Hesabı Kalıcı Olarak Sil adımından silebilirsiniz. Silme işlemi 4 adımlı onay gerektirir ve tüm verileriniz (kasa öğeleri, kategoriler, audit kayıtları dahil) kalıcı olarak kaldırılır. Bu işlem geri alınamaz.",
+  "privacyPolicySection7Title": "7. Çocukların Gizliliği",
+  "privacyPolicySection7Body": "DeniKey, 13 yaşın altındaki çocuklara yönelik değildir. Bilerek bu yaş grubundan veri toplamıyoruz.",
+  "privacyPolicySection8Title": "8. Politika Değişiklikleri",
+  "privacyPolicySection8Body": "Bu politikayı güncelleyebiliriz. Önemli değişiklikler kayıtlı e-posta adresinize bildirilir. Güncel politika her zaman uygulama içinden erişilebilir.",
+  "privacyPolicySection9Title": "9. İletişim",
+  "privacyPolicySection9Body": "Gizlilik ile ilgili sorularınız için destek talebi oluşturabilir ya da uygulama içindeki Destek Talebi ekranını kullanabilirsiniz.",
+
+  "vaultTitle": "DeniKey",
+  "vaultSearchTooltip": "Ara",
+  "vaultTrashTooltip": "Çöp Kutusu",
+  "vaultRefreshTooltip": "Yenile",
+  "vaultOfflineWarning": "İnternet bağlantısı olmadan kasanıza erişemezsiniz",
+  "vaultOfflineWarningDesktop": "Çevrimdışı mod — Salt okunur",
+  "vaultBulkDeleteTitle": "Toplu Sil",
+  "vaultBulkDeleteMessage": "{count} kayıt çöp kutusuna taşınacak. Devam edilsin mi?",
+  "@vaultBulkDeleteMessage": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "vaultBulkSelectAll": "Tümü",
+  "vaultBulkMoveTitle": "{count} kaydı taşı",
+  "@vaultBulkMoveTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "vaultBulkMoveUncategorized": "Kategorisiz",
+  "vaultCategoryEmpty": "Bu kategoride şifre yok",
+  "vaultEmpty": "Henüz şifre yok",
+  "vaultEmptyHint": "+ ile yeni şifre ekleyin",
+  "vaultFavoritesSection": "Favoriler",
+  "vaultOthersSection": "Diğerleri",
+  "vaultFavoritesAdd": "Favorilere ekle",
+  "vaultFavoritesRemove": "Favoriden çıkar",
+  "vaultAddButton": "Yeni Şifre",
+  "vaultBulkDeleteButton": "Sil",
+  "vaultBulkMoveButton": "Taşı",
+  "vaultBulkFavoritesButton": "Favoriye ekle",
+  "vaultBulkFavoritesRemoveButton": "Favoriden çıkar",
+  "vaultLoading": "Yükleniyor...",
+  "vaultError": "Hata",
+  "vaultRetry": "Yeniden Dene",
+  "vaultBulkSelectionCount": "{count} seçildi",
+  "@vaultBulkSelectionCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "addItemStep0": "Kategori Seç",
+  "addItemStep1": "Tür Seç",
+  "addItemStep2": "Bilgileri Gir",
+  "addItemUncategorized": "Kategorisiz",
+  "addItemUncategorizedSubtitle": "Kategorisizler altında sakla",
+  "addItemCreateCategory": "Kategori Oluştur",
+  "addItemCreateCategorySubtitle": "Yeni kategori ekle",
+  "addItemSelectType": "Tür Seçin",
+  "addItemNewCategory": "Yeni Kategori",
+  "addItemNewCategoryName": "Kategori Adı",
+  "addItemColorSelect": "Renk Seç",
+  "addItemNewItemType": "Yeni Tür",
+  "addItemTypeNameLabel": "Tür Adı",
+  "addItemTypeSelectIcon": "İkon Seç",
+  "addItemTypeSelectColor": "Renk Seç",
+  "addItemTypeFixedFields": "Sabit Alanlar",
+  "addItemTypeFieldAdd": "Alan Ekle",
+  "addItemTypeFieldDefault": "Alan eklenmedi — varsayılan olarak \"Şifre\" alanı oluşturulur.",
+  "addItemTypeFieldName": "Alan Adı",
+  "addItemTypeFieldType": "Tür",
+  "addItemTypeFieldTypeText": "Metin",
+  "addItemTypeFieldTypeSecret": "Gizli",
+  "addItemTypeFieldTypeNumber": "Sayı",
+  "addItemTypeFieldTypeDate": "Tarih",
+  "addItemTitleLabel": "Başlık *",
+  "addItemTitleHint": "Örn: Instagram, Gmail, Netflix",
+  "addItemUrlLabel": "Web Sitesi (URL)",
+  "addItemUrlHint": "Örn: https://instagram.com",
+  "addItemExtraFieldKeyLabel": "Alan Adı",
+  "addItemExtraFieldValueLabel": "Değer",
+  "addItemAddFieldButton": "Alan Ekle",
+  "addItemSaveButton": "Kaydet",
+  "addItemPasswordStrengthVeryWeak": "Çok Zayıf",
+  "addItemPasswordStrengthWeak": "Zayıf",
+  "addItemPasswordStrengthMedium": "Orta",
+  "addItemPasswordStrengthStrong": "Güçlü",
+  "addItemPasswordStrengthVeryStrong": "Çok Güçlü",
+  "addItemErrorSave": "Kayıt eklenirken bir hata oluştu.",
+  "addItemCategoryCreate": "Oluştur",
+  "addItemTypeCreate": "Ekle",
+  "addItemCancel": "İptal",
+
+  "detailPasswordLabel": "Şifre",
+  "detailExtraInfoSection": "Ek Bilgiler",
+  "detailCategoryLabel": "Klasör",
+  "detailCategoryUncategorized": "Sınıflandırılmamış",
+  "detailCategoryMove": "Klasöre Taşı",
+  "detailExternalLinkTitle": "Dış Link",
+  "detailExternalLinkMessage": "DeniKey bu bağlantıyı açmak üzere:\n\n{url}",
+  "@detailExternalLinkMessage": {
+    "placeholders": {
+      "url": { "type": "String" }
+    }
+  },
+  "detailExternalLinkDeny": "İzin Verme",
+  "detailExternalLinkOnce": "Bu Seferlik",
+  "detailExternalLinkNoAsk": "Bir Daha Sorma",
+  "detailDeleteTitle": "Sil",
+  "detailDeleteMessage": "Bu şifreyi silmek istediğinize emin misiniz?",
+  "detailDeleteButton": "Sil",
+  "detailFavoritesAdd": "Favorilere ekle",
+  "detailFavoritesRemove": "Favoriden çıkar",
+  "detailPasswordHistory": "Şifre Geçmişi",
+  "detailEditButton": "Düzenle",
+  "detailCancelEdit": "İptal",
+  "detailEditTitle": "Başlık",
+  "detailEditUrl": "Web Sitesi (URL)",
+  "detailEditPassword": "Şifre",
+  "detailEditCustomFieldKeyLabel": "Başlık",
+  "detailEditCustomFieldValueLabel": "İçerik",
+  "detailEditSaveButton": "Kaydet",
+  "detailEditErrorBlankTitle": "Başlık boş olamaz",
+  "detailEditErrorGeneral": "Güncellenemedi, tekrar deneyin",
+  "detailInfoTilePasswordCopied": "{label} kopyalandı, {timeout} saniye sonra silinecek",
+  "@detailInfoTilePasswordCopied": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "timeout": { "type": "int" }
+    }
+  },
+  "detailInfoTileCopied": "{label} kopyalandı",
+  "@detailInfoTileCopied": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "detailLinkOpen": "Linki Aç",
+  "detailLoadError": "Bilgiler yüklenemedi: {error}",
+  "@detailLoadError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "detailRetry": "Tekrar Dene",
+
+  "searchHint": "Ara...",
+  "searchEmpty": "Aramak için yazmaya başlayın",
+  "searchNoResults": "\"{query}\" için sonuç bulunamadı",
+  "@searchNoResults": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
+
+  "passwordHistoryTitle": "{itemTitle} — Geçmiş",
+  "@passwordHistoryTitle": {
+    "placeholders": {
+      "itemTitle": { "type": "String" }
+    }
+  },
+  "passwordHistoryClear": "Geçmişi Temizle",
+  "passwordHistoryClearTitle": "Geçmişi Temizle",
+  "passwordHistoryClearMessage": "Tüm şifre geçmişi silinsin mi?",
+  "passwordHistoryEmpty": "Şifre geçmişi yok",
+  "passwordHistoryEmptyHint": "Şifre güncellendiğinde eski sürümler burada görünür",
+  "passwordHistoryCopy": "Şifre kopyalandı, 30 sn sonra silinecek",
+  "passwordHistoryLoading": "Yükleniyor...",
+  "passwordHistoryError": "Yüklenemedi",
+  "passwordHistoryRetry": "Tekrar Dene",
+
+  "libraryTitle": "Kütüphane",
+  "libraryCategoriesTab": "Kategoriler",
+  "libraryTypesTab": "Türler",
+  "libraryAddCategory": "Yeni Kategori",
+  "libraryCategoryName": "Kategori Adı",
+  "libraryCategoryColorSelect": "Renk Seç",
+  "libraryDeleteCategoryTitle": "Sil",
+  "libraryDeleteCategoryMessage": "Bu kategoriyi silmek istediğinize emin misiniz?",
+  "libraryDeleteSystemCategory": "Sistem kategorileri silinemez.",
+  "libraryDeleteSystemType": "Sistem türleri silinemez.",
+  "libraryEmptyCategories": "Henüz kategori yok",
+  "libraryEmptyTypes": "Henüz tür yok",
+  "librarySystemLabel": "Sistem",
+  "librarySystemLock": "Kilitli",
+  "libraryTypeFieldCount": "{count} alan",
+  "@libraryTypeFieldCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "libraryCancel": "İptal",
+  "libraryAddButton": "Ekle",
+
+  "categoryDetailEmpty": "Bu kategoride henüz öğe yok",
+  "categoryDetailItem": "İsimsiz",
+
+  "passwordGeneratorTitle": "Şifre Üretici",
+  "passwordGeneratorHint": "Şifre üretmek için butona basın",
+  "passwordGeneratorGenerate": "Şifre Üret",
+  "passwordGeneratorLength": "Uzunluk",
+  "passwordGeneratorCharacterTypes": "Karakter Tipleri",
+  "passwordGeneratorUppercase": "Büyük Harf (A–Z)",
+  "passwordGeneratorLowercase": "Küçük Harf (a–z)",
+  "passwordGeneratorNumbers": "Rakam (0–9)",
+  "passwordGeneratorSymbols": "Sembol (!@#$...)",
+  "passwordGeneratorCopy": "Kopyala",
+  "passwordGeneratorCopySuccess": "Şifre kopyalandı, 30 sn sonra silinecek",
+
+  "trashTitle": "Çöp Kutusu",
+  "trashEmptyButton": "Tümünü Sil",
+  "trashEmptyTitle": "Çöp Kutusunu Boşalt",
+  "trashEmptyMessage": "Tüm öğeler kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+  "trashDeleteTitle": "Kalıcı Sil",
+  "trashDeleteMessage": "\"{title}\" kalıcı olarak silinsin mi?",
+  "@trashDeleteMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "trashDeleteButton": "Sil",
+  "trashEmpty": "Çöp kutusu boş",
+  "trashEmptyHint": "Silinen öğeler 7 gün burada saklanır",
+  "trashDeleteFor": "{date} tarihinde kalıcı silinecek",
+  "@trashDeleteFor": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "trashRestore": "Geri Yükle",
+  "trashDeletePermanent": "Kalıcı Sil",
+  "trashLoading": "Yükleniyor...",
+  "trashError": "Hata",
+  "trashRetry": "Tekrar Dene",
+  "trashCancel": "İptal",
+
+  "auditLogTitle": "Aktivite Geçmişi",
+  "auditLogFilterAll": "Tümü",
+  "auditLogFilterAccount": "Hesap",
+  "auditLogFilterSecurity": "Güvenlik",
+  "auditLogFilterVault": "Kasa",
+  "auditLogActionRegister": "Kayıt Olundu",
+  "auditLogActionLoginSuccess": "Giriş Yapıldı",
+  "auditLogActionLoginFailed": "Başarısız Giriş",
+  "auditLogActionLoginNewDevice": "Yeni Cihaz Girişi",
+  "auditLogActionLogout": "Çıkış Yapıldı",
+  "auditLogActionDeviceVerified": "Cihaz Doğrulandı",
+  "auditLogActionEmailChanged": "E-posta Değiştirildi",
+  "auditLogActionPasswordReset": "Şifre Sıfırlandı",
+  "auditLogActionVaultItemCreated": "Şifre Eklendi",
+  "auditLogActionVaultItemUpdated": "Şifre Güncellendi",
+  "auditLogActionVaultItemDeleted": "Şifre Silindi",
+  "auditLogUnknownAction": "Bilinmeyen İşlem",
+  "auditLogEmpty": "Henüz aktivite yok",
+  "auditLogEmptyCategory": "{category} kategorisinde kayıt yok",
+  "@auditLogEmptyCategory": {
+    "placeholders": {
+      "category": { "type": "String" }
+    }
+  },
+  "auditLogLoading": "Yükleniyor...",
+  "auditLogError": "Hata",
+  "auditLogRetry": "Tekrar Dene",
+
+  "supportTicketTitle": "Destek",
+  "supportTicketMyTickets": "Taleplerim",
+  "supportTicketNew": "Yeni Talep",
+  "supportTicketQuestion": "Nasıl yardımcı olabiliriz?",
+  "supportTicketCategoryLabel": "Kategori",
+  "supportTicketCategoryBug": "Hata Bildirimi",
+  "supportTicketCategorySuggestion": "Öneri",
+  "supportTicketCategoryOther": "Diğer",
+  "supportTicketSubjectLabel": "Konu",
+  "supportTicketSubjectError": "Konu gerekli",
+  "supportTicketSubjectMinError": "En az 5 karakter",
+  "supportTicketMessageLabel": "Mesajınız",
+  "supportTicketMessageError": "Mesaj gerekli",
+  "supportTicketMessageMinError": "En az 20 karakter",
+  "supportTicketPriorityLabel": "Öncelik",
+  "supportTicketPriorityLow": "Düşük",
+  "supportTicketPriorityNormal": "Normal",
+  "supportTicketPriorityHigh": "Yüksek",
+  "supportTicketSubmitButton": "Gönder",
+  "supportTicketStatusOpen": "Açık",
+  "supportTicketStatusInProgress": "İşlemde",
+  "supportTicketStatusClosed": "Kapalı",
+  "supportTicketYourMessage": "Mesajınız",
+  "supportTicketAdminReply": "Destek Yanıtı",
+  "supportTicketWaitingReply": "Yanıt bekleniyor...",
+  "supportTicketReplied": "Yanıtlandı",
+  "supportTicketWaitingReplyLong": "Yanıt bekleniyor",
+  "supportTicketSuccess": "Destek talebiniz gönderildi",
+  "supportTicketError": "Hata oluştu",
+  "supportTicketLoadingError": "Talepler yüklenemedi",
+  "supportTicketLoadingRetry": "Tekrar Dene",
+  "supportTicketDetailMessage": "Mesajınız",
+
+  "forceUpdateTitle": "Güncelleme Gerekli",
+  "forceUpdateDescription": "Bu sürüm artık desteklenmiyor.\nDevam etmek için lütfen uygulamayı güncelleyin.",
+  "forceUpdateCurrentVersion": "Mevcut sürüm",
+  "forceUpdateMinimumVersion": "Gerekli sürüm",
+  "forceUpdateButton": "Güncelle",
+  "forceUpdateDownloading": "İndiriliyor... %{progress}",
+  "@forceUpdateDownloading": {
+    "placeholders": {
+      "progress": { "type": "int" }
+    }
+  },
+  "forceUpdateError": "İndirme başarısız: {error}",
+  "@forceUpdateError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "forceUpdateInstallError": "Kurulum başlatılamadı: {error}",
+  "@forceUpdateInstallError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "forceUpdateInstallErrorFilePath": "Kurulum başlatılamadı. Dosya: {filePath}",
+  "@forceUpdateInstallErrorFilePath": {
+    "placeholders": {
+      "filePath": { "type": "String" }
+    }
+  },
+  "forceUpdatePermissionTitle": "İzin Gerekiyor",
+  "forceUpdatePermissionContent": "APK yükleyebilmek için \"Bilinmeyen uygulamaları yükle\" iznini vermeniz gerekiyor.\n\nAyarlar → Uygulamalar → DeniKey → Bilinmeyen uygulamaları yükle → İzin Ver\n\nİzni verdikten sonra \"Güncelle\" butonuna tekrar basın.",
+  "forceUpdatePermissionOpenSettings": "Ayarları Aç",
+  "forceUpdatePermissionUnderstand": "Anladım",
+
+  "navBarVault": "Kasam",
+  "navBarLibrary": "Kütüphane",
+  "navBarSettings": "Ayarlar",
+
+  "desktopOnboardingTitle": "Masaüstü Kısayolları",
+  "desktopOnboardingDescription": "DeniKey'i daha hızlı kullanmak için bu kısayolları deneyin.",
+  "desktopOnboardingShortcut1": "Kasam / Kütüphane / Ayarlar",
+  "desktopOnboardingShortcut2": "Yeni şifre ekle",
+  "desktopOnboardingShortcut3": "Arama",
+  "desktopOnboardingShortcut4": "Şifre Üretici",
+  "desktopOnboardingShortcut5": "Sekmeler arası geçiş",
+  "desktopOnboardingShortcut6": "Geri git / kapat",
+  "desktopOnboardingWindowsNote": "X butonu uygulamayı kapatır. Sistem tepsisindeki simgeye sağ tıklayarak da çıkış yapabilirsiniz.",
+  "desktopOnboardingButton": "Anladım",
+
+  "splashSubtitle": "Sıfır Bilgi · Tam Güvenlik",
+  "splashVersionPrefix": "v",
+
+  "settingsAutoLockUnlimited": "Süresiz",
+  "settingsAutoLockMinutesChip": "{minutes} dk",
+  "@settingsAutoLockMinutesChip": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "settingsClipboardSecondsChip": "{seconds} sn",
+  "@settingsClipboardSecondsChip": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "settingsClipboardUnlimited": "Sınırsız",
+  "settingsDeviceJustNow": "Az önce",
+  "settingsDeviceMinutesAgo": "{minutes} dakika önce",
+  "@settingsDeviceMinutesAgo": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "settingsDeviceHoursAgo": "{hours} saat önce",
+  "@settingsDeviceHoursAgo": {
+    "placeholders": { "hours": { "type": "int" } }
+  },
+  "settingsDeviceDaysAgo": "{days} gün önce",
+  "@settingsDeviceDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+
+  "onboardingSkip": "Atla",
+  "onboardingNext": "İleri",
+  "onboardingStart": "Başla",
+  "onboardingClose": "Kapat",
+  "onboardingWelcomeTitle": "DeniKey'e Hoş Geldiniz",
+  "onboardingWelcomeSubtitle": "Şifreleriniz, kartlarınız ve dijital kimlikleriniz tek bir güvenli yerde — yalnızca sizin elinizde.",
+  "onboardingChipZeroKnowledge": "Sıfır Bilgi",
+  "onboardingChipMultiPlatform": "Çok Platform",
+  "onboardingChipSync": "Anlık Senkron",
+  "onboardingVaultTitle": "Kasanız Her Şeyi Saklar",
+  "onboardingVaultSubtitle": "Şifreler, kartlar, notlar ve özel alanlar. Tek dokunuşla kopyalayın, gizli alanları isteğe göre maskeleyin.",
+  "onboardingVaultActionCopy": "Kopyala",
+  "onboardingVaultActionShow": "Göster",
+  "onboardingVaultActionEdit": "Düzenle",
+  "onboardingVaultMockBankCard": "Banka Kartı",
+  "onboardingChipQuickAdd": "Hızlı Ekle",
+  "onboardingChipFavorites": "Favoriler",
+  "onboardingChipHiddenField": "Gizli Alan",
+  "onboardingChipTrash": "Çöp Kutusu",
+  "onboardingLibraryTitle": "Organize Edin",
+  "onboardingLibrarySubtitle": "Kategorilerle şifrelerinizi düzenleyin. Öğe türleri ile kredi kartı, kimlik belgesi ve daha fazlasını saklayın.",
+  "onboardingLibraryCategorySocialMedia": "Sosyal Medya",
+  "onboardingLibraryCategoryBanking": "Bankacılık",
+  "onboardingLibraryCategoryWork": "İş",
+  "onboardingLibraryCategoryDevices": "Cihazlar",
+  "onboardingLibraryPasswordCount": "{count} şifre",
+  "@onboardingLibraryPasswordCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "onboardingLibraryItemTypesHeader": "Öğe Türleri",
+  "onboardingLibraryItemTypesDesc": "Kredi Kartı, Kimlik, SSH Anahtarı, Wi-Fi ve daha fazlası...",
+  "onboardingChipCategories": "Kategoriler",
+  "onboardingChipItemTypes": "Öğe Türleri",
+  "onboardingChipCustomize": "Özelleştir",
+  "onboardingGeneratorTitle": "Güçlü Şifreler Üretin",
+  "onboardingGeneratorSubtitle": "Uzunluk, büyük/küçük harf, rakam ve özel karakter seçenekleriyle tek tıkta kırılması zor şifreler oluşturun.",
+  "onboardingGeneratorSectionLabel": "Şifre Üretici",
+  "onboardingGeneratorStrengthLabel": "Güç:",
+  "onboardingGeneratorStrengthVeryStrong": "Çok Güçlü",
+  "onboardingGeneratorLengthOption": "Uzunluk: {n}",
+  "@onboardingGeneratorLengthOption": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "onboardingChipRefresh": "Yenile",
+  "onboardingSecurityTitle": "Tam Kontrol Sizde",
+  "onboardingSecuritySubtitle": "Parmak izi, otomatik kilit, cihaz yasaklama ve denetim kaydı ile güvenliğinizi her açıdan yönetin.",
+  "onboardingSecurityBiometric": "Biyometrik",
+  "onboardingSecurityBiometricDesc": "Parmak izi ile hızlı erişim",
+  "onboardingSecurityAutoLock": "Otomatik Kilit",
+  "onboardingSecurityAutoLockDesc": "Süre veya odak kaybıyla kilitle",
+  "onboardingSecurityDeviceManagement": "Cihaz Yönetimi",
+  "onboardingSecurityDeviceManagementDesc": "Oturumları görüntüle ve sonlandır",
+  "onboardingSecurityAuditLog": "Denetim Kaydı",
+  "onboardingSecurityAuditLogDesc": "Her işlemi takip et",
+  "onboardingSecurityZeroKnowledgeTitle": "Sıfır Bilgi Mimarisi",
+  "onboardingSecurityZeroKnowledgeDesc": "Master şifreniz hiçbir zaman sunucuya gönderilmez.",
+  "onboardingReadyTitle": "Başlamaya Hazır mısınız?",
+  "onboardingReadySubtitle": "Hesap oluşturun ya da giriş yapın. Güvenlik artık karmaşık değil.",
+  "onboardingReplayTitle": "Her Şeyi Hatırladınız!",
+  "onboardingReplaySubtitle": "Sorularınız için Ayarlar → Destek Talebi kısmından bize ulaşabilirsiniz.",
+  "onboardingSummaryZeroKnowledge": "Sıfır bilgi — veriler yalnızca sizin",
+  "onboardingSummaryAddPassword": "Kasam → şifre ekle ve yönet",
+  "onboardingSummaryGenerator": "Güçlü şifreler üret",
+  "onboardingSummaryBiometric": "Biyometrik ile hızlı giriş",
+
+  "vaultItemUntitled": "İsimsiz",
+  "vaultItemDetailFallbackTitle": "Detay",
+  "categoriesUncategorized": "Kategorisizler",
+  "genericError": "Hata: {error}",
+  "@genericError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "networkError": "Sunucuya bağlanılamadı"
+}

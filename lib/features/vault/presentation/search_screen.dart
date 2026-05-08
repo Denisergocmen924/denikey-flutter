@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -44,6 +45,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(vaultProvider);
     final results = _filter(state.items);
 
@@ -52,10 +54,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         title: TextField(
           controller: _ctrl,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Ara...',
+          decoration: InputDecoration(
+            hintText: l10n.searchHint,
             border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.grey),
+            hintStyle: const TextStyle(color: Colors.grey),
           ),
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           onChanged: (v) => setState(() => _query = v),
@@ -74,13 +76,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       body: state.status == VaultStatus.loading
           ? const Center(child: CircularProgressIndicator())
           : _query.isEmpty
-              ? const Center(
+              ? Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.search, size: 64, color: Colors.grey),
-                      SizedBox(height: 12),
-                      Text('Aramak için yazmaya başlayın', style: TextStyle(color: Colors.grey)),
+                      const Icon(Icons.search, size: 64, color: Colors.grey),
+                      const SizedBox(height: 12),
+                      Text(l10n.searchEmpty, style: const TextStyle(color: Colors.grey)),
                     ],
                   ),
                 )
@@ -91,7 +93,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         children: [
                           const Icon(Icons.search_off, size: 64, color: Colors.grey),
                           const SizedBox(height: 12),
-                          Text('"$_query" için sonuç bulunamadı',
+                          Text(l10n.searchNoResults(_query),
                               style: const TextStyle(color: Colors.grey)),
                         ],
                       ),
@@ -100,7 +102,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       itemCount: results.length,
                       itemBuilder: (ctx, i) {
                         final item = results[i];
-                        final title = item['title'] as String? ?? 'İsimsiz';
+                        final l10n = AppLocalizations.of(ctx);
+                        final title = item['title'] as String? ?? l10n.vaultItemUntitled;
                         final username = item['username'] as String? ?? '';
                         final type = item['item_type_name'] as String?;
                         return ListTile(

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../item_types/providers/item_type_provider.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class AddVaultItemScreen extends ConsumerStatefulWidget {
   const AddVaultItemScreen({super.key});
@@ -27,7 +28,6 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
 
   // Başlık alanı (her tip için ortak)
   final _titleCtrl = TextEditingController();
-  final _urlCtrl = TextEditingController();
 
   // Form hata mesajları
   String? _titleError;
@@ -48,7 +48,6 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   @override
   void dispose() {
     _titleCtrl.dispose();
-    _urlCtrl.dispose();
     for (final ctrl in _fieldControllers.values) {
       ctrl.dispose();
     }
@@ -92,10 +91,11 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     bool hasError = false;
 
     if (_titleCtrl.text.trim().isEmpty) {
-      setState(() => _titleError = 'Başlık boş bırakılamaz');
+      setState(() => _titleError = l10n.detailEditErrorBlankTitle);
       hasError = true;
     }
 
@@ -156,7 +156,6 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       if (_selectedItemType != null) 'icon': _selectedItemType!['icon'],
       if (_selectedItemType != null) 'color': _selectedItemType!['color'],
       if (customFieldsData.isNotEmpty) 'custom_fields_data': customFieldsData,
-      if (_urlCtrl.text.trim().isNotEmpty) 'url': _urlCtrl.text.trim(),
     };
 
     try {
@@ -165,8 +164,8 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kayıt eklenirken bir hata oluştu.'),
+          SnackBar(
+            content: Text(l10n.addItemErrorSave),
             backgroundColor: Colors.red,
           ),
         );
@@ -186,7 +185,8 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final titles = ['Kategori Seç', 'Tür Seç', 'Bilgileri Gir'];
+    final l10n = AppLocalizations.of(context);
+    final titles = [l10n.addItemStep0, l10n.addItemStep1, l10n.addItemStep2];
     return Scaffold(
       appBar: AppBar(
         title: Text(titles[_step]),
@@ -206,6 +206,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   // ─── Adım 0: Kategori Seç ───────────────────────────────────────────────
 
   Widget _buildCategorySelection() {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(categoryProvider);
     final categories = state.categories;
 
@@ -215,8 +216,8 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
         _selectionTile(
           icon: Icons.inbox_outlined,
           color: Colors.grey,
-          title: 'Kategorisiz',
-          subtitle: 'Kategorisizler altında sakla',
+          title: l10n.addItemUncategorized,
+          subtitle: l10n.addItemUncategorizedSubtitle,
           onTap: () {
             final uncategorized = categories.firstWhere(
               (c) => c['name_en'] == 'Uncategorized',
@@ -224,7 +225,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
             );
             setState(() {
               _selectedCategoryId = uncategorized['id'] as String?;
-              _selectedCategoryName = 'Kategorisizler';
+              _selectedCategoryName = l10n.categoriesUncategorized;
               _step = 1;
             });
           },
@@ -233,15 +234,15 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
         _selectionTile(
           icon: Icons.add_circle_outline,
           color: const Color(0xFFFF5900),
-          title: 'Kategori Oluştur',
-          subtitle: 'Yeni kategori ekle',
+          title: l10n.addItemCreateCategory,
+          subtitle: l10n.addItemCreateCategorySubtitle,
           onTap: _showCreateCategoryDialog,
         ),
         const SizedBox(height: 16),
         if (state.status == CategoryStatus.loading)
           const Center(child: CircularProgressIndicator())
         else ...[
-          Text('Kategoriler',
+          Text(l10n.libraryCategoriesTab,
               style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -271,19 +272,20 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
 
   void _showCreateCategoryDialog() {
     final nameCtrl = TextEditingController();
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Yeni Kategori'),
+        title: Text(l10n.addItemNewCategory),
         content: TextField(
           controller: nameCtrl,
-          decoration: const InputDecoration(
-            labelText: 'Kategori Adı',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.addItemNewCategoryName,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.addItemCancel)),
           FilledButton(
             onPressed: () async {
               if (nameCtrl.text.trim().isEmpty) return;
@@ -309,7 +311,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                 });
               }
             },
-            child: const Text('Oluştur'),
+            child: Text(l10n.addItemCategoryCreate),
           ),
         ],
       ),
@@ -319,6 +321,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   // ─── Adım 1: Öğe Tipi Seç ────────────────────────────────────────────────
 
   Widget _buildItemTypeSelection() {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(itemTypeProvider);
 
     if (state.isLoading) {
@@ -326,13 +329,13 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     }
 
     if (state.error != null) {
-      return Center(child: Text('Hata: ${state.error}'));
+      return Center(child: Text(l10n.genericError(state.error ?? '')));
     }
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Tür Seçin',
+        Text(l10n.addItemSelectType,
             style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -370,6 +373,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   // ─── Adım 2: Dinamik Form ─────────────────────────────────────────────────
 
   Widget _buildForm() {
+    final l10n = AppLocalizations.of(context);
     final fields = (_selectedItemType?['fields'] as List<dynamic>? ?? [])
       ..sort((a, b) => (a['sort_order'] as int).compareTo(b['sort_order'] as int));
 
@@ -389,23 +393,10 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
               if (_titleError != null) setState(() => _titleError = null);
             },
             decoration: InputDecoration(
-              labelText: 'Başlık *',
-              hintText: 'Örn: Instagram, Gmail, Netflix',
+              labelText: l10n.addItemTitleLabel,
+              hintText: l10n.addItemTitleHint,
               errorText: _titleError,
               border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // URL
-          TextField(
-            controller: _urlCtrl,
-            keyboardType: TextInputType.url,
-            decoration: const InputDecoration(
-              labelText: 'Web Sitesi (URL)',
-              hintText: 'Örn: https://instagram.com',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.link),
             ),
           ),
           const SizedBox(height: 12),
@@ -429,17 +420,17 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                       children: [
                         TextField(
                           controller: f['key'],
-                          decoration: const InputDecoration(
-                            labelText: 'Alan Adı',
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: l10n.addItemExtraFieldKeyLabel,
+                            border: const OutlineInputBorder(),
                           ),
                         ),
                         const SizedBox(height: 8),
                         TextField(
                           controller: f['value'],
-                          decoration: const InputDecoration(
-                            labelText: 'Değer',
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: l10n.addItemExtraFieldValueLabel,
+                            border: const OutlineInputBorder(),
                           ),
                         ),
                       ],
@@ -457,7 +448,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           OutlinedButton.icon(
             onPressed: _addExtraField,
             icon: const Icon(Icons.add),
-            label: const Text('Alan Ekle'),
+            label: Text(l10n.addItemAddFieldButton),
             style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFFF5900)),
           ),
           const SizedBox(height: 24),
@@ -467,7 +458,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: const Text('Kaydet', style: TextStyle(fontSize: 16)),
+            child: Text(l10n.addItemSaveButton, style: const TextStyle(fontSize: 16)),
           ),
         ],
       ),
@@ -617,7 +608,6 @@ class _PasswordStrengthIndicator extends StatelessWidget {
   final String password;
   const _PasswordStrengthIndicator({required this.password});
 
-  static const _labels = ['Çok Zayıf', 'Zayıf', 'Orta', 'Güçlü', 'Çok Güçlü'];
   static const _colors = [
     Color(0xFFE53935),
     Color(0xFFFF7043),
@@ -647,6 +637,14 @@ class _PasswordStrengthIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final level = _level();
     if (level < 0) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context);
+    final labels = [
+      l10n.addItemPasswordStrengthVeryWeak,
+      l10n.addItemPasswordStrengthWeak,
+      l10n.addItemPasswordStrengthMedium,
+      l10n.addItemPasswordStrengthStrong,
+      l10n.addItemPasswordStrengthVeryStrong,
+    ];
     final color = _colors[level];
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 2),
@@ -667,7 +665,7 @@ class _PasswordStrengthIndicator extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            _labels[level],
+            labels[level],
             style: TextStyle(
                 fontSize: 11, color: color, fontWeight: FontWeight.w500),
           ),

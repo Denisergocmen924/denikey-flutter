@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../vault/providers/vault_provider.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class CategoryDetailScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> category;
@@ -30,6 +31,7 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final vaultState = ref.watch(vaultProvider);
     final categoryId = widget.category['id'] as String;
     final categoryName = widget.category['name_tr'] ?? widget.category['name_en'] ?? '';
@@ -54,7 +56,7 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
                       Icon(Icons.lock_open_outlined, size: 64, color: Colors.grey.shade300),
                       const SizedBox(height: 16),
                       Text(
-                        'Bu kategoride henüz öğe yok',
+                        l10n.categoryDetailEmpty,
                         style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
                       ),
                     ],
@@ -78,7 +80,7 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
                           child: Icon(Icons.lock_outline, color: color, size: 20),
                         ),
                         title: Text(
-                          item['title'] ?? 'İsimsiz',
+                          item['title'] ?? l10n.categoryDetailItem,
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(

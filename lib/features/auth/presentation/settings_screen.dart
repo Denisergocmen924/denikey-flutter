@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../data/auth_repository.dart';
@@ -11,11 +10,13 @@ import '../../../core/providers/shortcuts_provider.dart';
 import '../../../core/providers/auto_lock_provider.dart';
 import '../../../core/providers/clipboard_timeout_provider.dart';
 import '../../../core/providers/app_version_provider.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
 import '../../../core/presentation/app_shortcuts.dart';
 import '../../devices/data/device_repository.dart';
 import '../../devices/providers/device_provider.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -69,40 +70,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _startDeleteAccountFlow() async {
+    final l10n = AppLocalizations.of(context);
+
     // Adım 1: Kullanıcı adı
     final usernameCtrl = TextEditingController();
     final usernameOk = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('Hesabı Sil — Adım 1/4'),
+        title: Text(l10n.settingsDeleteAccountStep1),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir.',
-              style: TextStyle(color: Colors.red, fontSize: 13),
+            Text(
+              l10n.settingsDeleteAccountWarningContent,
+              style: const TextStyle(color: Colors.red, fontSize: 13),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: usernameCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Kullanıcı adınızı girin',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.settingsDeleteAccountUsernameHint,
+                border: const OutlineInputBorder(),
               ),
               autofocus: true,
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.settingsDeleteAccountCancel)),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               if (usernameCtrl.text.trim().isNotEmpty) Navigator.pop(ctx, true);
             },
-            child: const Text('Devam'),
+            child: Text(l10n.settingsDeleteAccountContinue),
           ),
         ],
       ),
@@ -118,24 +121,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('Hesabı Sil — Adım 2/4'),
+        title: Text(l10n.settingsDeleteAccountStep2),
         content: TextField(
           controller: pass1Ctrl,
           obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'Master şifrenizi girin',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.settingsDeleteAccountPasswordHint,
+            border: const OutlineInputBorder(),
           ),
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.settingsDeleteAccountCancel)),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               if (pass1Ctrl.text.isNotEmpty) Navigator.pop(ctx, true);
             },
-            child: const Text('Devam'),
+            child: Text(l10n.settingsDeleteAccountContinue),
           ),
         ],
       ),
@@ -160,34 +163,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('Hesabı Sil — Adım 4/4'),
+        title: Text(l10n.settingsDeleteAccountStep4),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Son adım: şifrenizi bir kez daha girin.',
-              style: TextStyle(fontSize: 13),
-            ),
+            Text(l10n.settingsDeleteAccountFinalMessage, style: const TextStyle(fontSize: 13)),
             const SizedBox(height: 12),
             TextField(
               controller: pass2Ctrl,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Master şifrenizi tekrar girin',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.settingsDeleteAccountPasswordConfirmHint,
+                border: const OutlineInputBorder(),
               ),
               autofocus: true,
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.settingsDeleteAccountCancel)),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               if (pass2Ctrl.text.isNotEmpty) Navigator.pop(ctx, true);
             },
-            child: const Text('Hesabı Kalıcı Sil'),
+            child: Text(l10n.settingsDeleteAccountFinalButton),
           ),
         ],
       ),
@@ -210,7 +210,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } else {
       final err = ref.read(profileProvider).errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(err ?? 'Hesap silinemedi'), backgroundColor: Colors.red),
+        SnackBar(content: Text(err ?? l10n.settingsDeleteAccountFailed), backgroundColor: Colors.red),
       );
       ref.read(profileProvider.notifier).reset();
     }
@@ -235,6 +235,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _showUsernameDialog() async {
+    final l10n = AppLocalizations.of(context);
     final profile = ref.read(profileProvider);
     final ctrl = TextEditingController(text: profile.username ?? '');
     final formKey = GlobalKey<FormState>();
@@ -242,31 +243,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Kullanıcı Adı Değiştir'),
+        title: Text(l10n.settingsUsernameChangeTitle),
         content: Form(
           key: formKey,
           child: TextFormField(
             controller: ctrl,
-            decoration: const InputDecoration(
-              labelText: 'Yeni kullanıcı adı',
-            ),
+            decoration: InputDecoration(labelText: l10n.settingsUsernameChangeHint),
             validator: (v) {
-              if (v == null || v.isEmpty) return 'Boş bırakılamaz';
-              if (v.length < 3) return 'En az 3 karakter';
+              if (v == null || v.isEmpty) return l10n.settingsUsernameChangeError;
+              if (v.length < 3) return l10n.settingsUsernameChangeMinError;
               if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(v)) {
-                return 'Sadece harf, rakam ve _ kullanılabilir';
+                return l10n.settingsUsernameChangePatternError;
               }
               return null;
             },
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.settingsDeleteAccountCancel)),
           FilledButton(
             onPressed: () {
               if (formKey.currentState!.validate()) Navigator.pop(ctx, true);
             },
-            child: const Text('Kaydet'),
+            child: Text(l10n.settingsUsernameChangeSaved),
           ),
         ],
       ),
@@ -280,12 +279,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (!mounted) return;
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kullanıcı adı güncellendi')),
+        SnackBar(content: Text(l10n.settingsUsernameChangeSaved)),
       );
     } else {
       final err = ref.read(profileProvider).errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(err ?? 'Güncellenemedi')),
+        SnackBar(content: Text(err ?? l10n.settingsUsernameChangeFailed)),
       );
       ref.read(profileProvider.notifier).reset();
     }
@@ -293,13 +292,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final themeMode = ref.watch(themeModeProvider);
     final profile = ref.watch(profileProvider);
     final displayName = profile.username ?? _email ?? '';
     final cs = Theme.of(context).colorScheme;
+    final currentLocale = ref.watch(localeProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Ayarlar')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       bottomNavigationBar: const AppNavBar(currentIndex: 2),
       body: ListView(
         children: [
@@ -349,10 +350,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
 
-          _sectionHeader('HESAP'),
+          _sectionHeader(l10n.settingsAccountSection),
           ListTile(
             leading: const Icon(Icons.person_outline),
-            title: const Text('Kullanıcı Adı Değiştir'),
+            title: Text(l10n.settingsUsernameChange),
             subtitle: profile.username != null
                 ? Text(profile.username!, style: const TextStyle(fontSize: 12))
                 : null,
@@ -361,56 +362,69 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.email_outlined),
-            title: const Text('E-posta Değiştir'),
+            title: Text(l10n.settingsEmailChange),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/change-email'),
           ),
           ListTile(
             leading: const Icon(Icons.devices_outlined),
-            title: const Text('Cihazlarım'),
+            title: Text(l10n.settingsMyDevices),
             trailing: const Icon(Icons.chevron_right),
             onTap: _showDevicesSheet,
           ),
 
           const Divider(height: 1),
 
-          _sectionHeader('UYGULAMA'),
+          _sectionHeader(l10n.settingsAppSection),
           ListTile(
             leading: const Icon(Icons.password_outlined),
-            title: const Text('Şifre Üretici'),
+            title: Text(l10n.settingsPasswordGenerator),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/password-generator'),
           ),
           ListTile(
             leading: const Icon(Icons.history_outlined),
-            title: const Text('Aktivite Geçmişi'),
+            title: Text(l10n.settingsAuditLog),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/audit-log'),
           ),
           ListTile(
             leading: const Icon(Icons.support_agent_outlined),
-            title: const Text('Destek Talebi'),
+            title: Text(l10n.settingsSupportTicket),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/support-ticket'),
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('Gizlilik Politikası'),
+            title: Text(l10n.settingsPrivacyPolicy),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/privacy-policy'),
           ),
+
+          // Dil seçici
+          ListTile(
+            leading: const Icon(Icons.language_outlined),
+            title: Text(l10n.settingsLanguage),
+            subtitle: Text(
+              localeDisplayNames[currentLocale.languageCode] ?? currentLocale.languageCode,
+              style: const TextStyle(fontSize: 12),
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showLanguageDialog(context, l10n, currentLocale),
+          ),
+
           if (_biometricAvailable) ...[
             SwitchListTile(
               secondary: const Icon(Icons.fingerprint),
-              title: const Text('Biyometrik Kilit'),
+              title: Text(l10n.settingsBiometricLock),
               subtitle: Text(
                 _biometricEnabled
                     ? (_biometricRemainingDays > 1
-                        ? 'Aktif  ·  $_biometricRemainingDays gün sonra şifre istenecek'
+                        ? l10n.settingsBiometricActive(_biometricRemainingDays)
                         : _biometricRemainingDays == 1
-                            ? 'Aktif  ·  Yarın şifre istenecek'
-                            : 'Master şifre gerekiyor — kilidi açınca yenilenir')
-                    : 'Parmak izi veya yüz tanıma ile hızlı erişin.\nGüvenliğiniz için 7 günde bir master şifreniz istenecektir.',
+                            ? l10n.settingsBiometricActiveTomorrow
+                            : l10n.settingsBiometricExpired)
+                    : l10n.settingsBiometricDescription,
                 style: const TextStyle(fontSize: 12),
               ),
               value: _biometricEnabled,
@@ -419,6 +433,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ],
           Consumer(
             builder: (context, ref, _) {
+              final l10n = AppLocalizations.of(context);
               final autoLock = ref.watch(autoLockProvider);
               final cs = Theme.of(context).colorScheme;
               return Column(
@@ -429,13 +444,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       autoLock.enabled ? Icons.lock : Icons.lock_open_outlined,
                       color: autoLock.enabled ? cs.primary : null,
                     ),
-                    title: const Text('Otomatik Kilit'),
+                    title: Text(l10n.settingsAutoLock),
                     subtitle: Text(
                       autoLock.enabled
                           ? (autoLock.minutes == null
-                              ? 'Süresiz — odaklanmada kilitle'
-                              : '${autoLock.minutes} dk sonra kilitle')
-                          : 'Uygulamadan çıkınca master şifre iste',
+                              ? l10n.settingsAutoLockFocusLoss
+                              : l10n.settingsAutoLockEnabled(autoLock.minutes!))
+                          : l10n.settingsAutoLockDisabled,
                       style: const TextStyle(fontSize: 12),
                     ),
                     value: autoLock.enabled,
@@ -454,7 +469,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ])
                             ChoiceChip(
                               label: Text(
-                                  option == null ? 'Süresiz' : '$option dk'),
+                                option == null
+                                    ? l10n.settingsAutoLockUnlimited
+                                    : l10n.settingsAutoLockMinutesChip(option)),
                               selected: autoLock.minutes == option,
                               onSelected: (_) => ref
                                   .read(autoLockProvider.notifier)
@@ -469,6 +486,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           Consumer(
             builder: (context, ref, _) {
+              final l10n = AppLocalizations.of(context);
               final timeout = ref.watch(clipboardTimeoutProvider);
               final cs = Theme.of(context).colorScheme;
               return Column(
@@ -476,11 +494,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.content_paste_outlined),
-                    title: const Text('Pano Temizleme'),
+                    title: Text(l10n.settingsClipboardTimeout),
                     subtitle: Text(
                       timeout != null
-                          ? 'Kopyalanan şifre $timeout sn sonra silinir'
-                          : 'Sınırsız — pano otomatik temizlenmez',
+                          ? l10n.settingsClipboardTimeoutActive(timeout)
+                          : l10n.settingsClipboardTimeoutDisabled,
                       style: const TextStyle(fontSize: 12),
                     ),
                   ),
@@ -492,7 +510,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       children: [
                         for (final option in [10, 30, 60])
                           ChoiceChip(
-                            label: Text('$option sn'),
+                            label: Text(l10n.settingsClipboardSecondsChip(option)),
                             selected: timeout == option,
                             onSelected: (_) => ref
                                 .read(clipboardTimeoutProvider.notifier)
@@ -508,7 +526,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     ? cs.onPrimary
                                     : Colors.orange.shade700),
                               const SizedBox(width: 4),
-                              const Text('Sınırsız'),
+                              Text(l10n.settingsClipboardUnlimited),
                             ],
                           ),
                           selected: timeout == null,
@@ -526,13 +544,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) ...[
             Consumer(
               builder: (context, ref, _) {
+                final l10n = AppLocalizations.of(context);
                 final shortcutsEnabled = ref.watch(shortcutsProvider);
                 return SwitchListTile(
                   secondary: const Icon(Icons.keyboard_outlined),
-                  title: const Text('Klavye Kısayolları'),
-                  subtitle: const Text(
-                    'Ctrl+1/2/3, +, ←→, Esc vb.',
-                    style: TextStyle(fontSize: 12),
+                  title: Text(l10n.settingsKeyboardShortcuts),
+                  subtitle: Text(
+                    l10n.settingsKeyboardHint,
+                    style: const TextStyle(fontSize: 12),
                   ),
                   value: shortcutsEnabled,
                   onChanged: (val) =>
@@ -550,13 +569,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ],
           SwitchListTile(
             secondary: const Icon(Icons.dark_mode_outlined),
-            title: const Text('Karanlık Tema'),
+            title: Text(l10n.settingsDarkMode),
             subtitle: Text(
               themeMode == ThemeMode.system
-                  ? 'Sistem ayarına göre'
+                  ? l10n.settingsDarkModeSystem
                   : themeMode == ThemeMode.dark
-                      ? 'Açık'
-                      : 'Kapalı',
+                      ? l10n.settingsDarkModeEnabled
+                      : l10n.settingsDarkModeDisabled,
               style: const TextStyle(fontSize: 12),
             ),
             value: themeMode == ThemeMode.dark ||
@@ -571,8 +590,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           const Divider(height: 1),
 
-          // Nasıl Kullanılır
-          _sectionHeader('NASIL KULLANILIR'),
+          _sectionHeader(l10n.settingsHowToUse),
           ListTile(
             leading: Container(
               width: 36,
@@ -584,63 +602,48 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: const Icon(Icons.play_circle_outline_rounded,
                   color: Color(0xFFFF5900), size: 20),
             ),
-            title: const Text('Uygulamayı Keşfet',
-                style: TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: const Text('Tüm özelliklere genel bakış'),
+            title: Text(l10n.settingsDiscoverApp,
+                style: const TextStyle(fontWeight: FontWeight.w600)),
+            subtitle: Text(l10n.settingsDiscoverAppDescription),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/onboarding', extra: true),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
           _HelpTile(
             icon: Icons.shield_outlined,
-            title: 'Şifre Ekleme',
-            content:
-                'Alt menüden "Kasam" sekmesine geçin. Sağ alttaki "+ Yeni Şifre" butonuna dokunun. '
-                'Site adı, kullanıcı adı ve şifrenizi girin; kaydedin.',
+            title: l10n.settingsHelpAddPassword,
+            content: l10n.settingsHelpAddPasswordContent,
           ),
           _HelpTile(
             icon: Icons.key_outlined,
-            title: 'Şifre Üretici',
-            content:
-                'Uygulama → Şifre Üretici ekranından uzunluk, büyük/küçük harf, rakam ve '
-                'özel karakter seçenekleriyle güçlü şifre üretebilirsiniz.',
+            title: l10n.settingsHelpPasswordGenerator,
+            content: l10n.settingsHelpPasswordGeneratorContent,
           ),
           _HelpTile(
             icon: Icons.grid_view_outlined,
-            title: 'Kategoriler ve Türler',
-            content:
-                '"Kütüphane" sekmesinde şifrelerinizi kategorilere ayırabilir, '
-                'yeni öğe türleri oluşturabilirsiniz.',
+            title: l10n.settingsHelpCategories,
+            content: l10n.settingsHelpCategoriesContent,
           ),
           _HelpTile(
             icon: Icons.delete_outline,
-            title: 'Çöp Kutusu',
-            content:
-                'Silinen şifreler 7 gün boyunca Çöp Kutusu\'nda tutulur. '
-                'Kasam ekranının sağ üst köşesindeki çöp kutusu ikonundan erişebilirsiniz.',
+            title: l10n.settingsHelpTrash,
+            content: l10n.settingsHelpTrashContent,
           ),
           _HelpTile(
             icon: Icons.lock_outline,
-            title: 'Sıfır Bilgi Güvenliği',
-            content:
-                'DeniKey\'de master şifreniz hiçbir zaman sunucuya gönderilmez ve hiçbir '
-                'yerde saklanmaz. Şifreleriniz cihazınızda Argon2id algoritmasıyla türetilen '
-                'bir anahtarla AES-256-GCM formatında şifrelenir; bu anahtar yalnızca sizin '
-                'cihazınızda bulunur. Sunucuya yalnızca şifreli (encrypted) veri gönderilir. '
-                'Master şifrenizi unutursanız verilerinizi kurtarmanın hiçbir yolu yoktur — '
-                'bu, gerçek sıfır-bilgi güvenliğinin kaçınılmaz sonucudur.',
+            title: l10n.settingsHelpZeroKnowledge,
+            content: l10n.settingsHelpZeroKnowledgeContent,
           ),
 
           const Divider(height: 1),
 
-          // Çıkış
           ListTile(
             leading: _loggingOut
                 ? const SizedBox(
                     width: 24, height: 24,
                     child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.logout, color: Colors.red),
-            title: const Text('Çıkış Yap', style: TextStyle(color: Colors.red)),
+            title: Text(l10n.settingsLogout, style: const TextStyle(color: Colors.red)),
             onTap: _loggingOut ? null : _logout,
           ),
           ListTile(
@@ -649,10 +652,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     width: 24, height: 24,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red))
                 : const Icon(Icons.delete_forever, color: Colors.red),
-            title: const Text('Hesabı Kalıcı Olarak Sil',
-                style: TextStyle(color: Colors.red)),
-            subtitle: const Text('Tüm veriler silinir, geri alınamaz',
-                style: TextStyle(fontSize: 12, color: Colors.red)),
+            title: Text(l10n.settingsDeleteAccount,
+                style: const TextStyle(color: Colors.red)),
+            subtitle: Text(l10n.settingsDeleteAccountWarning,
+                style: const TextStyle(fontSize: 12, color: Colors.red)),
             onTap: _deletingAccount ? null : _startDeleteAccountFlow,
           ),
 
@@ -660,7 +663,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           Center(
             child: ref.watch(appVersionProvider).when(
               data: (v) => Text(
-                'DeniKey v$v',
+                l10n.settingsVersion(v),
                 style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
               ),
               loading: () => const SizedBox.shrink(),
@@ -672,6 +675,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context, AppLocalizations l10n, Locale currentLocale) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text(l10n.settingsLanguage),
+        children: supportedLocales.map((locale) {
+          final name = localeDisplayNames[locale.languageCode] ?? locale.languageCode;
+          final isSelected = locale.languageCode == currentLocale.languageCode;
+          return SimpleDialogOption(
+            onPressed: () {
+              ref.read(localeProvider.notifier).setLocale(locale);
+              Navigator.pop(ctx);
+            },
+            child: Row(
+              children: [
+                Expanded(child: Text(name)),
+                if (isSelected)
+                  Icon(Icons.check, color: Theme.of(context).colorScheme.primary, size: 18),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -716,15 +745,13 @@ class _CountdownDialogState extends State<_CountdownDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
-      title: const Text('Hesabı Sil — Adım 3/4'),
+      title: Text(l10n.settingsDeleteAccountStep3),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Gerçekten hesabınızı silmek istiyor musunuz?',
-            style: TextStyle(fontSize: 14),
-          ),
+          Text(l10n.settingsDeleteAccountConfirm, style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 24),
           Container(
             width: 72,
@@ -747,8 +774,8 @@ class _CountdownDialogState extends State<_CountdownDialog> {
           const SizedBox(height: 16),
           Text(
             _seconds > 0
-                ? '$_seconds saniye beklemeniz gerekiyor...'
-                : 'Devam edebilirsiniz.',
+                ? l10n.settingsDeleteAccountCountdownWait(_seconds)
+                : l10n.settingsDeleteAccountCountdownReady,
             style: TextStyle(
               fontSize: 13,
               color: _seconds > 0 ? Colors.grey : Colors.red,
@@ -759,12 +786,12 @@ class _CountdownDialogState extends State<_CountdownDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text('İptal'),
+          child: Text(l10n.settingsDeleteAccountCancel),
         ),
         FilledButton(
           style: FilledButton.styleFrom(backgroundColor: Colors.red),
           onPressed: _seconds > 0 ? null : () => Navigator.pop(context, true),
-          child: const Text('Evet, Devam Et'),
+          child: Text(l10n.settingsDeleteAccountYesConfirm),
         ),
       ],
     );
@@ -831,6 +858,7 @@ class _DevicesSheetState extends ConsumerState<_DevicesSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
     final devicesAsync = ref.watch(devicesProvider);
 
@@ -860,7 +888,7 @@ class _DevicesSheetState extends ConsumerState<_DevicesSheet> {
                 children: [
                   Icon(Icons.devices_outlined, color: cs.primary),
                   const SizedBox(width: 10),
-                  Text('Cihazlarım',
+                  Text(l10n.settingsDevicesTitle,
                       style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
@@ -868,7 +896,7 @@ class _DevicesSheetState extends ConsumerState<_DevicesSheet> {
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.refresh),
-                    tooltip: 'Yenile',
+                    tooltip: l10n.settingsDeviceRefresh,
                     onPressed: () => ref.invalidate(devicesProvider),
                   ),
                 ],
@@ -880,12 +908,12 @@ class _DevicesSheetState extends ConsumerState<_DevicesSheet> {
                 loading: () =>
                     const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(
-                  child: Text('Cihazlar yüklenemedi',
+                  child: Text(l10n.settingsDevicesError,
                       style: TextStyle(color: cs.error)),
                 ),
                 data: (devices) => devices.isEmpty
                     ? Center(
-                        child: Text('Kayıtlı cihaz yok',
+                        child: Text(l10n.settingsDevicesEmpty,
                             style: TextStyle(color: cs.onSurfaceVariant)),
                       )
                     : ListView.builder(
@@ -909,6 +937,7 @@ class _DeviceTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
     final isActive = device.status == 'active' &&
         device.lastActiveAt != null &&
@@ -922,10 +951,10 @@ class _DeviceTile extends ConsumerWidget {
             : Colors.orange;
 
     final statusLabel = isBanned
-        ? 'Yasaklı'
+        ? l10n.settingsDeviceStatusBanned
         : isActive
-            ? 'Aktif'
-            : 'Pasif';
+            ? l10n.settingsDeviceStatusActive
+            : l10n.settingsDeviceStatusPassive;
 
     return ListTile(
       leading: Stack(
@@ -948,41 +977,41 @@ class _DeviceTile extends ConsumerWidget {
           Text(statusLabel,
               style: TextStyle(fontSize: 11, color: indicatorColor)),
           if (device.lastActiveAt != null)
-            Text(_formatDate(device.lastActiveAt!),
+            Text(_formatDate(device.lastActiveAt!, l10n),
                 style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
         ],
       ),
       trailing: PopupMenuButton<String>(
         icon: const Icon(Icons.more_vert),
-        onSelected: (val) => _onAction(context, ref, val),
+        onSelected: (val) => _onAction(context, ref, val, l10n),
         itemBuilder: (_) => [
           if (device.status != 'revoked' && device.status != 'banned')
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'revoke',
               child: Row(children: [
-                Icon(Icons.logout, size: 18),
-                SizedBox(width: 8),
-                Text('Oturumu Sonlandır'),
+                const Icon(Icons.logout, size: 18),
+                const SizedBox(width: 8),
+                Text(l10n.settingsDeviceRevoke),
               ]),
             ),
           if (device.status != 'banned')
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'ban',
               child: Row(children: [
-                Icon(Icons.block, size: 18, color: Colors.red),
-                SizedBox(width: 8),
-                Text('Cihazı Yasakla',
-                    style: TextStyle(color: Colors.red)),
+                const Icon(Icons.block, size: 18, color: Colors.red),
+                const SizedBox(width: 8),
+                Text(l10n.settingsDeviceBan,
+                    style: const TextStyle(color: Colors.red)),
               ]),
             ),
           if (device.status == 'banned')
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'unban',
               child: Row(children: [
-                Icon(Icons.check_circle_outline, size: 18, color: Colors.green),
-                SizedBox(width: 8),
-                Text('Yasağı Kaldır',
-                    style: TextStyle(color: Colors.green)),
+                const Icon(Icons.check_circle_outline, size: 18, color: Colors.green),
+                const SizedBox(width: 8),
+                Text(l10n.settingsDeviceUnban,
+                    style: const TextStyle(color: Colors.green)),
               ]),
             ),
         ],
@@ -991,22 +1020,22 @@ class _DeviceTile extends ConsumerWidget {
   }
 
   Future<void> _onAction(
-      BuildContext context, WidgetRef ref, String action) async {
+      BuildContext context, WidgetRef ref, String action, AppLocalizations l10n) async {
     final repo = ref.read(deviceRepositoryProvider);
     try {
       if (action == 'revoke') {
         await repo.revokeDevice(device.id);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Oturum sonlandırıldı')),
+            SnackBar(content: Text(l10n.settingsDeviceRevokeSuccess)),
           );
         }
       } else if (action == 'ban') {
         await repo.banDevice(device.id);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Cihaz yasaklandı'),
+            SnackBar(
+                content: Text(l10n.settingsDeviceBanSuccess),
                 backgroundColor: Colors.red),
           );
         }
@@ -1014,7 +1043,7 @@ class _DeviceTile extends ConsumerWidget {
         await repo.unbanDevice(device.id);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Cihaz yasağı kaldırıldı')),
+            SnackBar(content: Text(l10n.settingsDeviceUnbanSuccess)),
           );
         }
       }
@@ -1022,8 +1051,8 @@ class _DeviceTile extends ConsumerWidget {
     } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('İşlem başarısız'),
+          SnackBar(
+              content: Text(l10n.settingsDeviceActionFailed),
               backgroundColor: Colors.red),
         );
       }
@@ -1047,12 +1076,12 @@ class _DeviceTile extends ConsumerWidget {
     }
   }
 
-  String _formatDate(DateTime dt) {
+  String _formatDate(DateTime dt, AppLocalizations l10n) {
     final diff = DateTime.now().difference(dt);
-    if (diff.inMinutes < 1) return 'Az önce';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} dakika önce';
-    if (diff.inHours < 24) return '${diff.inHours} saat önce';
-    return '${diff.inDays} gün önce';
+    if (diff.inMinutes < 1) return l10n.settingsDeviceJustNow;
+    if (diff.inMinutes < 60) return l10n.settingsDeviceMinutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.settingsDeviceHoursAgo(diff.inHours);
+    return l10n.settingsDeviceDaysAgo(diff.inDays);
   }
 }
 

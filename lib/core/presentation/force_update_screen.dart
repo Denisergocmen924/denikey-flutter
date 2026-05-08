@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/api_constants.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class ForceUpdateScreen extends StatefulWidget {
   final String currentVersion;
@@ -31,7 +32,7 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
   bool _downloading = false;
   double _progress  = 0;
   String? _error;
-  int _androidSdk   = 0; // 0 = henüz bilinmiyor veya Android değil
+  int _androidSdk   = 0;
 
   @override
   void initState() {
@@ -55,12 +56,13 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
   }
 
   Future<void> _update() async {
+    final l10n = AppLocalizations.of(context);
+
     if (Platform.isLinux) {
       await launchUrl(Uri.parse(ApiConstants.releasesPage), mode: LaunchMode.externalApplication);
       return;
     }
 
-    // Android 8+ → indirmeden önce izni kontrol et
     if (Platform.isAndroid && _androidSdk >= 26) {
       final status = await Permission.requestInstallPackages.status;
       if (!status.isGranted) {
@@ -91,7 +93,7 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
       if (Platform.isAndroid) {
         final result = await OpenFile.open(savePath);
         if (result.type != ResultType.done) {
-          setState(() => _error = 'Kurulum başlatılamadı: ${result.message}');
+          setState(() => _error = l10n.forceUpdateInstallError(result.message));
         }
       } else if (Platform.isWindows) {
         final launched = await launchUrl(
@@ -99,27 +101,24 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
           mode: LaunchMode.externalApplication,
         );
         if (!launched) {
-          setState(() => _error = 'Kurulum başlatılamadı. Dosya: $savePath');
+          setState(() => _error = l10n.forceUpdateInstallErrorFilePath(savePath));
         }
       }
     } catch (e) {
-      setState(() => _error = 'İndirme başarısız: $e');
+      setState(() => _error = l10n.forceUpdateError(e.toString()));
     } finally {
       if (mounted) setState(() => _downloading = false);
     }
   }
 
   void _showInstallPermissionDialog() {
+    final l10n = AppLocalizations.of(context);
     final canOpenSettings = _androidSdk >= 26;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('İzin Gerekiyor'),
-        content: const Text(
-          'APK yükleyebilmek için "Bilinmeyen uygulamaları yükle" iznini vermeniz gerekiyor.\n\n'
-          'Ayarlar → Uygulamalar → DeniKey → Bilinmeyen uygulamaları yükle → İzin Ver\n\n'
-          'İzni verdikten sonra "Güncelle" butonuna tekrar basın.',
-        ),
+        title: Text(l10n.forceUpdatePermissionTitle),
+        content: Text(l10n.forceUpdatePermissionContent),
         actions: [
           if (canOpenSettings)
             TextButton(
@@ -140,11 +139,11 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
                   } catch (_) {}
                 }
               },
-              child: const Text('Ayarları Aç'),
+              child: Text(l10n.forceUpdatePermissionOpenSettings),
             ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Anladım'),
+            child: Text(l10n.forceUpdatePermissionUnderstand),
           ),
         ],
       ),
@@ -153,6 +152,7 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -182,9 +182,9 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
 
                 const SizedBox(height: 32),
 
-                const Text(
-                  'Güncelleme Gerekli',
-                  style: TextStyle(
+                Text(
+                  l10n.forceUpdateTitle,
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
                     color: _cream,
@@ -195,9 +195,9 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
 
                 const SizedBox(height: 16),
 
-                const Text(
-                  'Bu sürüm artık desteklenmiyor.\nDevam etmek için lütfen uygulamayı güncelleyin.',
-                  style: TextStyle(
+                Text(
+                  l10n.forceUpdateDescription,
+                  style: const TextStyle(
                     fontSize: 15,
                     color: _muted,
                     height: 1.6,
@@ -218,13 +218,13 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _VersionBadge(
-                        label: 'Mevcut sürüm',
+                        label: l10n.forceUpdateCurrentVersion,
                         version: widget.currentVersion,
                         color: Colors.redAccent,
                       ),
                       Container(width: 1, height: 40, color: Colors.white12),
                       _VersionBadge(
-                        label: 'Gerekli sürüm',
+                        label: l10n.forceUpdateMinimumVersion,
                         version: widget.minimumVersion,
                         color: Colors.greenAccent,
                       ),
@@ -244,7 +244,7 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'İndiriliyor... %${(_progress * 100).toInt()}',
+                    l10n.forceUpdateDownloading((_progress * 100).toInt()),
                     style: const TextStyle(color: _muted, fontSize: 13),
                   ),
                 ] else ...[
@@ -261,9 +261,9 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
                         elevation: 0,
                       ),
                       icon: const Icon(Icons.download_outlined),
-                      label: const Text(
-                        'Güncelle',
-                        style: TextStyle(
+                      label: Text(
+                        l10n.forceUpdateButton,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),

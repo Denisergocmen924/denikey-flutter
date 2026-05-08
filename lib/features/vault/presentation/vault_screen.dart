@@ -6,6 +6,7 @@ import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../../core/presentation/app_nav_bar.dart';
 import '../../../core/presentation/desktop_onboarding_dialog.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class VaultScreen extends ConsumerStatefulWidget {
   const VaultScreen({super.key});
@@ -63,17 +64,18 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
 
   Future<void> _bulkDelete() async {
     final ids = _selectedIds.toList();
+    final l10n = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Toplu Sil'),
-        content: Text('${ids.length} kayıt çöp kutusuna taşınacak. Devam edilsin mi?'),
+        title: Text(l10n.vaultBulkDeleteTitle),
+        content: Text(l10n.vaultBulkDeleteMessage(ids.length)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.addItemCancel)),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sil'),
+            child: Text(l10n.vaultBulkDeleteButton),
           ),
         ],
       ),
@@ -92,6 +94,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
 
     final categories = ref.read(categoryProvider).categories;
     final ids = _selectedIds.toList();
+    final l10n = AppLocalizations.of(context);
 
     await showModalBottomSheet(
       context: context,
@@ -117,13 +120,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                 child: Text(
-                  '${ids.length} kaydı taşı',
+                  l10n.vaultBulkMoveTitle(ids.length),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
               ListTile(
                 leading: const Icon(Icons.folder_off_outlined),
-                title: const Text('Kategorisiz'),
+                title: Text(l10n.vaultBulkMoveUncategorized),
                 onTap: () {
                   Navigator.pop(ctx);
                   _exitSelectionMode();
@@ -190,6 +193,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(vaultProvider);
     final catState = ref.watch(categoryProvider);
     final cs = Theme.of(context).colorScheme;
@@ -212,33 +216,33 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 onPressed: _exitSelectionMode,
               ),
               title: Text(
-                '${_selectedIds.length} seçildi',
+                l10n.vaultBulkSelectionCount(_selectedIds.length),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               actions: [
                 TextButton.icon(
                   onPressed: () => _selectAll(filtered),
                   icon: const Icon(Icons.select_all, size: 18),
-                  label: const Text('Tümü'),
+                  label: Text(l10n.vaultBulkSelectAll),
                 ),
               ],
             )
           : AppBar(
-              title: const Text('DeniKey'),
+              title: Text(l10n.vaultTitle),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.search),
-                  tooltip: 'Ara',
+                  tooltip: l10n.vaultSearchTooltip,
                   onPressed: () => context.push('/search'),
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Çöp Kutusu',
+                  tooltip: l10n.vaultTrashTooltip,
                   onPressed: () => context.push('/trash'),
                 ),
                 IconButton(
                   icon: const Icon(Icons.refresh),
-                  tooltip: 'Yenile',
+                  tooltip: l10n.vaultRefreshTooltip,
                   onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
                 ),
               ],
@@ -258,8 +262,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                   const SizedBox(width: 8),
                   Text(
                     (Platform.isLinux || Platform.isWindows)
-                        ? 'İnternet bağlantısı olmadan kasanıza erişemezsiniz'
-                        : 'Çevrimdışı mod — Salt okunur',
+                        ? l10n.vaultOfflineWarning
+                        : l10n.vaultOfflineWarningDesktop,
                     style: const TextStyle(color: Colors.white, fontSize: 13),
                   ),
                 ],
@@ -279,7 +283,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           Expanded(
             child: Builder(builder: (context) {
               if (state.status == VaultStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: Text(l10n.vaultLoading));
               }
               if (state.status == VaultStatus.error) {
                 return Center(
@@ -288,12 +292,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     children: [
                       Icon(Icons.error_outline, size: 48, color: cs.error),
                       const SizedBox(height: 12),
-                      Text(state.errorMessage ?? 'Hata',
+                      Text(state.errorMessage ?? l10n.vaultError,
                         style: TextStyle(color: cs.onSurfaceVariant)),
                       const SizedBox(height: 16),
                       FilledButton(
                         onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
-                        child: const Text('Yeniden Dene'),
+                        child: Text(l10n.vaultRetry),
                       ),
                     ],
                   ),
@@ -307,11 +311,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                       Icon(Icons.shield_outlined, size: 72,
                         color: cs.onSurfaceVariant.withAlpha(80)),
                       const SizedBox(height: 20),
-                      Text('Henüz şifre yok',
+                      Text(l10n.vaultEmpty,
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600,
                           color: cs.onSurface)),
                       const SizedBox(height: 8),
-                      Text('+ ile yeni şifre ekleyin',
+                      Text(l10n.vaultEmptyHint,
                         style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant)),
                     ],
                   ),
@@ -325,7 +329,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                       Icon(Icons.folder_open_outlined, size: 64,
                         color: cs.onSurfaceVariant.withAlpha(80)),
                       const SizedBox(height: 16),
-                      Text('Bu kategoride şifre yok',
+                      Text(l10n.vaultCategoryEmpty,
                         style: TextStyle(fontSize: 16, color: cs.onSurfaceVariant)),
                     ],
                   ),
@@ -350,7 +354,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                           children: [
                             Icon(Icons.star, size: 14, color: Colors.amber.shade600),
                             const SizedBox(width: 6),
-                            Text('Favoriler',
+                            Text(l10n.vaultFavoritesSection,
                               style: TextStyle(fontSize: 11,
                                 fontWeight: FontWeight.w700, letterSpacing: 0.6,
                                 color: Colors.amber.shade700)),
@@ -366,7 +370,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                             Expanded(child: Divider(color: cs.outlineVariant, height: 1)),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: Text('Diğerleri',
+                              child: Text(l10n.vaultOthersSection,
                                 style: TextStyle(fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   color: cs.onSurfaceVariant)),
@@ -437,7 +441,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                   child: Icon(_iconForType(item['item_type']),
                                     color: cs.onPrimaryContainer, size: 22),
                                 ),
-                          title: Text(item['title'] ?? 'İsimsiz',
+                          title: Text(item['title'] ?? l10n.vaultItemUntitled,
                             style: const TextStyle(
                               fontWeight: FontWeight.w600, fontSize: 15)),
                           subtitle: item['username'] != null || item['url'] != null
@@ -461,8 +465,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                         size: 20,
                                       ),
                                       tooltip: isFavorite
-                                          ? 'Favoriden çıkar'
-                                          : 'Favorilere ekle',
+                                          ? l10n.vaultFavoritesRemove
+                                          : l10n.vaultFavoritesAdd,
                                       onPressed: () => ref
                                           .read(vaultProvider.notifier)
                                           .toggleFavorite(itemId, !isFavorite),
@@ -506,13 +510,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                       children: [
                         _BulkAction(
                           icon: Icons.delete_outline,
-                          label: 'Sil',
+                          label: l10n.vaultBulkDeleteButton,
                           color: cs.error,
                           onTap: _bulkDelete,
                         ),
                         _BulkAction(
                           icon: Icons.drive_file_move_outlined,
-                          label: 'Taşı',
+                          label: l10n.vaultBulkMoveButton,
                           color: cs.primary,
                           onTap: () => _bulkMoveToCategory(filtered),
                         ),
@@ -520,7 +524,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                           icon: allSelectedFav
                               ? Icons.star
                               : Icons.star_border,
-                          label: allSelectedFav ? 'Favoriden çıkar' : 'Favoriye ekle',
+                          label: allSelectedFav ? l10n.vaultBulkFavoritesRemoveButton : l10n.vaultBulkFavoritesButton,
                           color: Colors.amber.shade600,
                           onTap: () => _bulkFavorite(!allSelectedFav),
                         ),
@@ -536,12 +540,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           : FloatingActionButton.extended(
               onPressed: state.isOffline
                   ? () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('İnternet bağlantısı yok.')))
+                      SnackBar(content: Text(l10n.vaultOfflineWarning)))
                   : () => context.push('/add-item').then(
                       (_) => ref.read(vaultProvider.notifier).loadItems()),
               icon: const Icon(Icons.add),
-              label: const Text('Yeni Şifre',
-                style: TextStyle(fontWeight: FontWeight.w600)),
+              label: Text(l10n.vaultAddButton,
+                style: const TextStyle(fontWeight: FontWeight.w600)),
             ),
     );
   }
@@ -602,6 +606,7 @@ class _CategoryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       color: cs.surfaceContainerLow,
@@ -618,7 +623,7 @@ class _CategoryBar extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: _CategoryChip(
-                    label: 'Tümü',
+                    label: l10n.vaultBulkSelectAll,
                     color: cs.primary,
                     isSelected: selectedId == null,
                     onTap: () => onSelect(null),

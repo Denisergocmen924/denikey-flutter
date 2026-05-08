@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../data/auth_repository.dart';
 import '../../../core/storage/secure_storage.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class ConfirmEmailChangeScreen extends StatefulWidget {
   final String newEmail;
@@ -36,12 +37,12 @@ class _ConfirmEmailChangeScreenState extends State<ConfirmEmailChangeScreen> {
       await SecureStorage.instance.saveEmail(widget.newEmail);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('E-posta adresiniz başarıyla güncellendi')),
+        SnackBar(content: Text(AppLocalizations.of(context).confirmEmailChangeSuccess)),
       );
       context.go('/settings');
     } on DioException catch (e) {
       if (!mounted) return;
-      final msg = e.response?.data['detail'] ?? 'Bir hata oluştu';
+      final msg = e.response?.data['detail'] ?? AppLocalizations.of(context).confirmEmailChangeApiError;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg.toString())),
       );
@@ -52,8 +53,9 @@ class _ConfirmEmailChangeScreenState extends State<ConfirmEmailChangeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('E-posta Doğrulama')),
+      appBar: AppBar(title: Text(l10n.confirmEmailChangeTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -65,14 +67,14 @@ class _ConfirmEmailChangeScreenState extends State<ConfirmEmailChangeScreen> {
                 children: [
                   const Icon(Icons.verified_outlined, size: 64, color: Color(0xFFFF5900)),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Kodu Doğrulayın',
+                  Text(
+                    l10n.confirmEmailChangeHeading,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${widget.newEmail} adresine gönderilen 6 haneli kodu girin.',
+                    l10n.confirmEmailChangeDescription(widget.newEmail),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
@@ -83,14 +85,14 @@ class _ConfirmEmailChangeScreenState extends State<ConfirmEmailChangeScreen> {
                     maxLength: 6,
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 24, letterSpacing: 8),
-                    decoration: const InputDecoration(
-                      labelText: 'Doğrulama Kodu',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.confirmEmailChangeCodeLabel,
+                      border: const OutlineInputBorder(),
                       counterText: '',
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Kod gerekli';
-                      if (v.length < 6) return '6 haneli kodu girin';
+                      if (v == null || v.isEmpty) return l10n.confirmEmailChangeCodeError;
+                      if (v.length < 6) return l10n.confirmEmailChangeCodeMinError;
                       return null;
                     },
                   ),
@@ -106,7 +108,7 @@ class _ConfirmEmailChangeScreenState extends State<ConfirmEmailChangeScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Text('Onayla', style: TextStyle(fontSize: 16)),
+                        : Text(l10n.confirmEmailChangeSubmitButton, style: const TextStyle(fontSize: 16)),
                   ),
                 ],
               ),

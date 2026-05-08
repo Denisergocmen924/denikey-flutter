@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/password_generator_provider.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class PasswordGeneratorScreen extends ConsumerWidget {
   const PasswordGeneratorScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(passwordGeneratorProvider);
     final notifier = ref.read(passwordGeneratorProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Şifre Üretici')),
+      appBar: AppBar(title: Text(l10n.passwordGeneratorTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -42,7 +44,7 @@ class PasswordGeneratorScreen extends ConsumerWidget {
                     )
                   else
                     Text(
-                      'Şifre üretmek için butona basın',
+                      l10n.passwordGeneratorHint,
                       style: TextStyle(
                         fontSize: 14,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -53,7 +55,7 @@ class PasswordGeneratorScreen extends ConsumerWidget {
                     const SizedBox(height: 12),
                     IconButton.filled(
                       icon: const Icon(Icons.copy_outlined),
-                      tooltip: 'Kopyala',
+                      tooltip: l10n.passwordGeneratorCopy,
                       onPressed: () {
                         Clipboard.setData(
                           ClipboardData(text: state.generatedPassword!),
@@ -63,12 +65,12 @@ class PasswordGeneratorScreen extends ConsumerWidget {
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Row(
+                            content: Row(
                               children: [
-                                Icon(Icons.check_circle_outline,
+                                const Icon(Icons.check_circle_outline,
                                     color: Colors.white, size: 18),
-                                SizedBox(width: 8),
-                                Text('Şifre kopyalandı, 30 sn sonra silinecek'),
+                                const SizedBox(width: 8),
+                                Text(l10n.passwordGeneratorCopySuccess),
                               ],
                             ),
                             behavior: SnackBarBehavior.floating,
@@ -101,7 +103,7 @@ class PasswordGeneratorScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Uzunluk', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(l10n.passwordGeneratorLength, style: const TextStyle(fontWeight: FontWeight.w600)),
                 Text(
                   '${state.length}',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -118,30 +120,30 @@ class PasswordGeneratorScreen extends ConsumerWidget {
             ),
 
             const SizedBox(height: 16),
-            const Text(
-              'Karakter Tipleri',
-              style: TextStyle(fontWeight: FontWeight.w600),
+            Text(
+              l10n.passwordGeneratorCharacterTypes,
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
 
             // Karakter tipi seçenekleri
             _OptionTile(
-              label: 'Büyük Harf (A–Z)',
+              label: l10n.passwordGeneratorUppercase,
               value: state.uppercase,
               onTap: notifier.toggleUppercase,
             ),
             _OptionTile(
-              label: 'Küçük Harf (a–z)',
+              label: l10n.passwordGeneratorLowercase,
               value: state.lowercase,
               onTap: notifier.toggleLowercase,
             ),
             _OptionTile(
-              label: 'Rakam (0–9)',
+              label: l10n.passwordGeneratorNumbers,
               value: state.numbers,
               onTap: notifier.toggleNumbers,
             ),
             _OptionTile(
-              label: 'Sembol (!@#\$...)',
+              label: l10n.passwordGeneratorSymbols,
               value: state.symbols,
               onTap: notifier.toggleSymbols,
             ),
@@ -154,7 +156,7 @@ class PasswordGeneratorScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               icon: const Icon(Icons.autorenew),
-              label: const Text('Şifre Üret', style: TextStyle(fontSize: 16)),
+              label: Text(l10n.passwordGeneratorGenerate, style: const TextStyle(fontSize: 16)),
             ),
           ],
         ),

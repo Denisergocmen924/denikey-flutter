@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/support_ticket_provider.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class SupportTicketScreen extends ConsumerStatefulWidget {
   const SupportTicketScreen({super.key});
@@ -18,28 +19,28 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
   String _priority = 'normal';
   bool _ticketsExpanded = false;
 
-  static const _categories = {
-    'bug': 'Hata Bildirimi',
-    'suggestion': 'Öneri',
-    'other': 'Diğer',
-  };
-
-  static const _priorities = {
-    'low': 'Düşük',
-    'normal': 'Normal',
-    'high': 'Yüksek',
-  };
-
-  static const _statusLabels = {
-    'open': 'Açık',
-    'in_progress': 'İşlemde',
-    'closed': 'Kapalı',
-  };
-
   static const _statusColors = {
     'open': Color(0xFF2563EB),
     'in_progress': Color(0xFFD97706),
     'closed': Color(0xFF16A34A),
+  };
+
+  Map<String, String> _categoryLabels(AppLocalizations l10n) => {
+    'bug': l10n.supportTicketCategoryBug,
+    'suggestion': l10n.supportTicketCategorySuggestion,
+    'other': l10n.supportTicketCategoryOther,
+  };
+
+  Map<String, String> _priorityLabels(AppLocalizations l10n) => {
+    'low': l10n.supportTicketPriorityLow,
+    'normal': l10n.supportTicketPriorityNormal,
+    'high': l10n.supportTicketPriorityHigh,
+  };
+
+  Map<String, String> _statusLabels(AppLocalizations l10n) => {
+    'open': l10n.supportTicketStatusOpen,
+    'in_progress': l10n.supportTicketStatusInProgress,
+    'closed': l10n.supportTicketStatusClosed,
   };
 
   @override
@@ -66,11 +67,12 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
   }
 
   void _showTicketDetail(Map<String, dynamic> ticket) {
+    final l10n = AppLocalizations.of(context);
     final status = ticket['status'] as String? ?? 'open';
     final adminReply = ticket['admin_reply'] as String?;
     final statusColor = _statusColors[status] ?? Colors.grey;
-    final statusLabel = _statusLabels[status] ?? status;
-    final category = _categories[ticket['category']] ?? ticket['category'] ?? '';
+    final statusLabel = _statusLabels(l10n)[status] ?? status;
+    final category = _categoryLabels(l10n)[ticket['category']] ?? ticket['category'] ?? '';
     final repliedAt = ticket['replied_at'];
 
     showModalBottomSheet(
@@ -90,7 +92,6 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Başlık satırı
                 Row(
                   children: [
                     Expanded(
@@ -117,8 +118,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                 Text(category, style: const TextStyle(fontSize: 13, color: Colors.grey)),
                 const Divider(height: 28),
 
-                // Mesaj
-                const Text('Mesajınız', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey)),
+                Text(l10n.supportTicketDetailMessage, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey)),
                 const SizedBox(height: 8),
                 Container(
                   width: double.infinity,
@@ -134,7 +134,6 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                           color: Theme.of(context).colorScheme.onSurface)),
                 ),
 
-                // Admin yanıtı
                 if (adminReply != null && adminReply.isNotEmpty) ...[
                   const SizedBox(height: 20),
                   Row(
@@ -142,7 +141,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                       Icon(Icons.support_agent, size: 16, color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 6),
                       Text(
-                        'Destek Yanıtı',
+                        l10n.supportTicketAdminReply,
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
                       ),
                       if (repliedAt != null) ...[
@@ -174,7 +173,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                     children: [
                       const Icon(Icons.schedule, size: 14, color: Colors.grey),
                       const SizedBox(width: 6),
-                      const Text('Yanıt bekleniyor...', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                      Text(l10n.supportTicketWaitingReply, style: const TextStyle(fontSize: 13, color: Colors.grey)),
                     ],
                   ),
                 ],
@@ -198,12 +197,16 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(supportTicketProvider);
+    final categories = _categoryLabels(l10n);
+    final priorities = _priorityLabels(l10n);
+    final statusLabels = _statusLabels(l10n);
 
     ref.listen(supportTicketProvider, (_, next) {
       if (next.status == SupportTicketStatus.success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Destek talebiniz gönderildi')),
+          SnackBar(content: Text(l10n.supportTicketSuccess)),
         );
         _subjectCtrl.clear();
         _messageCtrl.clear();
@@ -212,21 +215,20 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
       }
       if (next.status == SupportTicketStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.errorMessage ?? 'Hata oluştu')),
+          SnackBar(content: Text(next.errorMessage ?? l10n.supportTicketError)),
         );
         ref.read(supportTicketProvider.notifier).reset();
       }
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Destek')),
+      appBar: AppBar(title: Text(l10n.supportTicketTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // --- Geçmiş talepler ---
             if (state.ticketsLoading)
               const Center(child: Padding(
                 padding: EdgeInsets.all(16),
@@ -239,11 +241,11 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   children: [
                     const Icon(Icons.error_outline, size: 16, color: Colors.red),
                     const SizedBox(width: 8),
-                    const Text('Talepler yüklenemedi', style: TextStyle(color: Colors.red, fontSize: 13)),
+                    Text(l10n.supportTicketLoadingError, style: const TextStyle(color: Colors.red, fontSize: 13)),
                     const Spacer(),
                     TextButton(
                       onPressed: () => ref.read(supportTicketProvider.notifier).loadTickets(),
-                      child: const Text('Tekrar Dene'),
+                      child: Text(l10n.supportTicketLoadingRetry),
                     ),
                   ],
                 ),
@@ -256,7 +258,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     children: [
-                      const Text('Taleplerim', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(l10n.supportTicketMyTickets, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -283,7 +285,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
               ...state.tickets.map((t) {
                 final status = t['status'] as String? ?? 'open';
                 final statusColor = _statusColors[status] ?? Colors.grey;
-                final statusLabel = _statusLabels[status] ?? status;
+                final statusLabel = statusLabels[status] ?? status;
                 final hasReply = (t['admin_reply'] as String?)?.isNotEmpty == true;
 
                 return Card(
@@ -316,7 +318,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     subtitle: Text(
-                      hasReply ? 'Yanıtlandı' : 'Yanıt bekleniyor',
+                      hasReply ? l10n.supportTicketReplied : l10n.supportTicketWaitingReplyLong,
                       style: TextStyle(
                         fontSize: 12,
                         color: hasReply ? Theme.of(context).colorScheme.primary : Colors.grey,
@@ -337,14 +339,13 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                 );
               }),
               const SizedBox(height: 8),
-              ], // _ticketsExpanded
+              ],
               const Divider(height: 32),
             ],
 
-            // --- Yeni talep formu ---
-            const Text('Yeni Talep', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(l10n.supportTicketNew, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            const Text('Nasıl yardımcı olabiliriz?', style: TextStyle(fontSize: 13, color: Colors.grey)),
+            Text(l10n.supportTicketQuestion, style: const TextStyle(fontSize: 13, color: Colors.grey)),
             const SizedBox(height: 20),
 
             Form(
@@ -354,12 +355,12 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                 children: [
                   DropdownButtonFormField<String>(
                     initialValue: _category,
-                    decoration: const InputDecoration(
-                      labelText: 'Kategori',
-                      prefixIcon: Icon(Icons.category_outlined),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.supportTicketCategoryLabel,
+                      prefixIcon: const Icon(Icons.category_outlined),
+                      border: const OutlineInputBorder(),
                     ),
-                    items: _categories.entries
+                    items: categories.entries
                         .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
                         .toList(),
                     onChanged: (v) => setState(() => _category = v!),
@@ -367,14 +368,14 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   const SizedBox(height: 14),
                   TextFormField(
                     controller: _subjectCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Konu',
-                      prefixIcon: Icon(Icons.title_outlined),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.supportTicketSubjectLabel,
+                      prefixIcon: const Icon(Icons.title_outlined),
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Konu gerekli';
-                      if (v.length < 5) return 'En az 5 karakter';
+                      if (v == null || v.isEmpty) return l10n.supportTicketSubjectError;
+                      if (v.length < 5) return l10n.supportTicketSubjectMinError;
                       return null;
                     },
                   ),
@@ -382,30 +383,30 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   TextFormField(
                     controller: _messageCtrl,
                     maxLines: 5,
-                    decoration: const InputDecoration(
-                      labelText: 'Mesajınız',
+                    decoration: InputDecoration(
+                      labelText: l10n.supportTicketMessageLabel,
                       alignLabelWithHint: true,
-                      prefixIcon: Padding(
+                      prefixIcon: const Padding(
                         padding: EdgeInsets.only(bottom: 64),
                         child: Icon(Icons.message_outlined),
                       ),
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Mesaj gerekli';
-                      if (v.length < 20) return 'En az 20 karakter';
+                      if (v == null || v.isEmpty) return l10n.supportTicketMessageError;
+                      if (v.length < 20) return l10n.supportTicketMessageMinError;
                       return null;
                     },
                   ),
                   const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
                     initialValue: _priority,
-                    decoration: const InputDecoration(
-                      labelText: 'Öncelik',
-                      prefixIcon: Icon(Icons.flag_outlined),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.supportTicketPriorityLabel,
+                      prefixIcon: const Icon(Icons.flag_outlined),
+                      border: const OutlineInputBorder(),
                     ),
-                    items: _priorities.entries
+                    items: priorities.entries
                         .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
                         .toList(),
                     onChanged: (v) => setState(() => _priority = v!),
@@ -422,7 +423,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Text('Gönder', style: TextStyle(fontSize: 16)),
+                        : Text(l10n.supportTicketSubmitButton, style: const TextStyle(fontSize: 16)),
                   ),
                   const SizedBox(height: 24),
                 ],

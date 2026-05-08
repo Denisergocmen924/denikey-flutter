@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/audit_log_provider.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class AuditLogScreen extends ConsumerStatefulWidget {
   const AuditLogScreen({super.key});
@@ -10,27 +11,15 @@ class AuditLogScreen extends ConsumerStatefulWidget {
 }
 
 class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
-  String _selectedCategory = 'Tümü';
+  String _selectedCategory = 'all';
 
   static const _categoryActions = {
-    'Hesap':    ['register', 'login_success', 'logout', 'email_changed', 'password_reset'],
-    'Güvenlik': ['login_failed', 'login_new_device', 'device_verified'],
-    'Kasa':     ['vault_item_created', 'vault_item_updated', 'vault_item_deleted'],
+    'account':  ['register', 'login_success', 'logout', 'email_changed', 'password_reset'],
+    'security': ['login_failed', 'login_new_device', 'device_verified'],
+    'vault':    ['vault_item_created', 'vault_item_updated', 'vault_item_deleted'],
   };
 
-  static const _actionLabels = {
-    'register':            'Kayıt Olundu',
-    'login_success':       'Giriş Yapıldı',
-    'login_failed':        'Başarısız Giriş',
-    'login_new_device':    'Yeni Cihaz Girişi',
-    'logout':              'Çıkış Yapıldı',
-    'device_verified':     'Cihaz Doğrulandı',
-    'email_changed':       'E-posta Değiştirildi',
-    'password_reset':      'Şifre Sıfırlandı',
-    'vault_item_created':  'Şifre Eklendi',
-    'vault_item_updated':  'Şifre Güncellendi',
-    'vault_item_deleted':  'Şifre Silindi',
-  };
+  static const _filterKeys = ['all', 'account', 'security', 'vault'];
 
   @override
   void initState() {
@@ -38,8 +27,35 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
     Future.microtask(() => ref.read(auditLogProvider.notifier).loadLogs());
   }
 
+  String _filterLabel(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'all':      return l10n.auditLogFilterAll;
+      case 'account':  return l10n.auditLogFilterAccount;
+      case 'security': return l10n.auditLogFilterSecurity;
+      case 'vault':    return l10n.auditLogFilterVault;
+      default:         return key;
+    }
+  }
+
+  String _getActionLabel(String? action, AppLocalizations l10n) {
+    switch (action) {
+      case 'register':            return l10n.auditLogActionRegister;
+      case 'login_success':       return l10n.auditLogActionLoginSuccess;
+      case 'login_failed':        return l10n.auditLogActionLoginFailed;
+      case 'login_new_device':    return l10n.auditLogActionLoginNewDevice;
+      case 'logout':              return l10n.auditLogActionLogout;
+      case 'device_verified':     return l10n.auditLogActionDeviceVerified;
+      case 'email_changed':       return l10n.auditLogActionEmailChanged;
+      case 'password_reset':      return l10n.auditLogActionPasswordReset;
+      case 'vault_item_created':  return l10n.auditLogActionVaultItemCreated;
+      case 'vault_item_updated':  return l10n.auditLogActionVaultItemUpdated;
+      case 'vault_item_deleted':  return l10n.auditLogActionVaultItemDeleted;
+      default:                    return action ?? l10n.auditLogUnknownAction;
+    }
+  }
+
   List<Map<String, dynamic>> _filteredLogs(List<Map<String, dynamic>> logs) {
-    if (_selectedCategory == 'Tümü') return logs;
+    if (_selectedCategory == 'all') return logs;
     final allowed = _categoryActions[_selectedCategory] ?? [];
     return logs.where((l) => allowed.contains(l['action'])).toList();
   }
@@ -81,10 +97,11 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(auditLogProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Aktivite Geçmişi')),
+      appBar: AppBar(title: Text(l10n.auditLogTitle)),
       body: Column(
         children: [
           // Filter chips
@@ -93,14 +110,14 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              children: ['Tümü', 'Hesap', 'Güvenlik', 'Kasa'].map((cat) {
-                final selected = _selectedCategory == cat;
+              children: _filterKeys.map((key) {
+                final selected = _selectedCategory == key;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(
-                    label: Text(cat),
+                    label: Text(_filterLabel(key, l10n)),
                     selected: selected,
-                    onSelected: (_) => setState(() => _selectedCategory = cat),
+                    onSelected: (_) => setState(() => _selectedCategory = key),
                     selectedColor: Theme.of(context).colorScheme.primaryContainer,
                     checkmarkColor: Theme.of(context).colorScheme.primary,
                     labelStyle: TextStyle(
@@ -114,13 +131,13 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
           ),
           const Divider(height: 1),
           // İçerik
-          Expanded(child: _buildBody(state)),
+          Expanded(child: _buildBody(state, l10n)),
         ],
       ),
     );
   }
 
-  Widget _buildBody(AuditLogState state) {
+  Widget _buildBody(AuditLogState state, AppLocalizations l10n) {
     if (state.status == AuditLogStatus.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -131,11 +148,11 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
           children: [
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 12),
-            Text(state.errorMessage ?? 'Hata'),
+            Text(state.errorMessage ?? l10n.auditLogError),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () => ref.read(auditLogProvider.notifier).loadLogs(),
-              child: const Text('Tekrar Dene'),
+              child: Text(l10n.auditLogRetry),
             ),
           ],
         ),
@@ -152,7 +169,9 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
             Icon(Icons.history_outlined, size: 64, color: Colors.grey.shade400),
             const SizedBox(height: 16),
             Text(
-              state.logs.isEmpty ? 'Henüz aktivite yok' : '$_selectedCategory kategorisinde kayıt yok',
+              state.logs.isEmpty
+                  ? l10n.auditLogEmpty
+                  : l10n.auditLogEmptyCategory(_filterLabel(_selectedCategory, l10n)),
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
           ],
@@ -189,7 +208,7 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
                 ),
               ),
               title: Text(
-                _actionLabels[action] ?? action ?? 'Bilinmeyen İşlem',
+                _getActionLabel(action, l10n),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
               ),
               subtitle: Column(

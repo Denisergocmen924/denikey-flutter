@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../data/auth_repository.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class ChangeEmailScreen extends StatefulWidget {
   const ChangeEmailScreen({super.key});
@@ -33,7 +34,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
       });
     } on DioException catch (e) {
       if (!mounted) return;
-      final msg = e.response?.data['detail'] ?? 'Bir hata oluştu';
+      final msg = e.response?.data['detail'] ?? AppLocalizations.of(context).changeEmailApiError;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg.toString())),
       );
@@ -44,8 +45,9 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('E-posta Değiştir')),
+      appBar: AppBar(title: Text(l10n.changeEmailTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -57,29 +59,29 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                 children: [
                   const Icon(Icons.mark_email_unread_outlined, size: 64, color: Color(0xFFFF5900)),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Yeni E-posta Adresi',
+                  Text(
+                    l10n.changeEmailHeading,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Yeni e-posta adresinize doğrulama kodu gönderilecek.',
+                  Text(
+                    l10n.changeEmailDescription,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 40),
                   TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Yeni E-posta',
-                      prefixIcon: Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.changeEmailLabel,
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'E-posta gerekli';
-                      if (!v.contains('@')) return 'Geçerli bir e-posta girin';
+                      if (v == null || v.isEmpty) return l10n.changeEmailError;
+                      if (!v.contains('@')) return l10n.changeEmailFormatError;
                       return null;
                     },
                   ),
@@ -95,7 +97,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Text('Kod Gönder', style: TextStyle(fontSize: 16)),
+                        : Text(l10n.changeEmailSubmitButton, style: const TextStyle(fontSize: 16)),
                   ),
                 ],
               ),

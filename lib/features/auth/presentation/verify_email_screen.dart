@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/constants/api_constants.dart';
@@ -43,10 +44,11 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
 
   Future<void> _verify() async {
     if (_codeCtrl.text.trim().length != 6) {
-      setState(() => _error = 'Lütfen 6 haneli kodu girin');
+      setState(() => _error = AppLocalizations.of(context).verifyCodeError);
       return;
     }
     setState(() { _loading = true; _error = null; });
+    final networkErrorMsg = AppLocalizations.of(context).networkError;
 
     try {
       if (widget.purpose == 'new_device') {
@@ -89,7 +91,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     } on DioException catch (e) {
       final msg = e.response?.data?['detail']?.toString()
           ?? e.message
-          ?? 'Sunucuya bağlanılamadı';
+          ?? networkErrorMsg;
       setState(() { _error = msg; _loading = false; });
     } catch (e) {
       setState(() { _error = e.toString(); _loading = false; });
@@ -108,13 +110,13 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kod tekrar gönderildi')),
+          SnackBar(content: Text(AppLocalizations.of(context).verifySendSuccess)),
         );
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kod gönderilemedi')),
+          SnackBar(content: Text(AppLocalizations.of(context).verifySendError)),
         );
       }
     } finally {
@@ -122,23 +124,26 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     }
   }
 
-  String get _title {
-    if (widget.purpose == 'new_device') return 'Cihaz Doğrulama';
-    return 'E-posta Doğrulama';
+  String _title(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (widget.purpose == 'new_device') return l10n.verifyDeviceTitle;
+    return l10n.verifyEmailTitle;
   }
 
-  String get _subtitle {
+  String _subtitle(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (widget.purpose == 'new_device') {
-      return 'Bu cihazdan ilk kez giriş yapıyorsunuz.\n${widget.email} adresine gönderilen 6 haneli kodu girin.';
+      return l10n.verifyDeviceSubtitle(widget.email);
     }
-    return '${widget.email} adresine gönderilen\n6 haneli kodu girin';
+    return l10n.verifyEmailSubtitle(widget.email);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(_title),
+        title: Text(_title(context)),
       ),
       body: SafeArea(
         child: Padding(
@@ -156,13 +161,13 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                _title,
+                _title(context),
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Text(
-                _subtitle,
+                _subtitle(context),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               ),
@@ -173,7 +178,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   Icon(Icons.info_outline, size: 14, color: Colors.grey.shade500),
                   const SizedBox(width: 4),
                   Text(
-                    'Spam/Gereksiz klasörünü kontrol edin',
+                    l10n.verifySpamWarning,
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 ],
@@ -201,12 +206,12 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                 child: _loading
                     ? const SizedBox(height: 20, width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Text('Doğrula', style: TextStyle(fontSize: 16)),
+                    : Text(l10n.verifySubmitButton, style: const TextStyle(fontSize: 16)),
               ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: _loading ? null : _resend,
-                child: const Text('Kodu tekrar gönder'),
+                child: Text(l10n.verifyResendButton),
               ),
             ],
           ),

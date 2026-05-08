@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../data/auth_repository.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -30,7 +31,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (!mounted) return;
       if (userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Doğrulama kodu gönderilemedi, tekrar deneyin')),
+          SnackBar(content: Text(AppLocalizations.of(context).forgotPasswordError)),
         );
         return;
       }
@@ -40,7 +41,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       });
     } on DioException catch (e) {
       if (!mounted) return;
-      final msg = e.response?.data['detail'] ?? 'Bir hata oluştu';
+      final msg = e.response?.data['detail'] ?? AppLocalizations.of(context).forgotPasswordApiError;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg.toString())),
       );
@@ -51,8 +52,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Şifremi Unuttum')),
+      appBar: AppBar(title: Text(l10n.forgotPasswordTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -64,29 +66,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 children: [
                   const Icon(Icons.lock_reset, size: 64, color: Color(0xFFFF5900)),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Şifre Sıfırlama',
+                  Text(
+                    l10n.forgotPasswordHeading,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Kayıtlı e-posta adresinize doğrulama kodu gönderilecek.',
+                  Text(
+                    l10n.forgotPasswordDescription,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 40),
                   TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'E-posta',
-                      prefixIcon: Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.forgotPasswordEmailLabel,
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'E-posta gerekli';
-                      if (!v.contains('@')) return 'Geçerli bir e-posta girin';
+                      if (v == null || v.isEmpty) return l10n.forgotPasswordEmailError;
+                      if (!v.contains('@')) return l10n.forgotPasswordEmailFormatError;
                       return null;
                     },
                   ),
@@ -102,7 +104,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Text('Kod Gönder', style: TextStyle(fontSize: 16)),
+                        : Text(l10n.forgotPasswordSubmitButton, style: const TextStyle(fontSize: 16)),
                   ),
                 ],
               ),

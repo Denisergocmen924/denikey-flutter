@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/category_provider.dart';
 import '../../item_types/providers/item_type_provider.dart';
 import '../../../core/presentation/app_nav_bar.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class LibraryScreen extends ConsumerStatefulWidget {
   const LibraryScreen({super.key});
@@ -97,8 +98,10 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setS) => AlertDialog(
-          title: const Text('Yeni Kategori'),
+        builder: (context, setS) {
+          final l10n = AppLocalizations.of(context);
+          return AlertDialog(
+          title: Text(l10n.libraryAddCategory),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -106,13 +109,13 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
               children: [
                 TextField(
                   controller: nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Kategori Adı',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.libraryCategoryName,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text('Renk Seç', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(l10n.libraryCategoryColorSelect, style: const TextStyle(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -138,7 +141,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.libraryCancel)),
             FilledButton(
               onPressed: () {
                 if (nameCtrl.text.trim().isEmpty) return;
@@ -150,10 +153,11 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                 );
                 Navigator.pop(ctx);
               },
-              child: const Text('Ekle'),
+              child: Text(l10n.libraryAddButton),
             ),
           ],
-        ),
+        );
+        },
       ),
     );
   }
@@ -161,24 +165,25 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
   void _confirmDeleteCategory(String id, bool isSystem) {
     if (isSystem) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sistem kategorileri silinemez.')),
+        SnackBar(content: Text(AppLocalizations.of(context).libraryDeleteSystemCategory)),
       );
       return;
     }
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sil'),
-        content: const Text('Bu kategoriyi silmek istediğinize emin misiniz?'),
+        title: Text(l10n.libraryDeleteCategoryTitle),
+        content: Text(l10n.libraryDeleteCategoryMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.libraryCancel)),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               ref.read(categoryProvider.notifier).deleteCategory(id);
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Sil'),
+            child: Text(l10n.libraryDeleteCategoryTitle),
           ),
         ],
       ),
@@ -195,20 +200,20 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     // Sabit alanlar: {name, type, isRequired}
     final List<Map<String, dynamic>> fixedFields = [];
 
-    final fieldTypes = const [
-      ('text',    'Metin'),
-      ('secret',  'Gizli'),
-      ('number',  'Sayı'),
-      ('date',    'Tarih'),
-    ];
-
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setS) {
           final cs = Theme.of(context).colorScheme;
+          final l10n = AppLocalizations.of(context);
+          final fieldTypes = [
+            ('text',    l10n.addItemTypeFieldTypeText),
+            ('secret',  l10n.addItemTypeFieldTypeSecret),
+            ('number',  l10n.addItemTypeFieldTypeNumber),
+            ('date',    l10n.addItemTypeFieldTypeDate),
+          ];
           return AlertDialog(
-            title: const Text('Yeni Tür'),
+            title: Text(l10n.libraryTypesTab),
             content: SizedBox(
               width: double.maxFinite,
               child: SingleChildScrollView(
@@ -218,10 +223,10 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                   children: [
                     TextField(
                       controller: nameCtrl,
-                      decoration: const InputDecoration(labelText: 'Tür Adı'),
+                      decoration: InputDecoration(labelText: l10n.addItemTypeNameLabel),
                     ),
                     const SizedBox(height: 16),
-                    Text('İkon Seç', style: TextStyle(
+                    Text(l10n.addItemTypeSelectIcon, style: TextStyle(
                       fontWeight: FontWeight.w600, color: cs.onSurface)),
                     const SizedBox(height: 8),
                     Wrap(
@@ -251,7 +256,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                       }).toList(),
                     ),
                     const SizedBox(height: 16),
-                    Text('Renk Seç', style: TextStyle(
+                    Text(l10n.libraryCategoryColorSelect, style: TextStyle(
                       fontWeight: FontWeight.w600, color: cs.onSurface)),
                     const SizedBox(height: 8),
                     Wrap(
@@ -283,7 +288,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Sabit Alanlar',
+                        Text(l10n.addItemTypeFixedFields,
                           style: TextStyle(
                             fontWeight: FontWeight.w600, color: cs.onSurface)),
                         TextButton.icon(
@@ -295,7 +300,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                             }));
                           },
                           icon: const Icon(Icons.add, size: 18),
-                          label: const Text('Alan Ekle'),
+                          label: Text(l10n.addItemTypeFieldAdd),
                         ),
                       ],
                     ),
@@ -303,7 +308,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Text(
-                          'Alan eklenmedi — varsayılan olarak "Şifre" alanı oluşturulur.',
+                          l10n.addItemTypeFieldDefault,
                           style: TextStyle(
                             fontSize: 12, color: cs.onSurfaceVariant),
                         ),
@@ -321,8 +326,8 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                               child: TextField(
                                 controller: ctrl,
                                 onChanged: (v) => f['field_name'] = v,
-                                decoration: const InputDecoration(
-                                  labelText: 'Alan Adı',
+                                decoration: InputDecoration(
+                                  labelText: l10n.addItemTypeFieldName,
                                   isDense: true,
                                 ),
                               ),
@@ -354,7 +359,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
               ),
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+              TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.libraryCancel)),
               FilledButton(
                 onPressed: () {
                   if (nameCtrl.text.trim().isEmpty) return;
@@ -374,7 +379,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                   );
                   Navigator.pop(ctx);
                 },
-                child: const Text('Ekle'),
+                child: Text(l10n.libraryAddButton),
               ),
             ],
           );
@@ -386,24 +391,25 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
   void _confirmDeleteItemType(String id, bool isSystem) {
     if (isSystem) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sistem türleri silinemez.')),
+        SnackBar(content: Text(AppLocalizations.of(context).libraryDeleteSystemType)),
       );
       return;
     }
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sil'),
-        content: const Text('Bu türü silmek istediğinize emin misiniz?'),
+        title: Text(l10n.libraryDeleteCategoryTitle),
+        content: Text(l10n.libraryDeleteCategoryMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.libraryCancel)),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               ref.read(itemTypeProvider.notifier).deleteItemType(id);
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Sil'),
+            child: Text(l10n.libraryDeleteCategoryTitle),
           ),
         ],
       ),
@@ -414,17 +420,18 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final catState = ref.watch(categoryProvider);
     final typeState = ref.watch(itemTypeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kütüphane'),
+        title: Text(l10n.libraryTitle),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Kategoriler'),
-            Tab(text: 'Türler'),
+          tabs: [
+            Tab(text: l10n.libraryCategoriesTab),
+            Tab(text: l10n.libraryTypesTab),
           ],
         ),
       ),
@@ -478,15 +485,16 @@ class _CategoriesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (state.status == CategoryStatus.loading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.status == CategoryStatus.error) {
-      return Center(child: Text(state.errorMessage ?? 'Hata'));
+      return Center(child: Text(state.errorMessage ?? l10n.libraryEmptyCategories));
     }
     if (state.categories.isEmpty) {
-      return const Center(
-        child: Text('Henüz kategori yok', style: TextStyle(color: Colors.grey)),
+      return Center(
+        child: Text(l10n.libraryEmptyCategories, style: const TextStyle(color: Colors.grey)),
       );
     }
 
@@ -511,7 +519,7 @@ class _CategoriesTab extends StatelessWidget {
             ),
             title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
             subtitle: isSystem
-                ? const Text('Sistem', style: TextStyle(fontSize: 12))
+                ? Text(l10n.librarySystemLabel, style: const TextStyle(fontSize: 12))
                 : null,
             trailing: isSystem
                 ? const Icon(Icons.lock_outline, size: 16, color: Colors.grey)
@@ -550,8 +558,8 @@ class _ItemTypesTab extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.itemTypes.isEmpty) {
-      return const Center(
-        child: Text('Henüz tür yok', style: TextStyle(color: Colors.grey)),
+      return Center(
+        child: Text(AppLocalizations.of(context).libraryEmptyTypes, style: const TextStyle(color: Colors.grey)),
       );
     }
 
@@ -575,7 +583,7 @@ class _ItemTypesTab extends StatelessWidget {
             ),
             title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
             subtitle: Text(
-              '${fields.length} alan',
+              AppLocalizations.of(context).libraryTypeFieldCount(fields.length),
               style: const TextStyle(fontSize: 12),
             ),
             trailing: isSystem

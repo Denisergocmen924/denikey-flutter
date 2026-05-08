@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 const _kKey = 'desktop_onboarding_done';
 
@@ -22,6 +23,7 @@ class _DesktopOnboardingDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
     final isWindows = Platform.isWindows;
 
@@ -40,7 +42,7 @@ class _DesktopOnboardingDialog extends StatelessWidget {
                   Icon(Icons.keyboard_outlined, color: cs.primary, size: 28),
                   const SizedBox(width: 12),
                   Text(
-                    'Masaüstü Kısayolları',
+                    l10n.desktopOnboardingTitle,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -51,16 +53,16 @@ class _DesktopOnboardingDialog extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'DeniKey\'i daha hızlı kullanmak için bu kısayolları deneyin.',
+                l10n.desktopOnboardingDescription,
                 style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
               ),
               const SizedBox(height: 20),
-              _shortcutRow(cs, 'Ctrl + 1 / 2 / 3', 'Kasam / Kütüphane / Ayarlar'),
-              _shortcutRow(cs, 'Ctrl + N', 'Yeni şifre ekle'),
-              _shortcutRow(cs, 'Ctrl + F', 'Arama'),
-              _shortcutRow(cs, 'Ctrl + G', 'Şifre Üretici'),
-              _shortcutRow(cs, '← →', 'Sekmeler arası geçiş'),
-              _shortcutRow(cs, 'Escape', 'Geri git / kapat'),
+              _shortcutRow(cs, 'Ctrl + 1 / 2 / 3', l10n.desktopOnboardingShortcut1),
+              _shortcutRow(cs, 'Ctrl + N', l10n.desktopOnboardingShortcut2),
+              _shortcutRow(cs, 'Ctrl + F', l10n.desktopOnboardingShortcut3),
+              _shortcutRow(cs, 'Ctrl + G', l10n.desktopOnboardingShortcut4),
+              _shortcutRow(cs, '← →', l10n.desktopOnboardingShortcut5),
+              _shortcutRow(cs, 'Escape', l10n.desktopOnboardingShortcut6),
               if (isWindows) ...[
                 const SizedBox(height: 16),
                 Divider(color: cs.outlineVariant),
@@ -71,7 +73,7 @@ class _DesktopOnboardingDialog extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'X butonu uygulamayı kapatır. Sistem tepsisindeki simgeye sağ tıklayarak da çıkış yapabilirsiniz.',
+                        l10n.desktopOnboardingWindowsNote,
                         style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant, height: 1.5),
                       ),
                     ),
@@ -83,7 +85,7 @@ class _DesktopOnboardingDialog extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: FilledButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Anladım'),
+                  child: Text(l10n.desktopOnboardingButton),
                 ),
               ),
             ],

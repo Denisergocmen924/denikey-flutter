@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class PasswordHistoryScreen extends StatefulWidget {
   final String itemId;
@@ -54,22 +55,23 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
 
       if (mounted) setState(() { _history = decrypted; _loading = false; });
     } catch (e) {
-      if (mounted) setState(() { _error = 'Yüklenemedi'; _loading = false; });
+      if (mounted) setState(() { _error = AppLocalizations.of(context).passwordHistoryError; _loading = false; });
     }
   }
 
   Future<void> _clearHistory() async {
+    final l10n = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Geçmişi Temizle'),
-        content: const Text('Tüm şifre geçmişi silinsin mi?'),
+        title: Text(l10n.passwordHistoryClearTitle),
+        content: Text(l10n.passwordHistoryClearMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.addItemCancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Temizle'),
+            child: Text(l10n.passwordHistoryClear),
           ),
         ],
       ),
@@ -86,7 +88,7 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
   void _copyToClipboard(String value) {
     Clipboard.setData(ClipboardData(text: value));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Şifre kopyalandı, 30 sn sonra silinecek')),
+      SnackBar(content: Text(AppLocalizations.of(context).passwordHistoryCopy)),
     );
     Future.delayed(const Duration(seconds: 30), () {
       Clipboard.setData(const ClipboardData(text: ''));
@@ -95,14 +97,15 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.itemTitle} — Geçmiş'),
+        title: Text(l10n.passwordHistoryTitle(widget.itemTitle)),
         actions: [
           if (_history.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep_outlined),
-              tooltip: 'Geçmişi Temizle',
+              tooltip: l10n.passwordHistoryClear,
               onPressed: _clearHistory,
             ),
         ],
@@ -112,6 +115,7 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
   }
 
   Widget _buildBody() {
+    final l10n = AppLocalizations.of(context);
     if (_loading) return const Center(child: CircularProgressIndicator());
 
     if (_error != null) {
@@ -123,24 +127,24 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
             const SizedBox(height: 12),
             Text(_error!),
             const SizedBox(height: 12),
-            FilledButton(onPressed: _load, child: const Text('Tekrar Dene')),
+            FilledButton(onPressed: _load, child: Text(l10n.passwordHistoryRetry)),
           ],
         ),
       );
     }
 
     if (_history.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.history, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('Şifre geçmişi yok',
-                style: TextStyle(fontSize: 16, color: Colors.grey)),
-            SizedBox(height: 8),
-            Text('Şifre güncellendiğinde eski sürümler burada görünür',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+            const Icon(Icons.history, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(l10n.passwordHistoryEmpty,
+                style: const TextStyle(fontSize: 16, color: Colors.grey)),
+            const SizedBox(height: 8),
+            Text(l10n.passwordHistoryEmptyHint,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
                 textAlign: TextAlign.center),
           ],
         ),

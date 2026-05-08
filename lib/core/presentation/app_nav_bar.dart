@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class AppNavBar extends StatelessWidget {
   final int currentIndex;
@@ -7,6 +8,7 @@ class AppNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: (index) {
@@ -19,21 +21,21 @@ class AppNavBar extends StatelessWidget {
             context.go('/settings');
         }
       },
-      destinations: const [
+      destinations: [
         NavigationDestination(
-          icon: Icon(Icons.shield_outlined),
-          selectedIcon: Icon(Icons.shield),
-          label: 'Kasam',
+          icon: const Icon(Icons.shield_outlined),
+          selectedIcon: const Icon(Icons.shield),
+          label: l10n.navBarVault,
         ),
         NavigationDestination(
-          icon: Icon(Icons.grid_view_outlined),
-          selectedIcon: Icon(Icons.grid_view),
-          label: 'Kütüphane',
+          icon: const Icon(Icons.grid_view_outlined),
+          selectedIcon: const Icon(Icons.grid_view),
+          label: l10n.navBarLibrary,
         ),
         NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings),
-          label: 'Ayarlar',
+          icon: const Icon(Icons.settings_outlined),
+          selectedIcon: const Icon(Icons.settings),
+          label: l10n.navBarSettings,
         ),
       ],
     );

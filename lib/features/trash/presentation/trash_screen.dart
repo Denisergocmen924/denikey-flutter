@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/trash_provider.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class TrashScreen extends ConsumerStatefulWidget {
   const TrashScreen({super.key});
@@ -17,20 +18,20 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
   }
 
   Future<void> _confirmEmptyTrash() async {
+    final l10n = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Çöp Kutusunu Boşalt'),
-        content: const Text(
-            'Tüm öğeler kalıcı olarak silinecek. Bu işlem geri alınamaz.'),
+        title: Text(l10n.trashEmptyTitle),
+        content: Text(l10n.trashEmptyMessage),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('İptal')),
+              child: Text(l10n.trashCancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Boşalt'),
+            child: Text(l10n.trashEmptyButton),
           ),
         ],
       ),
@@ -39,19 +40,20 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
   }
 
   Future<void> _confirmDelete(String trashId, String title) async {
+    final l10n = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Kalıcı Sil'),
-        content: Text('"$title" kalıcı olarak silinsin mi?'),
+        title: Text(l10n.trashDeleteTitle),
+        content: Text(l10n.trashDeleteMessage(title)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('İptal')),
+              child: Text(l10n.trashCancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Sil'),
+            child: Text(l10n.trashDeleteButton),
           ),
         ],
       ),
@@ -61,26 +63,27 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(trashProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Çöp Kutusu'),
+        title: Text(l10n.trashTitle),
         foregroundColor: Colors.white,
         actions: [
           if (state.items.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep_outlined),
-              tooltip: 'Tümünü Sil',
+              tooltip: l10n.trashEmptyButton,
               onPressed: _confirmEmptyTrash,
             ),
         ],
       ),
-      body: _buildBody(state),
+      body: _buildBody(state, l10n),
     );
   }
 
-  Widget _buildBody(TrashState state) {
+  Widget _buildBody(TrashState state, AppLocalizations l10n) {
     if (state.status == TrashStatus.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -92,11 +95,11 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
           children: [
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 12),
-            Text(state.error ?? 'Hata'),
+            Text(state.error ?? l10n.trashError),
             const SizedBox(height: 12),
             FilledButton(
               onPressed: () => ref.read(trashProvider.notifier).load(),
-              child: const Text('Tekrar Dene'),
+              child: Text(l10n.trashRetry),
             ),
           ],
         ),
@@ -104,17 +107,17 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
     }
 
     if (state.items.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.delete_outline, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('Çöp kutusu boş',
-                style: TextStyle(fontSize: 16, color: Colors.grey)),
-            SizedBox(height: 8),
-            Text('Silinen öğeler 7 gün burada saklanır',
-                style: TextStyle(fontSize: 13, color: Colors.grey)),
+            const Icon(Icons.delete_outline, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(l10n.trashEmpty,
+                style: const TextStyle(fontSize: 16, color: Colors.grey)),
+            const SizedBox(height: 8),
+            Text(l10n.trashEmptyHint,
+                style: const TextStyle(fontSize: 13, color: Colors.grey)),
           ],
         ),
       );
@@ -149,7 +152,7 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
                   style: const TextStyle(fontWeight: FontWeight.w600)),
               subtitle: permanentDeleteAt != null
                   ? Text(
-                      _formatDeleteDate(permanentDeleteAt),
+                      l10n.trashDeleteFor(_formatDate(permanentDeleteAt)),
                       style: TextStyle(
                           fontSize: 12, color: Colors.orange.shade700),
                     )
@@ -160,14 +163,14 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
                   IconButton(
                     icon: const Icon(Icons.restore_outlined,
                         color: Colors.green),
-                    tooltip: 'Geri Yükle',
+                    tooltip: l10n.trashRestore,
                     onPressed: () =>
                         ref.read(trashProvider.notifier).restore(trashId),
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete_forever_outlined,
                         color: Colors.red),
-                    tooltip: 'Kalıcı Sil',
+                    tooltip: l10n.trashDeletePermanent,
                     onPressed: () => _confirmDelete(trashId, title),
                   ),
                 ],
@@ -179,12 +182,12 @@ class _TrashScreenState extends ConsumerState<TrashScreen> {
     );
   }
 
-  String _formatDeleteDate(String isoDate) {
+  String _formatDate(String isoDate) {
     try {
       final dt = DateTime.parse(isoDate).toLocal();
-      return '${dt.day}.${dt.month.toString().padLeft(2, '0')}.${dt.year} tarihinde kalıcı silinecek';
+      return '${dt.day}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
     } catch (_) {
-      return 'Yakında kalıcı silinecek';
+      return '';
     }
   }
 }

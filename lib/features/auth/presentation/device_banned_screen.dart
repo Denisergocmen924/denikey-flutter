@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class DeviceBannedScreen extends StatelessWidget {
   const DeviceBannedScreen({super.key});
@@ -7,6 +8,7 @@ class DeviceBannedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -18,7 +20,7 @@ class DeviceBannedScreen extends StatelessWidget {
                 Icon(Icons.block, size: 72, color: cs.error),
                 const SizedBox(height: 24),
                 Text(
-                  'Cihaz Yasaklandı',
+                  l10n.deviceBannedTitle,
                   style: Theme.of(context)
                       .textTheme
                       .headlineSmall
@@ -27,7 +29,7 @@ class DeviceBannedScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Bu hesap için bu cihaz kullanılamıyor.\nHesap sahibi tarafından erişiminiz kısıtlanmıştır.',
+                  l10n.deviceBannedDescription,
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -36,7 +38,7 @@ class DeviceBannedScreen extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () => context.go('/login'),
-                    child: const Text('Geri Dön'),
+                    child: Text(l10n.deviceBannedBackButton),
                   ),
                 ),
               ],

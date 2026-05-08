@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final bool isReplay;
@@ -59,6 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isLast = _currentPage == 5;
     return Scaffold(
       backgroundColor: _kOnyx,
@@ -71,17 +73,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Sayfa sayacı
                   Text(
                     '${_currentPage + 1} / 6',
                     style: const TextStyle(color: _muted, fontSize: 13),
                   ),
-                  // Atla
                   if (!isLast)
                     TextButton(
                       onPressed: _finish,
-                      child: const Text('Atla',
-                          style: TextStyle(color: _muted, fontSize: 14)),
+                      child: Text(l10n.onboardingSkip,
+                          style: const TextStyle(color: _muted, fontSize: 14)),
                     )
                   else
                     const SizedBox(width: 60),
@@ -144,8 +144,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   ),
                   child: Text(
                     isLast
-                        ? (widget.isReplay ? 'Kapat' : 'Başla')
-                        : 'İleri',
+                        ? (widget.isReplay ? l10n.onboardingClose : l10n.onboardingStart)
+                        : l10n.onboardingNext,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -159,9 +159,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             if (!widget.isReplay)
               TextButton(
                 onPressed: () => context.push('/privacy-policy'),
-                child: const Text(
-                  'Gizlilik Politikası',
-                  style: TextStyle(
+                child: Text(
+                  l10n.privacyPolicyTitle,
+                  style: const TextStyle(
                     color: _muted,
                     fontSize: 12,
                     decoration: TextDecoration.underline,
@@ -210,9 +210,7 @@ class _PageShell extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          // Görsel alan
           Expanded(flex: 5, child: Center(child: visual)),
-          // Metin
           Expanded(
             flex: 4,
             child: Column(
@@ -316,15 +314,15 @@ class _WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return _PageShell(
       visual: AnimatedBuilder(
         animation: pulseCtrl,
-        builder: (_, __) {
+        builder: (context, child) {
           final glow = pulseCtrl.value;
           return Stack(
             alignment: Alignment.center,
             children: [
-              // Dış halka
               Container(
                 width: 160,
                 height: 160,
@@ -336,7 +334,6 @@ class _WelcomePage extends StatelessWidget {
                   ),
                 ),
               ),
-              // İç halka
               Container(
                 width: 130,
                 height: 130,
@@ -349,7 +346,6 @@ class _WelcomePage extends StatelessWidget {
                   color: _kOrange.withAlpha((10 + (glow * 10).toInt())),
                 ),
               ),
-              // Merkez
               Container(
                 width: 100,
                 height: 100,
@@ -371,12 +367,12 @@ class _WelcomePage extends StatelessWidget {
           );
         },
       ),
-      title: 'DeniKey\'e Hoş Geldiniz',
-      subtitle: 'Şifreleriniz, kartlarınız ve dijital kimlikleriniz tek bir güvenli yerde — yalnızca sizin elinizde.',
-      chips: const [
-        _FeatureChip(icon: Icons.lock_outline, label: 'Sıfır Bilgi'),
-        _FeatureChip(icon: Icons.devices_outlined, label: 'Çok Platform'),
-        _FeatureChip(icon: Icons.sync_outlined, label: 'Anlık Senkron'),
+      title: l10n.onboardingWelcomeTitle,
+      subtitle: l10n.onboardingWelcomeSubtitle,
+      chips: [
+        _FeatureChip(icon: Icons.lock_outline, label: l10n.onboardingChipZeroKnowledge),
+        _FeatureChip(icon: Icons.devices_outlined, label: l10n.onboardingChipMultiPlatform),
+        _FeatureChip(icon: Icons.sync_outlined, label: l10n.onboardingChipSync),
       ],
     );
   }
@@ -389,6 +385,7 @@ class _VaultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return _PageShell(
       visual: Column(
         mainAxisSize: MainAxisSize.min,
@@ -417,11 +414,11 @@ class _VaultPage extends StatelessWidget {
             Container(height: 1, color: _kBorder),
             const SizedBox(height: 10),
             Row(children: [
-              _MiniTag(icon: Icons.copy_outlined, label: 'Kopyala'),
+              _MiniTag(icon: Icons.copy_outlined, label: l10n.onboardingVaultActionCopy),
               const SizedBox(width: 6),
-              _MiniTag(icon: Icons.visibility_outlined, label: 'Göster'),
+              _MiniTag(icon: Icons.visibility_outlined, label: l10n.onboardingVaultActionShow),
               const SizedBox(width: 6),
-              _MiniTag(icon: Icons.edit_outlined, label: 'Düzenle'),
+              _MiniTag(icon: Icons.edit_outlined, label: l10n.onboardingVaultActionEdit),
             ]),
           ]),
           const SizedBox(height: 10),
@@ -436,24 +433,24 @@ class _VaultPage extends StatelessWidget {
                 child: const Icon(Icons.credit_card_outlined, size: 18, color: Color(0xFF42A5F5)),
               ),
               const SizedBox(width: 10),
-              const Expanded(child: Column(
+              Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Banka Kartı', style: TextStyle(color: _kCream, fontSize: 13, fontWeight: FontWeight.w600)),
-                  Text('•••• •••• •••• 4242', style: TextStyle(color: _kMuted, fontSize: 11)),
+                  Text(l10n.onboardingVaultMockBankCard, style: const TextStyle(color: _kCream, fontSize: 13, fontWeight: FontWeight.w600)),
+                  const Text('•••• •••• •••• 4242', style: TextStyle(color: _kMuted, fontSize: 11)),
                 ],
               )),
             ]),
           ]),
         ],
       ),
-      title: 'Kasanız Her Şeyi Saklar',
-      subtitle: 'Şifreler, kartlar, notlar ve özel alanlar. Tek dokunuşla kopyalayın, gizli alanları isteğe göre maskeleyin.',
-      chips: const [
-        _FeatureChip(icon: Icons.add_circle_outline, label: 'Hızlı Ekle'),
-        _FeatureChip(icon: Icons.star_outline, label: 'Favoriler'),
-        _FeatureChip(icon: Icons.lock_outline, label: 'Gizli Alan'),
-        _FeatureChip(icon: Icons.delete_outline, label: 'Çöp Kutusu'),
+      title: l10n.onboardingVaultTitle,
+      subtitle: l10n.onboardingVaultSubtitle,
+      chips: [
+        _FeatureChip(icon: Icons.add_circle_outline, label: l10n.onboardingChipQuickAdd),
+        _FeatureChip(icon: Icons.star_outline, label: l10n.onboardingChipFavorites),
+        _FeatureChip(icon: Icons.lock_outline, label: l10n.onboardingChipHiddenField),
+        _FeatureChip(icon: Icons.delete_outline, label: l10n.onboardingChipTrash),
       ],
     );
   }
@@ -488,6 +485,7 @@ class _LibraryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return _PageShell(
       visual: Column(
         mainAxisSize: MainAxisSize.min,
@@ -495,15 +493,15 @@ class _LibraryPage extends StatelessWidget {
           Row(children: [
             Expanded(child: _CategoryCard(
               icon: Icons.language_outlined,
-              label: 'Sosyal Medya',
-              count: '4 şifre',
+              label: l10n.onboardingLibraryCategorySocialMedia,
+              count: l10n.onboardingLibraryPasswordCount(4),
               color: _kOrange,
             )),
             const SizedBox(width: 10),
             Expanded(child: _CategoryCard(
               icon: Icons.account_balance_outlined,
-              label: 'Bankacılık',
-              count: '2 şifre',
+              label: l10n.onboardingLibraryCategoryBanking,
+              count: l10n.onboardingLibraryPasswordCount(2),
               color: const Color(0xFF42A5F5),
             )),
           ]),
@@ -511,39 +509,38 @@ class _LibraryPage extends StatelessWidget {
           Row(children: [
             Expanded(child: _CategoryCard(
               icon: Icons.work_outline,
-              label: 'İş',
-              count: '6 şifre',
+              label: l10n.onboardingLibraryCategoryWork,
+              count: l10n.onboardingLibraryPasswordCount(6),
               color: const Color(0xFF66BB6A),
             )),
             const SizedBox(width: 10),
             Expanded(child: _CategoryCard(
               icon: Icons.devices_outlined,
-              label: 'Cihazlar',
-              count: '3 şifre',
+              label: l10n.onboardingLibraryCategoryDevices,
+              count: l10n.onboardingLibraryPasswordCount(3),
               color: const Color(0xFFAB47BC),
             )),
           ]),
           const SizedBox(height: 10),
           _MockCard(padding: const EdgeInsets.all(12), children: [
-            const Row(children: [
-              Icon(Icons.grid_view_outlined, size: 14, color: _kOrange),
-              SizedBox(width: 6),
-              Text('Öğe Türleri', style: TextStyle(color: _kCream, fontSize: 12, fontWeight: FontWeight.w600)),
+            Row(children: [
+              const Icon(Icons.grid_view_outlined, size: 14, color: _kOrange),
+              const SizedBox(width: 6),
+              Text(l10n.onboardingLibraryItemTypesHeader,
+                  style: const TextStyle(color: _kCream, fontSize: 12, fontWeight: FontWeight.w600)),
             ]),
             const SizedBox(height: 6),
-            const Text(
-              'Kredi Kartı, Kimlik, SSH Anahtarı, Wi-Fi ve daha fazlası...',
-              style: TextStyle(color: _kMuted, fontSize: 11),
-            ),
+            Text(l10n.onboardingLibraryItemTypesDesc,
+                style: const TextStyle(color: _kMuted, fontSize: 11)),
           ]),
         ],
       ),
-      title: 'Organize Edin',
-      subtitle: 'Kategorilerle şifrelerinizi düzenleyin. Öğe türleri ile kredi kartı, kimlik belgesi ve daha fazlasını saklayın.',
-      chips: const [
-        _FeatureChip(icon: Icons.folder_outlined, label: 'Kategoriler'),
-        _FeatureChip(icon: Icons.extension_outlined, label: 'Öğe Türleri'),
-        _FeatureChip(icon: Icons.add_box_outlined, label: 'Özelleştir'),
+      title: l10n.onboardingLibraryTitle,
+      subtitle: l10n.onboardingLibrarySubtitle,
+      chips: [
+        _FeatureChip(icon: Icons.folder_outlined, label: l10n.onboardingChipCategories),
+        _FeatureChip(icon: Icons.extension_outlined, label: l10n.onboardingChipItemTypes),
+        _FeatureChip(icon: Icons.add_box_outlined, label: l10n.onboardingChipCustomize),
       ],
     );
   }
@@ -595,15 +592,16 @@ class _GeneratorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return _PageShell(
       visual: _MockCard(children: [
-        const Row(children: [
-          Icon(Icons.auto_fix_high_outlined, size: 16, color: _kOrange),
-          SizedBox(width: 6),
-          Text('Şifre Üretici', style: TextStyle(color: _kOrange, fontSize: 12, fontWeight: FontWeight.w700)),
+        Row(children: [
+          const Icon(Icons.auto_fix_high_outlined, size: 16, color: _kOrange),
+          const SizedBox(width: 6),
+          Text(l10n.onboardingGeneratorSectionLabel,
+              style: const TextStyle(color: _kOrange, fontSize: 12, fontWeight: FontWeight.w700)),
         ]),
         const SizedBox(height: 12),
-        // Üretilen şifre
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -624,38 +622,38 @@ class _GeneratorPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        // Güç göstergesi
-        const Row(children: [
-          Text('Güç:', style: TextStyle(color: _kMuted, fontSize: 11)),
-          SizedBox(width: 6),
-          Text('Çok Güçlü', style: TextStyle(color: _kGreen, fontSize: 11, fontWeight: FontWeight.w600)),
+        Row(children: [
+          Text(l10n.onboardingGeneratorStrengthLabel,
+              style: const TextStyle(color: _kMuted, fontSize: 11)),
+          const SizedBox(width: 6),
+          Text(l10n.onboardingGeneratorStrengthVeryStrong,
+              style: const TextStyle(color: _kGreen, fontSize: 11, fontWeight: FontWeight.w600)),
         ]),
         const SizedBox(height: 6),
         ClipRRect(
           borderRadius: BorderRadius.circular(3),
-          child: LinearProgressIndicator(
+          child: const LinearProgressIndicator(
             value: 0.92,
             minHeight: 6,
             backgroundColor: _kBorder,
-            valueColor: const AlwaysStoppedAnimation(_kGreen),
+            valueColor: AlwaysStoppedAnimation(_kGreen),
           ),
         ),
         const SizedBox(height: 14),
-        // Seçenekler
-        Wrap(spacing: 6, runSpacing: 6, children: const [
-          _OptionChip(label: 'Uzunluk: 16'),
-          _OptionChip(label: 'A-Z'),
-          _OptionChip(label: 'a-z'),
-          _OptionChip(label: '0-9'),
-          _OptionChip(label: '!@#\$', active: true),
+        Wrap(spacing: 6, runSpacing: 6, children: [
+          _OptionChip(label: l10n.onboardingGeneratorLengthOption(16)),
+          const _OptionChip(label: 'A-Z'),
+          const _OptionChip(label: 'a-z'),
+          const _OptionChip(label: '0-9'),
+          const _OptionChip(label: '!@#\$', active: true),
         ]),
       ]),
-      title: 'Güçlü Şifreler Üretin',
-      subtitle: 'Uzunluk, büyük/küçük harf, rakam ve özel karakter seçenekleriyle tek tıkta kırılması zor şifreler oluşturun.',
-      chips: const [
-        _FeatureChip(icon: Icons.tune_outlined, label: 'Özelleştir'),
-        _FeatureChip(icon: Icons.copy_outlined, label: 'Kopyala'),
-        _FeatureChip(icon: Icons.refresh_outlined, label: 'Yenile'),
+      title: l10n.onboardingGeneratorTitle,
+      subtitle: l10n.onboardingGeneratorSubtitle,
+      chips: [
+        _FeatureChip(icon: Icons.tune_outlined, label: l10n.onboardingChipCustomize),
+        _FeatureChip(icon: Icons.copy_outlined, label: l10n.onboardingVaultActionCopy),
+        _FeatureChip(icon: Icons.refresh_outlined, label: l10n.onboardingChipRefresh),
       ],
     );
   }
@@ -691,6 +689,7 @@ class _SecurityPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return _PageShell(
       visual: Column(
         mainAxisSize: MainAxisSize.min,
@@ -698,15 +697,15 @@ class _SecurityPage extends StatelessWidget {
           Row(children: [
             Expanded(child: _SecurityTile(
               icon: Icons.fingerprint_rounded,
-              label: 'Biyometrik',
-              desc: 'Parmak izi ile hızlı erişim',
+              label: l10n.onboardingSecurityBiometric,
+              desc: l10n.onboardingSecurityBiometricDesc,
               color: _kOrange,
             )),
             const SizedBox(width: 10),
             Expanded(child: _SecurityTile(
               icon: Icons.lock_clock_outlined,
-              label: 'Otomatik Kilit',
-              desc: 'Süre veya odak kaybıyla kilitle',
+              label: l10n.onboardingSecurityAutoLock,
+              desc: l10n.onboardingSecurityAutoLockDesc,
               color: const Color(0xFF42A5F5),
             )),
           ]),
@@ -714,35 +713,34 @@ class _SecurityPage extends StatelessWidget {
           Row(children: [
             Expanded(child: _SecurityTile(
               icon: Icons.devices_outlined,
-              label: 'Cihaz Yönetimi',
-              desc: 'Oturumları görüntüle ve sonlandır',
+              label: l10n.onboardingSecurityDeviceManagement,
+              desc: l10n.onboardingSecurityDeviceManagementDesc,
               color: const Color(0xFF66BB6A),
             )),
             const SizedBox(width: 10),
             Expanded(child: _SecurityTile(
               icon: Icons.history_edu_outlined,
-              label: 'Denetim Kaydı',
-              desc: 'Her işlemi takip et',
+              label: l10n.onboardingSecurityAuditLog,
+              desc: l10n.onboardingSecurityAuditLogDesc,
               color: const Color(0xFFAB47BC),
             )),
           ]),
           const SizedBox(height: 10),
           _MockCard(padding: const EdgeInsets.all(12), children: [
-            const Row(children: [
-              Icon(Icons.verified_user_outlined, size: 14, color: _kOrange),
-              SizedBox(width: 6),
-              Text('Sıfır Bilgi Mimarisi', style: TextStyle(color: _kCream, fontSize: 12, fontWeight: FontWeight.w600)),
+            Row(children: [
+              const Icon(Icons.verified_user_outlined, size: 14, color: _kOrange),
+              const SizedBox(width: 6),
+              Text(l10n.onboardingSecurityZeroKnowledgeTitle,
+                  style: const TextStyle(color: _kCream, fontSize: 12, fontWeight: FontWeight.w600)),
             ]),
             const SizedBox(height: 4),
-            const Text(
-              'Master şifreniz hiçbir zaman sunucuya gönderilmez.',
-              style: TextStyle(color: _kMuted, fontSize: 11),
-            ),
+            Text(l10n.onboardingSecurityZeroKnowledgeDesc,
+                style: const TextStyle(color: _kMuted, fontSize: 11)),
           ]),
         ],
       ),
-      title: 'Tam Kontrol Sizde',
-      subtitle: 'Parmak izi, otomatik kilit, cihaz yasaklama ve denetim kaydı ile güvenliğinizi her açıdan yönetin.',
+      title: l10n.onboardingSecurityTitle,
+      subtitle: l10n.onboardingSecuritySubtitle,
       chips: const [
         _FeatureChip(icon: Icons.shield_outlined, label: 'AES-256-GCM'),
         _FeatureChip(icon: Icons.key_outlined, label: 'Argon2id'),
@@ -792,6 +790,7 @@ class _ReadyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return _PageShell(
       visual: Column(
         mainAxisSize: MainAxisSize.min,
@@ -810,7 +809,6 @@ class _ReadyPage extends StatelessWidget {
             child: const Icon(Icons.rocket_launch_rounded, size: 50, color: _kOrange),
           ),
           const SizedBox(height: 24),
-          // Özet kartı
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -820,21 +818,19 @@ class _ReadyPage extends StatelessWidget {
               border: Border.all(color: _kBorder),
             ),
             child: Column(children: [
-              _SummaryRow(icon: Icons.shield_rounded, text: 'Sıfır bilgi — veriler yalnızca sizin'),
+              _SummaryRow(icon: Icons.shield_rounded, text: l10n.onboardingSummaryZeroKnowledge),
               const Divider(height: 16, color: _kBorder),
-              _SummaryRow(icon: Icons.add_circle_outline, text: 'Kasam → şifre ekle ve yönet'),
+              _SummaryRow(icon: Icons.add_circle_outline, text: l10n.onboardingSummaryAddPassword),
               const Divider(height: 16, color: _kBorder),
-              _SummaryRow(icon: Icons.auto_fix_high_outlined, text: 'Güçlü şifreler üret'),
+              _SummaryRow(icon: Icons.auto_fix_high_outlined, text: l10n.onboardingSummaryGenerator),
               const Divider(height: 16, color: _kBorder),
-              _SummaryRow(icon: Icons.fingerprint_rounded, text: 'Biyometrik ile hızlı giriş'),
+              _SummaryRow(icon: Icons.fingerprint_rounded, text: l10n.onboardingSummaryBiometric),
             ]),
           ),
         ],
       ),
-      title: isReplay ? 'Her Şeyi Hatırladınız!' : 'Başlamaya Hazır mısınız?',
-      subtitle: isReplay
-          ? 'Sorularınız için Ayarlar → Destek Talebi kısmından bize ulaşabilirsiniz.'
-          : 'Hesap oluşturun ya da giriş yapın. Güvenlik artık karmaşık değil.',
+      title: isReplay ? l10n.onboardingReplayTitle : l10n.onboardingReadyTitle,
+      subtitle: isReplay ? l10n.onboardingReplaySubtitle : l10n.onboardingReadySubtitle,
     );
   }
 }

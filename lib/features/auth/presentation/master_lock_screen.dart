@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class MasterLockScreen extends StatefulWidget {
   const MasterLockScreen({super.key});
@@ -54,14 +55,14 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
       if (!mounted) return;
       if (masterKey == null) {
         setState(() {
-          _error = 'Lütfen bir kez master şifrenizi girin';
+          _error = AppLocalizations.of(context).masterLockBiometricNeeded;
           _loading = false;
         });
         return;
       }
       context.go('/vault');
     } else {
-      setState(() { _error = 'Kimlik doğrulama başarısız'; _loading = false; });
+      setState(() { _error = AppLocalizations.of(context).masterLockAuthFailed; _loading = false; });
     }
   }
 
@@ -99,7 +100,7 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
       );
 
       if (plaintext != 'denikey-verify') {
-        setState(() { _error = 'Yanlış master şifre'; _loading = false; });
+        setState(() { _error = AppLocalizations.of(context).masterLockWrongPassword; _loading = false; });
         return;
       }
 
@@ -108,13 +109,14 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
       await BiometricService.instance.saveMasterPasswordTimestamp();
       if (mounted) context.go('/vault');
     } catch (_) {
-      setState(() { _error = 'Yanlış master şifre'; _loading = false; });
+      setState(() { _error = AppLocalizations.of(context).masterLockWrongPassword; _loading = false; });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -135,7 +137,7 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'DeniKey Kilitli',
+                    l10n.masterLockTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 26,
@@ -146,8 +148,8 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                   const SizedBox(height: 6),
                   Text(
                     _biometricExpired
-                        ? '7 günlük biyometrik süreniz doldu.\nGüvenliğiniz için master şifrenizi girin.'
-                        : 'Devam etmek için master şifrenizi girin',
+                        ? l10n.masterLockBiometricExpired
+                        : l10n.masterLockPassword,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -160,7 +162,7 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                     obscureText: _obscure,
                     autofocus: true,
                     decoration: InputDecoration(
-                      labelText: 'Master Şifre',
+                      labelText: l10n.masterLockPasswordLabel,
                       prefixIcon: const Icon(Icons.key_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(_obscure
@@ -172,7 +174,7 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                     ),
                     onFieldSubmitted: (_) => _loading ? null : _unlock(),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Şifre gerekli';
+                      if (v == null || v.isEmpty) return l10n.masterLockPasswordError;
                       return null;
                     },
                   ),
@@ -191,7 +193,7 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Kilidi Aç', style: TextStyle(fontSize: 16)),
+                        : Text(l10n.masterLockButton, style: const TextStyle(fontSize: 16)),
                   ),
                   if (_biometric != null) ...[
                     const SizedBox(height: 12),
@@ -207,8 +209,8 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                     Center(
                       child: Text(
                         _remainingDays > 1
-                            ? '$_remainingDays gün sonra şifre istenecek'
-                            : 'Yarın şifre istenecek',
+                            ? l10n.masterLockBiometricDaysRemaining(_remainingDays)
+                            : l10n.masterLockBiometricTomorrow,
                         style: TextStyle(
                           fontSize: 12,
                           color: cs.onSurfaceVariant,
@@ -220,7 +222,7 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                   TextButton(
                     onPressed: _loading ? null : _logout,
                     child: Text(
-                      'Farklı hesapla giriş yap',
+                      l10n.masterLockDifferentAccount,
                       style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
                     ),
                   ),

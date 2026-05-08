@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/cache/cache_service.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class LockScreen extends StatefulWidget {
   const LockScreen({super.key});
@@ -29,7 +30,7 @@ class _LockScreenState extends State<LockScreen> {
     if (ok) {
       context.go('/vault');
     } else {
-      setState(() { _loading = false; _error = 'Kimlik doğrulama başarısız'; });
+      setState(() { _loading = false; _error = AppLocalizations.of(context).lockAuthFailed; });
     }
   }
 
@@ -41,6 +42,7 @@ class _LockScreenState extends State<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -49,9 +51,9 @@ class _LockScreenState extends State<LockScreen> {
             children: [
               const Icon(Icons.lock_outline, size: 72, color: Color(0xFFFF5900)),
               const SizedBox(height: 24),
-              const Text(
-                'DeniKey Kilitli',
-                style: TextStyle(
+              Text(
+                l10n.lockTitle,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -59,7 +61,7 @@ class _LockScreenState extends State<LockScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Devam etmek için kimliğinizi doğrulayın',
+                l10n.lockDescription,
                 style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
               ),
               const SizedBox(height: 40),
@@ -73,7 +75,7 @@ class _LockScreenState extends State<LockScreen> {
                 FilledButton.icon(
                   onPressed: _tryBiometric,
                   icon: const Icon(Icons.fingerprint),
-                  label: const Text('Biyometrik ile Aç'),
+                  label: Text(l10n.lockBiometricButton),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                   ),
@@ -83,7 +85,7 @@ class _LockScreenState extends State<LockScreen> {
               TextButton(
                 onPressed: _logout,
                 child: Text(
-                  'Çıkış Yap',
+                  l10n.lockLogoutButton,
                   style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
                 ),
               ),

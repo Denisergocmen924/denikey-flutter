@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../storage/secure_storage.dart';
 import '../network/dio_client.dart';
@@ -266,9 +267,9 @@ class _SplashScreenState extends State<SplashScreen>
                   animation: _textCtrl,
                   builder: (context, child) => Opacity(
                     opacity: _subtitleFade.value.clamp(0.0, 1.0),
-                    child: const Text(
-                      'Sıfır Bilgi · Tam Güvenlik',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context).splashSubtitle,
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF9BABA4),
                         letterSpacing: 1.2,

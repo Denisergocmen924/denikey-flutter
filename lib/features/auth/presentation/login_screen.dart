@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -35,6 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
     final cs = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     ref.listen(authProvider, (_, next) {
       if (next.status == AuthStatus.success) {
@@ -53,7 +55,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
       if (next.status == AuthStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.errorMessage ?? 'Hata')),
+          SnackBar(content: Text(next.errorMessage ?? AppLocalizations.of(context).loginError)),
         );
       }
     });
@@ -90,7 +92,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Şifreleriniz güvende',
+                    l10n.loginTagline,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 14,
                       color: cs.onSurfaceVariant),
@@ -98,13 +100,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 48),
                   TextFormField(
                     controller: _usernameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Kullanıcı Adı veya E-posta',
-                      prefixIcon: Icon(Icons.person_outline),
+                    decoration: InputDecoration(
+                      labelText: l10n.loginUsernameLabel,
+                      prefixIcon: const Icon(Icons.person_outline),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Kullanıcı adı veya e-posta gerekli';
-                      if (v.length < 3) return 'En az 3 karakter';
+                      if (v == null || v.isEmpty) return l10n.loginUsernameError;
+                      if (v.length < 3) return l10n.loginUsernameMinError;
                       return null;
                     },
                   ),
@@ -113,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     controller: _passwordCtrl,
                     obscureText: _obscure,
                     decoration: InputDecoration(
-                      labelText: 'Master Şifre',
+                      labelText: l10n.loginPasswordLabel,
                       prefixIcon: const Icon(Icons.key_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(_obscure
@@ -123,8 +125,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Şifre gerekli';
-                      if (v.length < 6) return 'En az 6 karakter';
+                      if (v == null || v.isEmpty) return l10n.loginPasswordError;
+                      if (v.length < 6) return l10n.loginPasswordMinError;
                       return null;
                     },
                   ),
@@ -135,27 +137,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ? const SizedBox(height: 22, width: 22,
                             child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.white))
-                        : const Text('Giriş Yap'),
+                        : Text(l10n.loginSubmitButton),
                   ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Hesabın yok mu?',
+                      Text(l10n.loginNoAccountQuestion,
                         style: TextStyle(color: cs.onSurfaceVariant)),
                       TextButton(
                         onPressed: () {
                           ref.read(authProvider.notifier).reset();
                           context.go('/register');
                         },
-                        child: const Text('Kayıt Ol'),
+                        child: Text(l10n.loginRegisterButton),
                       ),
                     ],
                   ),
                   Center(
                     child: TextButton(
                       onPressed: () => context.push('/forgot-password'),
-                      child: Text('Şifremi Unuttum',
+                      child: Text(l10n.loginForgotButton,
                         style: TextStyle(color: cs.onSurfaceVariant)),
                     ),
                   ),

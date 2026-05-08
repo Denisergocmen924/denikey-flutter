@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../providers/vault_provider.dart';
 import '../data/vault_repository.dart';
 import '../../../core/network/dio_client.dart';
@@ -37,7 +38,6 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
 
   final _titleCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  final _urlCtrl = TextEditingController();
   // custom fields — her biri {key: ctrl, value: ctrl}
   final List<Map<String, TextEditingController>> _editCustomFields = [];
   final List<String> _editFieldTypes = []; // _editCustomFields ile paralel, field_type saklar
@@ -58,7 +58,6 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   void dispose() {
     _titleCtrl.dispose();
     _passwordCtrl.dispose();
-    _urlCtrl.dispose();
     _disposeCustomFieldCtrls();
     super.dispose();
   }
@@ -92,7 +91,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
       if (mounted) {
         setState(() {
           _decrypting = false;
-          _saveError = 'Bilgiler yüklenemedi: ${e.toString()}';
+          _saveError = AppLocalizations.of(context).detailLoadError(e.toString());
         });
       }
     }
@@ -101,7 +100,6 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   void _fillControllers() {
     _titleCtrl.text = _fullItem['title'] as String? ?? '';
     _passwordCtrl.text = _decryptedPassword ?? '';
-    _urlCtrl.text = _fullItem['url'] as String? ?? '';
 
     // Mevcut custom field controller'larını temizle
     _disposeCustomFieldCtrls();
@@ -147,8 +145,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   }
 
   Future<void> _saveEdit() async {
+    final l10n = AppLocalizations.of(context);
     if (_titleCtrl.text.trim().isEmpty) {
-      setState(() => _saveError = 'Başlık boş olamaz');
+      setState(() => _saveError = l10n.detailEditErrorBlankTitle);
       return;
     }
     setState(() { _saving = true; _saveError = null; });
@@ -157,7 +156,6 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
       final data = <String, dynamic>{
         'title': _titleCtrl.text.trim(),
         'password': _passwordCtrl.text.trim(),
-        'url': _urlCtrl.text.trim(),
       };
 
       final customFieldsList = <Map<String, String>>[];
@@ -180,7 +178,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
       await _loadItem();
       if (mounted) setState(() { _isEditing = false; _showPassword = false; });
     } catch (_) {
-      if (mounted) setState(() => _saveError = 'Güncellenemedi, tekrar deneyin');
+      if (mounted) setState(() => _saveError = l10n.detailEditErrorGeneral);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -196,26 +194,27 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
     }
 
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Dış Link'),
+        title: Text(l10n.detailExternalLinkTitle),
         content: Text(
-          'DeniKey bu bağlantıyı açmak üzere:\n\n$url',
+          l10n.detailExternalLinkMessage(url),
           style: const TextStyle(fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, 'cancel'),
-            child: const Text('İzin Verme'),
+            child: Text(l10n.detailExternalLinkDeny),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, 'once'),
-            child: const Text('Bu Seferlik'),
+            child: Text(l10n.detailExternalLinkOnce),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, 'noask'),
-            child: const Text('Bir Daha Sorma'),
+            child: Text(l10n.detailExternalLinkNoAsk),
           ),
         ],
       ),
@@ -232,14 +231,15 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   }
 
   void _copyToClipboard(String value, String label) {
+    final l10n = AppLocalizations.of(context);
     final timeout = ref.read(clipboardTimeoutProvider);
     Clipboard.setData(ClipboardData(text: value));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           timeout != null
-              ? '$label kopyalandı, $timeout saniye sonra silinecek'
-              : '$label kopyalandı',
+              ? l10n.detailInfoTilePasswordCopied(label, timeout)
+              : l10n.detailInfoTileCopied(label),
         ),
       ),
     );
@@ -251,13 +251,14 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   }
 
   void _confirmDelete() {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sil'),
-        content: const Text('Bu şifreyi silmek istediğinize emin misiniz?'),
+        title: Text(l10n.detailDeleteTitle),
+        content: Text(l10n.detailDeleteMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.detailCancelEdit)),
           FilledButton(
             onPressed: () async {
               Navigator.pop(ctx);
@@ -265,7 +266,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
               if (mounted) Navigator.pop(context);
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Sil'),
+            child: Text(l10n.detailDeleteButton),
           ),
         ],
       ),
@@ -273,6 +274,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   }
 
   Future<void> _showCategoryPicker() async {
+    final l10n = AppLocalizations.of(context);
     final categoryState = ref.read(categoryProvider);
     if (categoryState.categories.isEmpty) {
       await ref.read(categoryProvider.notifier).loadCategories();
@@ -292,9 +294,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
-              child: Text('Klasöre Taşı', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+              child: Text(l10n.detailCategoryMove, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
             ListTile(
               leading: CircleAvatar(
@@ -302,7 +304,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                 backgroundColor: Colors.grey.shade200,
                 child: const Icon(Icons.folder_off_outlined, size: 18, color: Colors.grey),
               ),
-              title: const Text('Sınıflandırılmamış'),
+              title: Text(l10n.detailCategoryUncategorized),
               trailing: currentCategoryId == null ? const Icon(Icons.check, color: Color(0xFFFF5900)) : null,
               onTap: () async {
                 Navigator.pop(ctx);
@@ -384,7 +386,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
               if (!isSecret && _isUrl(value))
                 IconButton(
                   icon: const Icon(Icons.open_in_new, size: 20),
-                  tooltip: 'Linki Aç',
+                  tooltip: AppLocalizations.of(context).detailLinkOpen,
                   onPressed: () => _openLink(value),
                 ),
               IconButton(
@@ -400,7 +402,8 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = _fullItem['title'] as String? ?? widget.item['title'] ?? 'Detay';
+    final l10n = AppLocalizations.of(context);
+    final title = _fullItem['title'] as String? ?? widget.item['title'] ?? l10n.vaultItemDetailFallbackTitle;
 
     return Scaffold(
       appBar: AppBar(
@@ -409,7 +412,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             ? [
                 TextButton(
                   onPressed: _saving ? null : _cancelEdit,
-                  child: const Text('İptal', style: TextStyle(color: Colors.white)),
+                  child: Text(l10n.detailCancelEdit, style: const TextStyle(color: Colors.white)),
                 ),
               ]
             : [
@@ -423,8 +426,8 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                         : null,
                   ),
                   tooltip: _fullItem['is_favorite'] == true
-                      ? 'Favoriden çıkar'
-                      : 'Favorilere ekle',
+                      ? l10n.detailFavoritesRemove
+                      : l10n.detailFavoritesAdd,
                   onPressed: _decrypting ? null : () {
                     final isFav = _fullItem['is_favorite'] == true;
                     setState(() => _fullItem['is_favorite'] = !isFav);
@@ -436,7 +439,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.history_outlined),
-                  tooltip: 'Şifre Geçmişi',
+                  tooltip: l10n.detailPasswordHistory,
                   onPressed: _decrypting ? null : () {
                     Navigator.push(
                       context,
@@ -451,7 +454,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Düzenle',
+                  tooltip: l10n.detailEditButton,
                   onPressed: _decrypting ? null : () => setState(() => _isEditing = true),
                 ),
                 IconButton(
@@ -469,6 +472,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   }
 
   Widget _buildViewMode() {
+    final l10n = AppLocalizations.of(context);
     if (_saveError != null) {
       return Center(
         child: Padding(
@@ -485,7 +489,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                   setState(() => _saveError = null);
                   _loadItem();
                 },
-                child: const Text('Tekrar Dene'),
+                child: Text(l10n.detailRetry),
               ),
             ],
           ),
@@ -525,9 +529,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                   Icons.folder_outlined,
                   color: categoryName != null ? const Color(0xFFFF5900) : cs.onSurfaceVariant,
                 ),
-                title: Text('Klasör', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+                title: Text(l10n.detailCategoryLabel, style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
                 subtitle: Text(
-                  categoryName ?? 'Sınıflandırılmamış',
+                  categoryName ?? l10n.detailCategoryUncategorized,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
@@ -540,7 +544,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             }),
           ),
         ),
-        _infoTile('Şifre', _decryptedPassword,
+        _infoTile(l10n.detailPasswordLabel, _decryptedPassword,
           isSecret: true,
           showSecret: _showPassword,
           onToggleSecret: () => setState(() => _showPassword = !_showPassword),
@@ -549,7 +553,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.only(bottom: 8, left: 4),
-            child: Text('Ek Bilgiler',
+            child: Text(l10n.detailExtraInfoSection,
               style: TextStyle(fontSize: 13,
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).colorScheme.onSurfaceVariant)),
@@ -573,6 +577,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   }
 
   Widget _buildEditForm() {
+    final l10n = AppLocalizations.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -583,22 +588,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
           // Başlık
           TextField(
             controller: _titleCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Başlık',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // URL
-          TextField(
-            controller: _urlCtrl,
-            keyboardType: TextInputType.url,
-            decoration: const InputDecoration(
-              labelText: 'Web Sitesi (URL)',
-              hintText: 'Örn: https://instagram.com',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.link),
+            decoration: InputDecoration(
+              labelText: l10n.detailEditTitle,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
@@ -608,7 +600,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             controller: _passwordCtrl,
             obscureText: !_showPassword,
             decoration: InputDecoration(
-              labelText: 'Şifre',
+              labelText: l10n.detailEditPassword,
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
                 icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
@@ -635,9 +627,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                       children: [
                         TextField(
                           controller: f['key'],
-                          decoration: const InputDecoration(
-                            labelText: 'Başlık',
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: l10n.detailEditCustomFieldKeyLabel,
+                            border: const OutlineInputBorder(),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -645,7 +637,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
                           controller: f['value'],
                           obscureText: isFieldSecret && !showFieldValue,
                           decoration: InputDecoration(
-                            labelText: 'İçerik',
+                            labelText: l10n.detailEditCustomFieldValueLabel,
                             border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -677,7 +669,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
           OutlinedButton.icon(
             onPressed: _addEditCustomField,
             icon: const Icon(Icons.add),
-            label: const Text('Alan Ekle'),
+            label: Text(l10n.addItemAddFieldButton),
             style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFFF5900)),
           ),
           const SizedBox(height: 24),
@@ -699,7 +691,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             child: _saving
                 ? const SizedBox(height: 20, width: 20,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Text('Kaydet', style: TextStyle(fontSize: 16)),
+                : Text(l10n.detailEditSaveButton, style: const TextStyle(fontSize: 16)),
           ),
           const SizedBox(height: 16),
         ],

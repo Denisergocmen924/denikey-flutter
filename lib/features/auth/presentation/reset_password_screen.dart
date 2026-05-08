@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../data/auth_repository.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -46,12 +47,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Şifreniz başarıyla sıfırlandı')),
+        SnackBar(content: Text(AppLocalizations.of(context).resetPasswordSuccess)),
       );
       context.go('/login');
     } on DioException catch (e) {
       if (!mounted) return;
-      final msg = e.response?.data['detail'] ?? 'Bir hata oluştu';
+      final msg = e.response?.data['detail'] ?? AppLocalizations.of(context).resetPasswordApiError;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg.toString())),
       );
@@ -62,8 +63,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Yeni Şifre Belirle')),
+      appBar: AppBar(title: Text(l10n.resetPasswordTitle)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -76,14 +78,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   const SizedBox(height: 16),
                   const Icon(Icons.verified_outlined, size: 64, color: Color(0xFFFF5900)),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Şifrenizi Sıfırlayın',
+                  Text(
+                    l10n.resetPasswordHeading,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${widget.email} adresine gönderilen kodu ve yeni şifrenizi girin.',
+                    l10n.resetPasswordDescription(widget.email),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
@@ -92,15 +94,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     controller: _codeCtrl,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
-                    decoration: const InputDecoration(
-                      labelText: 'Doğrulama Kodu',
-                      prefixIcon: Icon(Icons.pin_outlined),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.resetPasswordCodeLabel,
+                      prefixIcon: const Icon(Icons.pin_outlined),
+                      border: const OutlineInputBorder(),
                       counterText: '',
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Kod gerekli';
-                      if (v.length < 6) return '6 haneli kodu girin';
+                      if (v == null || v.isEmpty) return l10n.resetPasswordCodeError;
+                      if (v.length < 6) return l10n.resetPasswordCodeMinError;
                       return null;
                     },
                   ),
@@ -109,7 +111,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     controller: _passwordCtrl,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
-                      labelText: 'Yeni Master Şifre',
+                      labelText: l10n.resetPasswordNewLabel,
                       prefixIcon: const Icon(Icons.key_outlined),
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
@@ -118,8 +120,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Şifre gerekli';
-                      if (v.length < 8) return 'En az 8 karakter';
+                      if (v == null || v.isEmpty) return l10n.resetPasswordNewError;
+                      if (v.length < 8) return l10n.resetPasswordNewMinError;
                       return null;
                     },
                   ),
@@ -128,7 +130,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     controller: _confirmCtrl,
                     obscureText: _obscureConfirm,
                     decoration: InputDecoration(
-                      labelText: 'Şifre Tekrar',
+                      labelText: l10n.resetPasswordConfirmLabel,
                       prefixIcon: const Icon(Icons.key_outlined),
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
@@ -137,8 +139,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Şifre tekrarı gerekli';
-                      if (v != _passwordCtrl.text) return 'Şifreler eşleşmiyor';
+                      if (v == null || v.isEmpty) return l10n.resetPasswordConfirmError;
+                      if (v != _passwordCtrl.text) return l10n.resetPasswordConfirmMismatch;
                       return null;
                     },
                   ),
@@ -154,7 +156,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Text('Şifremi Sıfırla', style: TextStyle(fontSize: 16)),
+                        : Text(l10n.resetPasswordSubmitButton, style: const TextStyle(fontSize: 16)),
                   ),
                 ],
               ),

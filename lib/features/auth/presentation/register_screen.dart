@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -35,7 +36,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       initialDate: DateTime(now.year - 18),
       firstDate: DateTime(now.year - 120),
       lastDate: DateTime(now.year - 1),
-      helpText: 'Doğum Tarihinizi Seçin',
+      helpText: AppLocalizations.of(context).registerBirthdateHelper,
     );
     if (picked != null) setState(() => _birthDate = picked);
   }
@@ -55,13 +56,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_birthDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen doğum tarihinizi seçin')),
+        SnackBar(content: Text(AppLocalizations.of(context).registerBirthdateMissing)),
       );
       return;
     }
     if ((_age() ?? 0) < 13) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('DeniKey\'i kullanmak için en az 13 yaşında olmalısınız')),
+        SnackBar(content: Text(AppLocalizations.of(context).registerAgeRestriction)),
       );
       return;
     }
@@ -76,6 +77,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(authProvider);
     final cs = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     ref.listen(authProvider, (_, next) {
       if (next.status == AuthStatus.success) {
@@ -89,7 +91,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
       if (next.status == AuthStatus.error && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.errorMessage ?? 'Hata')),
+          SnackBar(content: Text(next.errorMessage ?? AppLocalizations.of(context).registerError)),
         );
       }
     });
@@ -98,7 +100,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kayıt Ol'),
+        title: Text(l10n.registerAppBarTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/login'),
@@ -118,7 +120,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     color: cs.primary),
                   const SizedBox(height: 12),
                   Text(
-                    'Hesap Oluştur',
+                    l10n.registerHeading,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 26,
@@ -128,7 +130,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Kimliğiniz gizli kalır.',
+                    l10n.registerSubheading,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 13,
                       color: cs.onSurfaceVariant),
@@ -136,14 +138,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   const SizedBox(height: 36),
                   TextFormField(
                     controller: _usernameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Kullanıcı Adı',
-                      prefixIcon: Icon(Icons.person_outline),
+                    decoration: InputDecoration(
+                      labelText: l10n.registerUsernameLabel,
+                      prefixIcon: const Icon(Icons.person_outline),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Kullanıcı adı gerekli';
-                      if (v.trim().length < 3) return 'En az 3 karakter';
-                      if (v.trim().length > 50) return 'En fazla 50 karakter';
+                      if (v == null || v.isEmpty) return l10n.registerUsernameError;
+                      if (v.trim().length < 3) return l10n.registerUsernameMinError;
+                      if (v.trim().length > 50) return l10n.registerUsernameMaxError;
                       return null;
                     },
                   ),
@@ -151,13 +153,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'E-posta',
-                      prefixIcon: Icon(Icons.email_outlined),
+                    decoration: InputDecoration(
+                      labelText: l10n.registerEmailLabel,
+                      prefixIcon: const Icon(Icons.email_outlined),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'E-posta gerekli';
-                      if (!v.contains('@')) return 'Geçerli e-posta girin';
+                      if (v == null || v.isEmpty) return l10n.registerEmailError;
+                      if (!v.contains('@')) return l10n.registerEmailFormatError;
                       return null;
                     },
                   ),
@@ -166,7 +168,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _passwordCtrl,
                     obscureText: _obscure,
                     decoration: InputDecoration(
-                      labelText: 'Master Şifre',
+                      labelText: l10n.registerPasswordLabel,
                       prefixIcon: const Icon(Icons.key_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(_obscure
@@ -176,8 +178,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Şifre gerekli';
-                      if (v.length < 6) return 'En az 6 karakter';
+                      if (v == null || v.isEmpty) return l10n.registerPasswordError;
+                      if (v.length < 6) return l10n.registerPasswordMinError;
                       return null;
                     },
                   ),
@@ -185,12 +187,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   TextFormField(
                     controller: _confirmCtrl,
                     obscureText: _obscure,
-                    decoration: const InputDecoration(
-                      labelText: 'Şifre Tekrar',
-                      prefixIcon: Icon(Icons.key_outlined),
+                    decoration: InputDecoration(
+                      labelText: l10n.registerConfirmLabel,
+                      prefixIcon: const Icon(Icons.key_outlined),
                     ),
                     validator: (v) {
-                      if (v != _passwordCtrl.text) return 'Şifreler eşleşmiyor';
+                      if (v != _passwordCtrl.text) return l10n.registerConfirmError;
                       return null;
                     },
                   ),
@@ -198,13 +200,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   GestureDetector(
                     onTap: _pickBirthDate,
                     child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Doğum Tarihi',
-                        prefixIcon: Icon(Icons.cake_outlined),
+                      decoration: InputDecoration(
+                        labelText: l10n.registerBirthdateLabel,
+                        prefixIcon: const Icon(Icons.cake_outlined),
                       ),
                       child: Text(
                         _birthDate == null
-                            ? 'Seçiniz'
+                            ? l10n.registerBirthdateSelect
                             : '${_birthDate!.day.toString().padLeft(2, '0')}.'
                               '${_birthDate!.month.toString().padLeft(2, '0')}.'
                               '${_birthDate!.year}',
@@ -224,7 +226,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ? const SizedBox(height: 22, width: 22,
                             child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.white))
-                        : const Text('Kayıt Ol'),
+                        : Text(l10n.registerSubmitButton),
                   ),
                   const SizedBox(height: 20),
                 ],
