@@ -712,5 +712,27 @@
       "error": { "type": "String" }
     }
   },
-  "networkError": "Не удалось подключиться к серверу"
+  "networkError": "Не удалось подключиться к серверу",
+
+  "addItemTypeCreateTitle": "Создать новый тип",
+  "addItemTypeNameLabel": "Название типа",
+  "addItemTypeFieldsLabel": "Поля",
+
+  "onboardingCategoriesTitle": "Организуй с категориями",
+  "onboardingCategoriesSubtitle": "Группируй пароли по папкам. Папка «Без категории» всегда на месте и не может быть удалена.",
+  "onboardingCategoriesDefault": "Без категории",
+  "onboardingCategoriesDefaultLock": "Нельзя удалить или переименовать",
+  "onboardingCategoriesChipDefault": "Папка по умолчанию",
+  "onboardingCategoriesChipCustom": "Свои категории",
+  "onboardingCategoriesChipOrganize": "Упорядочить",
+
+  "onboardingTypesTitle": "Ускорься с шаблонами",
+  "onboardingTypesSubtitle": "Определи группы полей один раз. Они будут готовы при каждом добавлении нового пароля.",
+  "onboardingTypesWithout": "Без типа",
+  "onboardingTypesWith": "С типом",
+  "onboardingTypesWithoutDesc": "Добавить поле, ещё поле, ещё...",
+  "onboardingTypesWithDesc": "Поля уже готовы!",
+  "onboardingTypesChipTemplate": "Шаблон",
+  "onboardingTypesChipSpeed": "Быстрое сохранение",
+  "onboardingTypesChipCustomize": "Настроить"
 }

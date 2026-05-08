@@ -1597,7 +1597,7 @@ abstract class AppLocalizations {
   /// No description provided for @addItemTypeNameLabel.
   ///
   /// In tr, this message translates to:
-  /// **'Tür Adı'**
+  /// **'Tip Adı'**
   String get addItemTypeNameLabel;
 
   /// No description provided for @addItemTypeSelectIcon.
@@ -3225,6 +3225,114 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Sunucuya bağlanılamadı'**
   String get networkError;
+
+  /// No description provided for @addItemTypeCreateTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Tip Oluştur'**
+  String get addItemTypeCreateTitle;
+
+  /// No description provided for @addItemTypeFieldsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alanlar'**
+  String get addItemTypeFieldsLabel;
+
+  /// No description provided for @onboardingCategoriesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategorilerle düzenle'**
+  String get onboardingCategoriesTitle;
+
+  /// No description provided for @onboardingCategoriesSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifrelerini klasörler halinde grupla. Kategorisizler her zaman oradadır ve silinemez.'**
+  String get onboardingCategoriesSubtitle;
+
+  /// No description provided for @onboardingCategoriesDefault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategorisizler'**
+  String get onboardingCategoriesDefault;
+
+  /// No description provided for @onboardingCategoriesDefaultLock.
+  ///
+  /// In tr, this message translates to:
+  /// **'Silinemez & Düzenlenemez'**
+  String get onboardingCategoriesDefaultLock;
+
+  /// No description provided for @onboardingCategoriesChipDefault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Varsayılan Klasör'**
+  String get onboardingCategoriesChipDefault;
+
+  /// No description provided for @onboardingCategoriesChipCustom.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özel Kategoriler'**
+  String get onboardingCategoriesChipCustom;
+
+  /// No description provided for @onboardingCategoriesChipOrganize.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düzenle'**
+  String get onboardingCategoriesChipOrganize;
+
+  /// No description provided for @onboardingTypesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şablonlarla hızlan'**
+  String get onboardingTypesTitle;
+
+  /// No description provided for @onboardingTypesSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sık kullandığın alan gruplarını bir kez tanımla. Her yeni şifrede hazır gelsin.'**
+  String get onboardingTypesSubtitle;
+
+  /// No description provided for @onboardingTypesWithout.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tipsiz'**
+  String get onboardingTypesWithout;
+
+  /// No description provided for @onboardingTypesWith.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tip seçilince'**
+  String get onboardingTypesWith;
+
+  /// No description provided for @onboardingTypesWithoutDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alan ekle, alan ekle, alan ekle...'**
+  String get onboardingTypesWithoutDesc;
+
+  /// No description provided for @onboardingTypesWithDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alanlar hazır geliyor!'**
+  String get onboardingTypesWithDesc;
+
+  /// No description provided for @onboardingTypesChipTemplate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şablon'**
+  String get onboardingTypesChipTemplate;
+
+  /// No description provided for @onboardingTypesChipSpeed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hızlı Kayıt'**
+  String get onboardingTypesChipSpeed;
+
+  /// No description provided for @onboardingTypesChipCustomize.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özelleştir'**
+  String get onboardingTypesChipCustomize;
 }
 
 class _AppLocalizationsDelegate

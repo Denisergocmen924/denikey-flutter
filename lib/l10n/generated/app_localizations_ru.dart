@@ -1700,4 +1700,61 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get networkError => 'Не удалось подключиться к серверу';
+
+  @override
+  String get addItemTypeCreateTitle => 'Создать новый тип';
+
+  @override
+  String get addItemTypeFieldsLabel => 'Поля';
+
+  @override
+  String get onboardingCategoriesTitle => 'Организуй с категориями';
+
+  @override
+  String get onboardingCategoriesSubtitle =>
+      'Группируй пароли по папкам. Папка «Без категории» всегда на месте и не может быть удалена.';
+
+  @override
+  String get onboardingCategoriesDefault => 'Без категории';
+
+  @override
+  String get onboardingCategoriesDefaultLock =>
+      'Нельзя удалить или переименовать';
+
+  @override
+  String get onboardingCategoriesChipDefault => 'Папка по умолчанию';
+
+  @override
+  String get onboardingCategoriesChipCustom => 'Свои категории';
+
+  @override
+  String get onboardingCategoriesChipOrganize => 'Упорядочить';
+
+  @override
+  String get onboardingTypesTitle => 'Ускорься с шаблонами';
+
+  @override
+  String get onboardingTypesSubtitle =>
+      'Определи группы полей один раз. Они будут готовы при каждом добавлении нового пароля.';
+
+  @override
+  String get onboardingTypesWithout => 'Без типа';
+
+  @override
+  String get onboardingTypesWith => 'С типом';
+
+  @override
+  String get onboardingTypesWithoutDesc => 'Добавить поле, ещё поле, ещё...';
+
+  @override
+  String get onboardingTypesWithDesc => 'Поля уже готовы!';
+
+  @override
+  String get onboardingTypesChipTemplate => 'Шаблон';
+
+  @override
+  String get onboardingTypesChipSpeed => 'Быстрое сохранение';
+
+  @override
+  String get onboardingTypesChipCustomize => 'Настроить';
 }

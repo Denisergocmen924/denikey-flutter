@@ -816,7 +816,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get addItemNewItemType => 'Yeni Tür';
 
   @override
-  String get addItemTypeNameLabel => 'Tür Adı';
+  String get addItemTypeNameLabel => 'Tip Adı';
 
   @override
   String get addItemTypeSelectIcon => 'İkon Seç';
@@ -1696,4 +1696,60 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get networkError => 'Sunucuya bağlanılamadı';
+
+  @override
+  String get addItemTypeCreateTitle => 'Yeni Tip Oluştur';
+
+  @override
+  String get addItemTypeFieldsLabel => 'Alanlar';
+
+  @override
+  String get onboardingCategoriesTitle => 'Kategorilerle düzenle';
+
+  @override
+  String get onboardingCategoriesSubtitle =>
+      'Şifrelerini klasörler halinde grupla. Kategorisizler her zaman oradadır ve silinemez.';
+
+  @override
+  String get onboardingCategoriesDefault => 'Kategorisizler';
+
+  @override
+  String get onboardingCategoriesDefaultLock => 'Silinemez & Düzenlenemez';
+
+  @override
+  String get onboardingCategoriesChipDefault => 'Varsayılan Klasör';
+
+  @override
+  String get onboardingCategoriesChipCustom => 'Özel Kategoriler';
+
+  @override
+  String get onboardingCategoriesChipOrganize => 'Düzenle';
+
+  @override
+  String get onboardingTypesTitle => 'Şablonlarla hızlan';
+
+  @override
+  String get onboardingTypesSubtitle =>
+      'Sık kullandığın alan gruplarını bir kez tanımla. Her yeni şifrede hazır gelsin.';
+
+  @override
+  String get onboardingTypesWithout => 'Tipsiz';
+
+  @override
+  String get onboardingTypesWith => 'Tip seçilince';
+
+  @override
+  String get onboardingTypesWithoutDesc => 'Alan ekle, alan ekle, alan ekle...';
+
+  @override
+  String get onboardingTypesWithDesc => 'Alanlar hazır geliyor!';
+
+  @override
+  String get onboardingTypesChipTemplate => 'Şablon';
+
+  @override
+  String get onboardingTypesChipSpeed => 'Hızlı Kayıt';
+
+  @override
+  String get onboardingTypesChipCustomize => 'Özelleştir';
 }

@@ -6,6 +6,34 @@ import '../../categories/providers/category_provider.dart';
 import '../../item_types/providers/item_type_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
+// ─── Alan modeli ─────────────────────────────────────────────────────────────
+
+class _FieldEntry {
+  final int uid;
+  final String? backendFieldId;
+  final TextEditingController nameCtr;
+  final TextEditingController valueCtr;
+  bool isSecret;
+  bool obscure;
+  String? error;
+
+  _FieldEntry({
+    required this.uid,
+    this.backendFieldId,
+    String name = '',
+    this.isSecret = false,
+  })  : nameCtr = TextEditingController(text: name),
+        valueCtr = TextEditingController(),
+        obscure = isSecret;
+
+  void dispose() {
+    nameCtr.dispose();
+    valueCtr.dispose();
+  }
+}
+
+// ─── Ana ekran ────────────────────────────────────────────────────────────────
+
 class AddVaultItemScreen extends ConsumerStatefulWidget {
   const AddVaultItemScreen({super.key});
 
@@ -14,27 +42,15 @@ class AddVaultItemScreen extends ConsumerStatefulWidget {
 }
 
 class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
-  // Adımlar: 0 = kategori seç, 1 = tip seç, 2 = form
-  int _step = 0;
-
-  // Seçimler
+  int _step = 0; // 0 = kategori seç, 1 = form
   String? _selectedCategoryId;
   String? _selectedCategoryName;
   Map<String, dynamic>? _selectedItemType;
 
-  // Dinamik form controller'ları — field id → TextEditingController
-  final Map<String, TextEditingController> _fieldControllers = {};
-  final Map<String, bool> _obscureFields = {};
-
-  // Başlık alanı (her tip için ortak)
   final _titleCtrl = TextEditingController();
-
-  // Form hata mesajları
   String? _titleError;
-  final Map<String, String?> _fieldErrors = {};
-
-  // Ek özel alanlar
-  final List<Map<String, TextEditingController>> _extraFields = [];
+  final List<_FieldEntry> _fields = [];
+  int _uidCounter = 0;
 
   @override
   void initState() {
@@ -48,46 +64,54 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   @override
   void dispose() {
     _titleCtrl.dispose();
-    for (final ctrl in _fieldControllers.values) {
-      ctrl.dispose();
-    }
-    for (final f in _extraFields) {
-      f['key']!.dispose();
-      f['value']!.dispose();
+    for (final f in _fields) {
+      f.dispose();
     }
     super.dispose();
   }
 
-  // Item type seçildiğinde controller'ları hazırla
-  void _selectItemType(Map<String, dynamic> itemType) {
-    // Önceki controller'ları temizle
-    for (final ctrl in _fieldControllers.values) {
-      ctrl.dispose();
-    }
-    _fieldControllers.clear();
-    _obscureFields.clear();
+  _FieldEntry _newEntry({String name = '', bool isSecret = false, String? backendFieldId}) {
+    return _FieldEntry(uid: _uidCounter++, name: name, isSecret: isSecret, backendFieldId: backendFieldId);
+  }
 
-    final fields = itemType['fields'] as List<dynamic>? ?? [];
-    for (final field in fields) {
-      final id = field['id'] as String;
-      _fieldControllers[id] = TextEditingController();
-      _obscureFields[id] = field['field_type'] == 'secret';
+  void _selectType(Map<String, dynamic> type) {
+    for (final f in _fields) {
+      f.dispose();
+    }
+    _fields.clear();
+
+    final typeFields = type['fields'] as List<dynamic>? ?? [];
+    for (final f in typeFields) {
+      _fields.add(_newEntry(
+        name: f['field_name_tr'] as String? ?? '',
+        isSecret: f['field_type'] == 'secret',
+        backendFieldId: f['id'] as String?,
+      ));
     }
 
     setState(() {
-      _selectedItemType = itemType;
-      _fieldErrors.clear();
-      _step = 2;
+      _selectedItemType = type;
     });
   }
 
-  void _addExtraField() {
-    setState(() {
-      _extraFields.add({
-        'key': TextEditingController(),
-        'value': TextEditingController(),
-      });
-    });
+  void _deselectType() {
+    for (final f in _fields) {
+      f.dispose();
+    }
+    _fields.clear();
+    setState(() => _selectedItemType = null);
+  }
+
+  void _addField() {
+    setState(() => _fields.add(_newEntry()));
+  }
+
+  void _removeField(int uid) {
+    final idx = _fields.indexWhere((f) => f.uid == uid);
+    if (idx != -1) {
+      _fields[idx].dispose();
+      setState(() => _fields.removeAt(idx));
+    }
   }
 
   Future<void> _save() async {
@@ -99,52 +123,30 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       hasError = true;
     }
 
-    final fields = (_selectedItemType?['fields'] as List<dynamic>? ?? []);
-
-    for (final field in fields) {
-      final id = field['id'] as String;
-      final isRequired = field['is_required'] as bool? ?? false;
-      if (isRequired && (_fieldControllers[id]?.text.trim().isEmpty ?? true)) {
-        final label = field['field_name_tr'] as String? ?? 'Alan';
-        setState(() => _fieldErrors[id] = '$label boş bırakılamaz');
-        hasError = true;
-      }
-    }
-
     if (hasError) return;
 
-    // İlk secret alanı → password
+    // İlk secret alan → password
     String password = '';
-    String? firstSecretId;
-    for (final field in fields) {
-      if (field['field_type'] == 'secret') {
-        firstSecretId = field['id'] as String;
-        password = _fieldControllers[firstSecretId]?.text.trim() ?? '';
+    int? firstSecretIdx;
+    for (int i = 0; i < _fields.length; i++) {
+      if (_fields[i].isSecret) {
+        firstSecretIdx = i;
+        password = _fields[i].valueCtr.text.trim();
         break;
       }
     }
 
-    // Diğer alanlar → custom_fields_data
     final customFieldsData = <Map<String, String>>[];
-    for (final field in fields) {
-      final id = field['id'] as String;
-      if (id == firstSecretId) continue; // zaten password olarak kullanıldı
-      final value = _fieldControllers[id]?.text.trim() ?? '';
-      if (value.isNotEmpty) {
+    for (int i = 0; i < _fields.length; i++) {
+      if (i == firstSecretIdx) continue;
+      final name = _fields[i].nameCtr.text.trim();
+      final value = _fields[i].valueCtr.text.trim();
+      if (name.isNotEmpty) {
         customFieldsData.add({
-          'field_name': field['field_name_tr'] as String,
+          'field_name': name,
           'value': value,
-          'field_type': (_obscureFields[id] ?? false) ? 'secret' : 'text',
+          'field_type': _fields[i].isSecret ? 'secret' : 'text',
         });
-      }
-    }
-
-    // Ek özel alanlar
-    for (final f in _extraFields) {
-      final k = f['key']!.text.trim();
-      final v = f['value']!.text.trim();
-      if (k.isNotEmpty) {
-        customFieldsData.add({'field_name': k, 'value': v, 'field_type': 'text'});
       }
     }
 
@@ -174,19 +176,77 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   }
 
   void _goBack() {
-    if (_step == 2) {
-      setState(() => _step = 1);
-    } else if (_step == 1) {
+    if (_step == 1) {
       setState(() => _step = 0);
     } else {
       context.pop();
     }
   }
 
+  // ─── Kategori oluşturma sheet ─────────────────────────────────────────────
+
+  void _showCreateCategorySheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: const Color(0xFF0E1610),
+      builder: (ctx) => _CreateCategorySheet(
+        onCreated: (id, name) {
+          setState(() {
+            _selectedCategoryId = id;
+            _selectedCategoryName = name;
+            _step = 1;
+          });
+        },
+        onCreate: (name) async {
+          await ref.read(categoryProvider.notifier).createCategory(name, name, null, '#FF5900');
+          final cats = ref.read(categoryProvider).categories;
+          final newCat = cats.lastWhere(
+            (c) => c['name_tr'] == name || c['name_en'] == name,
+            orElse: () => <String, dynamic>{},
+          );
+          return (newCat['id'] as String?, name);
+        },
+      ),
+    );
+  }
+
+  // ─── Tip oluşturma sheet ──────────────────────────────────────────────────
+
+  void _showCreateTypeSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: const Color(0xFF0E1610),
+      builder: (ctx) => _CreateTypeSheet(
+        onCreate: (name, fields) async {
+          await ref.read(itemTypeProvider.notifier).createItemType(
+            name,
+            'category',
+            '#FF5900',
+            fields: fields,
+          );
+          final types = ref.read(itemTypeProvider).itemTypes;
+          final newType = types.lastWhere(
+            (t) => t['name_tr'] == name,
+            orElse: () => <String, dynamic>{},
+          );
+          if (newType.isNotEmpty) {
+            _selectType(newType);
+          }
+        },
+      ),
+    );
+  }
+
+  // ─── Build ───────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final titles = [l10n.addItemStep0, l10n.addItemStep1, l10n.addItemStep2];
+    final titles = [l10n.addItemStep0, l10n.addItemStep2];
     return Scaffold(
       appBar: AppBar(
         title: Text(titles[_step]),
@@ -195,15 +255,11 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           onPressed: _goBack,
         ),
       ),
-      body: [
-        _buildCategorySelection(),
-        _buildItemTypeSelection(),
-        _buildForm(),
-      ][_step],
+      body: _step == 0 ? _buildCategorySelection() : _buildForm(),
     );
   }
 
-  // ─── Adım 0: Kategori Seç ───────────────────────────────────────────────
+  // ─── Adım 0: Kategori Seç ────────────────────────────────────────────────
 
   Widget _buildCategorySelection() {
     final l10n = AppLocalizations.of(context);
@@ -220,7 +276,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           subtitle: l10n.addItemUncategorizedSubtitle,
           onTap: () {
             final uncategorized = categories.firstWhere(
-              (c) => c['name_en'] == 'Uncategorized',
+              (c) => c['is_system'] == true,
               orElse: () => <String, dynamic>{},
             );
             setState(() {
@@ -236,7 +292,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           color: const Color(0xFFFF5900),
           title: l10n.addItemCreateCategory,
           subtitle: l10n.addItemCreateCategorySubtitle,
-          onTap: _showCreateCategoryDialog,
+          onTap: _showCreateCategorySheet,
         ),
         const SizedBox(height: 16),
         if (state.status == CategoryStatus.loading)
@@ -248,7 +304,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                   fontWeight: FontWeight.w500,
                   color: Colors.grey.shade600)),
           const SizedBox(height: 8),
-          ...categories.where((c) => c['name_en'] != 'Uncategorized').map((cat) {
+          ...categories.where((c) => c['is_system'] != true).map((cat) {
             final color = _parseColor(cat['color']);
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -270,121 +326,111 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     );
   }
 
-  void _showCreateCategoryDialog() {
-    final nameCtrl = TextEditingController();
-    final l10n = AppLocalizations.of(context);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.addItemNewCategory),
-        content: TextField(
-          controller: nameCtrl,
-          decoration: InputDecoration(
-            labelText: l10n.addItemNewCategoryName,
-            border: const OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.addItemCancel)),
-          FilledButton(
-            onPressed: () async {
-              if (nameCtrl.text.trim().isEmpty) return;
-              await ref.read(categoryProvider.notifier).createCategory(
-                    nameCtrl.text.trim(),
-                    nameCtrl.text.trim(),
-                    null,
-                    '#FF5900',
+  // ─── Adım 1: Form + Sol Tip Paneli ───────────────────────────────────────
+
+  Widget _buildForm() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTypePanel(),
+        const VerticalDivider(width: 1, thickness: 1),
+        Expanded(child: _buildFormArea()),
+      ],
+    );
+  }
+
+  Widget _buildTypePanel() {
+    final state = ref.watch(itemTypeProvider);
+    final types = state.itemTypes;
+
+    return SizedBox(
+      width: 80,
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              children: [
+                ...types.map((type) {
+                  final isSelected = _selectedItemType?['id'] == type['id'];
+                  final color = isSelected
+                      ? const Color(0xFFFF5900)
+                      : const Color(0xFF9BABA4);
+                  final icon = _materialIcon(type['icon'] as String?);
+                  return GestureDetector(
+                    onTap: () {
+                      if (isSelected) {
+                        _deselectType();
+                      } else {
+                        _selectType(type);
+                      }
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: isSelected
+                            ? const Color(0xFFFF5900).withAlpha(20)
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFFFF5900).withAlpha(100)
+                              : Colors.transparent,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(icon, size: 22, color: color),
+                          const SizedBox(height: 4),
+                          Text(
+                            (type['name_tr'] as String? ?? ''),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: color,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
-              final cats = ref.read(categoryProvider).categories;
-              final newCat = cats.lastWhere(
-                (c) => c['name_en'] == nameCtrl.text.trim(),
-                orElse: () => <String, dynamic>{},
-              );
-              final catId = newCat['id'] as String?;
-              final catName = nameCtrl.text.trim();
-              if (ctx.mounted) Navigator.pop(ctx);
-              if (mounted) {
-                setState(() {
-                  _selectedCategoryId = catId;
-                  _selectedCategoryName = catName;
-                  _step = 1;
-                });
-              }
-            },
-            child: Text(l10n.addItemCategoryCreate),
+                }),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: IconButton(
+              onPressed: _showCreateTypeSheet,
+              icon: const Icon(Icons.add_circle_outline,
+                  color: Color(0xFFFF5900), size: 26),
+              tooltip: 'Yeni Tip',
+            ),
           ),
         ],
       ),
     );
   }
 
-  // ─── Adım 1: Öğe Tipi Seç ────────────────────────────────────────────────
-
-  Widget _buildItemTypeSelection() {
+  Widget _buildFormArea() {
     final l10n = AppLocalizations.of(context);
-    final state = ref.watch(itemTypeProvider);
-
-    if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state.error != null) {
-      return Center(child: Text(l10n.genericError(state.error ?? '')));
-    }
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text(l10n.addItemSelectType,
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey.shade600)),
-        const SizedBox(height: 8),
-        ...state.itemTypes.map((type) {
-          final color = _parseColor(type['color'] as String?);
-          final icon = _materialIcon(type['icon'] as String?);
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: _selectionTile(
-              icon: icon,
-              color: color,
-              title: type['name_tr'] as String? ?? type['name_en'] as String? ?? '',
-              subtitle: _fieldsSummary(type),
-              onTap: () => _selectItemType(type),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  String _fieldsSummary(Map<String, dynamic> type) {
-    final fields = type['fields'] as List<dynamic>? ?? [];
-    if (fields.isEmpty) return '';
-    final names = fields
-        .take(3)
-        .map((f) => f['field_name_tr'] as String? ?? '')
-        .where((n) => n.isNotEmpty)
-        .join(', ');
-    return fields.length > 3 ? '$names...' : names;
-  }
-
-  // ─── Adım 2: Dinamik Form ─────────────────────────────────────────────────
-
-  Widget _buildForm() {
-    final l10n = AppLocalizations.of(context);
-    final fields = (_selectedItemType?['fields'] as List<dynamic>? ?? [])
-      ..sort((a, b) => (a['sort_order'] as int).compareTo(b['sort_order'] as int));
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(12, 16, 16, 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Seçim özeti
-          _selectionSummaryRow(),
-          const SizedBox(height: 16),
+          _buildSelectionSummary(),
+          const SizedBox(height: 12),
 
           // Başlık
           TextField(
@@ -401,55 +447,18 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Item type alanları
-          ...fields.map((field) => _buildDynamicField(field)),
+          // Alanlar
+          ..._fields.asMap().entries.map((e) => _buildFieldRow(e.value)),
 
           const SizedBox(height: 8),
 
-          // Ek özel alanlar
-          ..._extraFields.asMap().entries.map((entry) {
-            final i = entry.key;
-            final f = entry.value;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: f['key'],
-                          decoration: InputDecoration(
-                            labelText: l10n.addItemExtraFieldKeyLabel,
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: f['value'],
-                          decoration: InputDecoration(
-                            labelText: l10n.addItemExtraFieldValueLabel,
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                    onPressed: () => setState(() => _extraFields.removeAt(i)),
-                  ),
-                ],
-              ),
-            );
-          }),
-
           OutlinedButton.icon(
-            onPressed: _addExtraField,
+            onPressed: _addField,
             icon: const Icon(Icons.add),
             label: Text(l10n.addItemAddFieldButton),
-            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFFF5900)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFFFF5900),
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -458,85 +467,120 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: Text(l10n.addItemSaveButton, style: const TextStyle(fontSize: 16)),
+            child: Text(l10n.addItemSaveButton,
+                style: const TextStyle(fontSize: 16)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDynamicField(Map<String, dynamic> field) {
-    final id = field['id'] as String;
-    final label = field['field_name_tr'] as String? ?? '';
-    final fieldType = field['field_type'] as String? ?? 'text';
-    final isRequired = field['is_required'] as bool? ?? false;
-    final isSecret = fieldType == 'secret';
-    final ctrl = _fieldControllers[id];
-    if (ctrl == null) return const SizedBox.shrink();
-
-    final textField = TextField(
-      controller: ctrl,
-      obscureText: _obscureFields[id] ?? false,
-      keyboardType: fieldType == 'number' ? TextInputType.number : TextInputType.text,
-      onChanged: (_) {
-        if (_fieldErrors[id] != null) setState(() => _fieldErrors[id] = null);
-      },
-      decoration: InputDecoration(
-        labelText: isRequired ? '$label *' : label,
-        errorText: _fieldErrors[id],
-        border: const OutlineInputBorder(),
-        suffixIcon: IconButton(
-          icon: Icon(
-            (_obscureFields[id] ?? false)
-                ? Icons.visibility_off
-                : Icons.visibility,
-          ),
-          onPressed: () => setState(
-            () => _obscureFields[id] = !(_obscureFields[id] ?? false),
-          ),
-        ),
-      ),
-    );
-
-    if (!isSecret) {
-      return Padding(
-          padding: const EdgeInsets.only(bottom: 12), child: textField);
-    }
-
+  Widget _buildFieldRow(_FieldEntry entry) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          textField,
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: ctrl,
-            builder: (_, value, __) =>
-                _PasswordStrengthIndicator(password: value.text),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Alan adı
+              SizedBox(
+                width: 110,
+                child: TextField(
+                  controller: entry.nameCtr,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context).addItemExtraFieldKeyLabel,
+                    border: const OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ),
+              const SizedBox(width: 6),
+              // Değer
+              Expanded(
+                child: TextField(
+                  controller: entry.valueCtr,
+                  obscureText: entry.obscure,
+                  onChanged: (_) {
+                    if (entry.error != null) setState(() => entry.error = null);
+                  },
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context).addItemExtraFieldValueLabel,
+                    errorText: entry.error,
+                    border: const OutlineInputBorder(),
+                    isDense: true,
+                    suffixIcon: entry.isSecret
+                        ? IconButton(
+                            iconSize: 18,
+                            icon: Icon(entry.obscure
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () =>
+                                setState(() => entry.obscure = !entry.obscure),
+                          )
+                        : null,
+                  ),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ),
+              // Gizle toggle
+              IconButton(
+                tooltip: entry.isSecret ? 'Gizli alan' : 'Normal alan',
+                icon: Icon(
+                  entry.isSecret ? Icons.lock_outline : Icons.lock_open_outlined,
+                  size: 18,
+                  color: entry.isSecret
+                      ? const Color(0xFFFF5900)
+                      : Colors.grey,
+                ),
+                onPressed: () =>
+                    setState(() => entry.isSecret = !entry.isSecret),
+              ),
+              // Sil
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline,
+                    color: Colors.red, size: 18),
+                onPressed: () => _removeField(entry.uid),
+              ),
+            ],
           ),
+          // Şifre güç göstergesi
+          if (entry.isSecret)
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: entry.valueCtr,
+              builder: (ctx2, v, child) =>
+                  _PasswordStrengthIndicator(password: v.text),
+            ),
         ],
       ),
     );
   }
 
-  Widget _selectionSummaryRow() {
+  Widget _buildSelectionSummary() {
+    if (_selectedCategoryName == null && _selectedItemType == null) {
+      return const SizedBox.shrink();
+    }
     final typeColor = _parseColor(_selectedItemType?['color'] as String?);
     final typeIcon = _materialIcon(_selectedItemType?['icon'] as String?);
     return Row(
       children: [
         if (_selectedCategoryName != null) ...[
-          const Icon(Icons.folder_outlined, size: 14, color: Color(0xFFFF5900)),
+          const Icon(Icons.folder_outlined,
+              size: 13, color: Color(0xFFFF5900)),
           const SizedBox(width: 4),
           Text(_selectedCategoryName!,
-              style: const TextStyle(color: Color(0xFFFF5900), fontSize: 12)),
-          const SizedBox(width: 12),
+              style: const TextStyle(
+                  color: Color(0xFFFF5900), fontSize: 11)),
+          const SizedBox(width: 10),
         ],
         if (_selectedItemType != null) ...[
-          Icon(typeIcon, size: 14, color: typeColor),
+          Icon(typeIcon, size: 13, color: typeColor),
           const SizedBox(width: 4),
           Text(
             _selectedItemType!['name_tr'] as String? ?? '',
-            style: TextStyle(color: typeColor, fontSize: 12),
+            style: TextStyle(color: typeColor, fontSize: 11),
           ),
         ],
       ],
@@ -563,11 +607,13 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           backgroundColor: color.withAlpha(30),
           child: Icon(icon, color: color, size: 20),
         ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        title:
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: subtitle.isNotEmpty
             ? Text(subtitle, style: const TextStyle(fontSize: 12))
             : null,
-        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+        trailing:
+            const Icon(Icons.chevron_right, color: Colors.grey),
         onTap: onTap,
       ),
     );
@@ -576,7 +622,8 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   Color _parseColor(String? hex) {
     if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
     try {
-      return Color(int.parse('FF${hex.replaceAll('#', '')}', radix: 16));
+      return Color(
+          int.parse('FF${hex.replaceAll('#', '')}', radix: 16));
     } catch (_) {
       return const Color(0xFFFF5900);
     }
@@ -603,6 +650,289 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     }
   }
 }
+
+// ─── Kategori oluşturma sheet ─────────────────────────────────────────────────
+
+class _CreateCategorySheet extends StatefulWidget {
+  final void Function(String? id, String name) onCreated;
+  final Future<(String?, String)> Function(String name) onCreate;
+
+  const _CreateCategorySheet(
+      {required this.onCreated, required this.onCreate});
+
+  @override
+  State<_CreateCategorySheet> createState() => _CreateCategorySheetState();
+}
+
+class _CreateCategorySheetState extends State<_CreateCategorySheet> {
+  final _nameCtrl = TextEditingController();
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_nameCtrl.text.trim().isEmpty) return;
+    setState(() => _loading = true);
+    final (id, name) = await widget.onCreate(_nameCtrl.text.trim());
+    if (mounted) {
+      Navigator.pop(context);
+      widget.onCreated(id, name);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 24,
+        right: 24,
+        top: 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.create_new_folder_outlined,
+                  color: Color(0xFFFF5900)),
+              const SizedBox(width: 10),
+              Text(
+                AppLocalizations.of(context).addItemNewCategory,
+                style: const TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _nameCtrl,
+            autofocus: true,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _save(),
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context).addItemNewCategoryName,
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: _loading ? null : _save,
+            style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14)),
+            child: _loading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2))
+                : Text(AppLocalizations.of(context).addItemCategoryCreate),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Tip oluşturma sheet ──────────────────────────────────────────────────────
+
+class _CreateTypeSheet extends StatefulWidget {
+  final Future<void> Function(
+      String name, List<Map<String, dynamic>> fields) onCreate;
+
+  const _CreateTypeSheet({required this.onCreate});
+
+  @override
+  State<_CreateTypeSheet> createState() => _CreateTypeSheetState();
+}
+
+class _CreateTypeSheetState extends State<_CreateTypeSheet> {
+  final _nameCtrl = TextEditingController();
+  final List<Map<String, TextEditingController>> _fieldRows = [];
+  final List<bool> _fieldSecrets = [];
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    for (final r in _fieldRows) {
+      r['name']!.dispose();
+    }
+    super.dispose();
+  }
+
+  void _addFieldRow() {
+    setState(() {
+      _fieldRows.add({'name': TextEditingController()});
+      _fieldSecrets.add(false);
+    });
+  }
+
+  void _removeFieldRow(int i) {
+    _fieldRows[i]['name']!.dispose();
+    setState(() {
+      _fieldRows.removeAt(i);
+      _fieldSecrets.removeAt(i);
+    });
+  }
+
+  Future<void> _save() async {
+    if (_nameCtrl.text.trim().isEmpty) return;
+    setState(() => _loading = true);
+    final fields = _fieldRows.asMap().entries.map((e) {
+      final name = e.value['name']!.text.trim();
+      return {
+        'field_name': name.isEmpty ? 'Alan ${e.key + 1}' : name,
+        'field_type': _fieldSecrets[e.key] ? 'secret' : 'text',
+        'is_required': false,
+      };
+    }).toList();
+
+    await widget.onCreate(_nameCtrl.text.trim(), fields);
+    if (mounted) Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (ctx, scrollCtrl) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          children: [
+            // Handle
+            Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade600,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  const Icon(Icons.extension_outlined,
+                      color: Color(0xFFFF5900)),
+                  const SizedBox(width: 10),
+                  Text(
+                    l10n.addItemTypeCreateTitle,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView(
+                controller: scrollCtrl,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                children: [
+                  TextField(
+                    controller: _nameCtrl,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: l10n.addItemTypeNameLabel,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.addItemTypeFieldsLabel,
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey.shade500),
+                  ),
+                  const SizedBox(height: 8),
+                  ..._fieldRows.asMap().entries.map((e) {
+                    final i = e.key;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: e.value['name'],
+                              decoration: InputDecoration(
+                                labelText: '${l10n.addItemExtraFieldKeyLabel} ${i + 1}',
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                              ),
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            tooltip: _fieldSecrets[i]
+                                ? 'Gizli alan'
+                                : 'Normal alan',
+                            icon: Icon(
+                              _fieldSecrets[i]
+                                  ? Icons.lock_outline
+                                  : Icons.lock_open_outlined,
+                              size: 18,
+                              color: _fieldSecrets[i]
+                                  ? const Color(0xFFFF5900)
+                                  : Colors.grey,
+                            ),
+                            onPressed: () => setState(
+                                () => _fieldSecrets[i] = !_fieldSecrets[i]),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.remove_circle_outline,
+                                color: Colors.red, size: 18),
+                            onPressed: () => _removeFieldRow(i),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  OutlinedButton.icon(
+                    onPressed: _addFieldRow,
+                    icon: const Icon(Icons.add, size: 16),
+                    label: Text(l10n.addItemAddFieldButton),
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFF5900)),
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton(
+                    onPressed: _loading ? null : _save,
+                    style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14)),
+                    child: _loading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : Text(l10n.addItemSaveButton),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Şifre güç göstergesi ─────────────────────────────────────────────────────
 
 class _PasswordStrengthIndicator extends StatelessWidget {
   final String password;
@@ -647,27 +977,30 @@ class _PasswordStrengthIndicator extends StatelessWidget {
     ];
     final color = _colors[level];
     return Padding(
-      padding: const EdgeInsets.only(top: 6, bottom: 2),
+      padding: const EdgeInsets.only(top: 4, bottom: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: List.generate(5, (i) => Expanded(
-              child: Container(
-                height: 4,
-                margin: EdgeInsets.only(right: i < 4 ? 4 : 0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(2),
-                  color: i <= level ? color : color.withAlpha(40),
+            children: List.generate(
+              5,
+              (i) => Expanded(
+                child: Container(
+                  height: 3,
+                  margin: EdgeInsets.only(right: i < 4 ? 4 : 0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    color: i <= level ? color : color.withAlpha(40),
+                  ),
                 ),
               ),
-            )),
+            ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
           Text(
             labels[level],
             style: TextStyle(
-                fontSize: 11, color: color, fontWeight: FontWeight.w500),
+                fontSize: 10, color: color, fontWeight: FontWeight.w500),
           ),
         ],
       ),

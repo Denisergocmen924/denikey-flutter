@@ -712,5 +712,27 @@
       "error": { "type": "String" }
     }
   },
-  "networkError": "Sunucuya bağlanılamadı"
+  "networkError": "Sunucuya bağlanılamadı",
+
+  "addItemTypeCreateTitle": "Yeni Tip Oluştur",
+  "addItemTypeNameLabel": "Tip Adı",
+  "addItemTypeFieldsLabel": "Alanlar",
+
+  "onboardingCategoriesTitle": "Kategorilerle düzenle",
+  "onboardingCategoriesSubtitle": "Şifrelerini klasörler halinde grupla. Kategorisizler her zaman oradadır ve silinemez.",
+  "onboardingCategoriesDefault": "Kategorisizler",
+  "onboardingCategoriesDefaultLock": "Silinemez & Düzenlenemez",
+  "onboardingCategoriesChipDefault": "Varsayılan Klasör",
+  "onboardingCategoriesChipCustom": "Özel Kategoriler",
+  "onboardingCategoriesChipOrganize": "Düzenle",
+
+  "onboardingTypesTitle": "Şablonlarla hızlan",
+  "onboardingTypesSubtitle": "Sık kullandığın alan gruplarını bir kez tanımla. Her yeni şifrede hazır gelsin.",
+  "onboardingTypesWithout": "Tipsiz",
+  "onboardingTypesWith": "Tip seçilince",
+  "onboardingTypesWithoutDesc": "Alan ekle, alan ekle, alan ekle...",
+  "onboardingTypesWithDesc": "Alanlar hazır geliyor!",
+  "onboardingTypesChipTemplate": "Şablon",
+  "onboardingTypesChipSpeed": "Hızlı Kayıt",
+  "onboardingTypesChipCustomize": "Özelleştir"
 }

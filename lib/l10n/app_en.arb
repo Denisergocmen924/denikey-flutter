@@ -712,5 +712,27 @@
       "error": { "type": "String" }
     }
   },
-  "networkError": "Could not connect to server"
+  "networkError": "Could not connect to server",
+
+  "addItemTypeCreateTitle": "Create New Type",
+  "addItemTypeNameLabel": "Type Name",
+  "addItemTypeFieldsLabel": "Fields",
+
+  "onboardingCategoriesTitle": "Organize with categories",
+  "onboardingCategoriesSubtitle": "Group your passwords into folders. Uncategorized is always there and cannot be deleted.",
+  "onboardingCategoriesDefault": "Uncategorized",
+  "onboardingCategoriesDefaultLock": "Cannot be deleted or renamed",
+  "onboardingCategoriesChipDefault": "Default Folder",
+  "onboardingCategoriesChipCustom": "Custom Categories",
+  "onboardingCategoriesChipOrganize": "Organize",
+
+  "onboardingTypesTitle": "Speed up with templates",
+  "onboardingTypesSubtitle": "Define your common field groups once. They'll be ready every time you add a new password.",
+  "onboardingTypesWithout": "Without a type",
+  "onboardingTypesWith": "With a type",
+  "onboardingTypesWithoutDesc": "Add field, add field, add field...",
+  "onboardingTypesWithDesc": "Fields are ready to go!",
+  "onboardingTypesChipTemplate": "Template",
+  "onboardingTypesChipSpeed": "Quick Save",
+  "onboardingTypesChipCustomize": "Customize"
 }

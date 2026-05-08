@@ -1698,4 +1698,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get networkError => 'Could not connect to server';
+
+  @override
+  String get addItemTypeCreateTitle => 'Create New Type';
+
+  @override
+  String get addItemTypeFieldsLabel => 'Fields';
+
+  @override
+  String get onboardingCategoriesTitle => 'Organize with categories';
+
+  @override
+  String get onboardingCategoriesSubtitle =>
+      'Group your passwords into folders. Uncategorized is always there and cannot be deleted.';
+
+  @override
+  String get onboardingCategoriesDefault => 'Uncategorized';
+
+  @override
+  String get onboardingCategoriesDefaultLock => 'Cannot be deleted or renamed';
+
+  @override
+  String get onboardingCategoriesChipDefault => 'Default Folder';
+
+  @override
+  String get onboardingCategoriesChipCustom => 'Custom Categories';
+
+  @override
+  String get onboardingCategoriesChipOrganize => 'Organize';
+
+  @override
+  String get onboardingTypesTitle => 'Speed up with templates';
+
+  @override
+  String get onboardingTypesSubtitle =>
+      'Define your common field groups once. They\'ll be ready every time you add a new password.';
+
+  @override
+  String get onboardingTypesWithout => 'Without a type';
+
+  @override
+  String get onboardingTypesWith => 'With a type';
+
+  @override
+  String get onboardingTypesWithoutDesc => 'Add field, add field, add field...';
+
+  @override
+  String get onboardingTypesWithDesc => 'Fields are ready to go!';
+
+  @override
+  String get onboardingTypesChipTemplate => 'Template';
+
+  @override
+  String get onboardingTypesChipSpeed => 'Quick Save';
+
+  @override
+  String get onboardingTypesChipCustomize => 'Customize';
 }

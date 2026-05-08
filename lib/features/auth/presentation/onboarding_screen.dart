@@ -61,7 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final isLast = _currentPage == 5;
+    final isLast = _currentPage == 6;
     return Scaffold(
       backgroundColor: _kOnyx,
       body: SafeArea(
@@ -74,7 +74,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${_currentPage + 1} / 6',
+                    '${_currentPage + 1} / 7',
                     style: const TextStyle(color: _muted, fontSize: 13),
                   ),
                   if (!isLast)
@@ -97,7 +97,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 children: [
                   _WelcomePage(pulseCtrl: _pulseCtrl),
                   const _VaultPage(),
-                  const _LibraryPage(),
+                  const _CategoriesPage(),
+                  const _TypesPage(),
                   const _GeneratorPage(),
                   const _SecurityPage(),
                   _ReadyPage(isReplay: widget.isReplay),
@@ -110,7 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               padding: const EdgeInsets.only(bottom: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(6, (i) {
+                children: List.generate(7, (i) {
                   final active = i == _currentPage;
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
@@ -478,109 +479,335 @@ class _MiniTag extends StatelessWidget {
   }
 }
 
-// ─── SAYFA 3: KÜTÜPHANE ─────────────────────────────────────────────────────
+// ─── SAYFA 3: KATEGORİLER ────────────────────────────────────────────────────
 
-class _LibraryPage extends StatelessWidget {
-  const _LibraryPage();
+class _CategoriesPage extends StatelessWidget {
+  const _CategoriesPage();
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return _PageShell(
-      visual: Column(
-        mainAxisSize: MainAxisSize.min,
+      visual: _MockCard(
+        padding: const EdgeInsets.all(0),
         children: [
-          Row(children: [
-            Expanded(child: _CategoryCard(
-              icon: Icons.language_outlined,
-              label: l10n.onboardingLibraryCategorySocialMedia,
-              count: l10n.onboardingLibraryPasswordCount(4),
-              color: _kOrange,
-            )),
-            const SizedBox(width: 10),
-            Expanded(child: _CategoryCard(
-              icon: Icons.account_balance_outlined,
-              label: l10n.onboardingLibraryCategoryBanking,
-              count: l10n.onboardingLibraryPasswordCount(2),
-              color: const Color(0xFF42A5F5),
-            )),
-          ]),
-          const SizedBox(height: 10),
-          Row(children: [
-            Expanded(child: _CategoryCard(
-              icon: Icons.work_outline,
-              label: l10n.onboardingLibraryCategoryWork,
-              count: l10n.onboardingLibraryPasswordCount(6),
-              color: const Color(0xFF66BB6A),
-            )),
-            const SizedBox(width: 10),
-            Expanded(child: _CategoryCard(
-              icon: Icons.devices_outlined,
-              label: l10n.onboardingLibraryCategoryDevices,
-              count: l10n.onboardingLibraryPasswordCount(3),
-              color: const Color(0xFFAB47BC),
-            )),
-          ]),
-          const SizedBox(height: 10),
-          _MockCard(padding: const EdgeInsets.all(12), children: [
-            Row(children: [
-              const Icon(Icons.grid_view_outlined, size: 14, color: _kOrange),
-              const SizedBox(width: 6),
-              Text(l10n.onboardingLibraryItemTypesHeader,
-                  style: const TextStyle(color: _kCream, fontSize: 12, fontWeight: FontWeight.w600)),
-            ]),
-            const SizedBox(height: 6),
-            Text(l10n.onboardingLibraryItemTypesDesc,
-                style: const TextStyle(color: _kMuted, fontSize: 11)),
-          ]),
+          // Sistem kategorisi — kilitli
+          _FolderRow(
+            icon: Icons.inbox_outlined,
+            color: const Color(0xFF888780),
+            label: l10n.onboardingCategoriesDefault,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    color: const Color(0xFFFF5900).withAlpha(20),
+                    border: Border.all(
+                        color: const Color(0xFFFF5900).withAlpha(60)),
+                  ),
+                  child: Text(
+                    l10n.onboardingCategoriesDefaultLock,
+                    style: const TextStyle(
+                        color: Color(0xFFFF5900),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(Icons.lock_outline, size: 14, color: Color(0xFF888780)),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFF1E2820)),
+          // Örnek kullanıcı kategorileri
+          _FolderRow(
+            icon: Icons.work_outline,
+            color: const Color(0xFF854F0B),
+            label: l10n.onboardingLibraryCategoryWork,
+            trailing: const Icon(Icons.chevron_right, size: 14, color: Color(0xFF9BABA4)),
+          ),
+          const Divider(height: 1, color: Color(0xFF1E2820)),
+          _FolderRow(
+            icon: Icons.language_outlined,
+            color: const Color(0xFF534AB7),
+            label: l10n.onboardingLibraryCategorySocialMedia,
+            trailing: const Icon(Icons.chevron_right, size: 14, color: Color(0xFF9BABA4)),
+          ),
+          const Divider(height: 1, color: Color(0xFF1E2820)),
+          // Yeni ekle butonu
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    color: _kOrange.withAlpha(20),
+                    border: Border.all(color: _kOrange.withAlpha(60)),
+                  ),
+                  child: const Icon(Icons.add, size: 16, color: _kOrange),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  l10n.addItemCreateCategory,
+                  style: const TextStyle(
+                      color: _kOrange,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
-      title: l10n.onboardingLibraryTitle,
-      subtitle: l10n.onboardingLibrarySubtitle,
+      title: l10n.onboardingCategoriesTitle,
+      subtitle: l10n.onboardingCategoriesSubtitle,
       chips: [
-        _FeatureChip(icon: Icons.folder_outlined, label: l10n.onboardingChipCategories),
-        _FeatureChip(icon: Icons.extension_outlined, label: l10n.onboardingChipItemTypes),
-        _FeatureChip(icon: Icons.add_box_outlined, label: l10n.onboardingChipCustomize),
+        _FeatureChip(icon: Icons.lock_outline, label: l10n.onboardingCategoriesChipDefault),
+        _FeatureChip(icon: Icons.folder_outlined, label: l10n.onboardingCategoriesChipCustom),
+        _FeatureChip(icon: Icons.sort_outlined, label: l10n.onboardingCategoriesChipOrganize),
       ],
     );
   }
 }
 
-class _CategoryCard extends StatelessWidget {
+class _FolderRow extends StatelessWidget {
   final IconData icon;
-  final String label;
-  final String count;
   final Color color;
+  final String label;
+  final Widget trailing;
 
-  const _CategoryCard({
+  const _FolderRow({
     required this.icon,
-    required this.label,
-    required this.count,
     required this.color,
+    required this.label,
+    required this.trailing,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: _kCard,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _kBorder),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 32, height: 32,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: color.withAlpha(25),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              color: color.withAlpha(30),
+            ),
+            child: Icon(icon, size: 15, color: color),
           ),
-          child: Icon(icon, size: 16, color: color),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(color: _kCream, fontSize: 12, fontWeight: FontWeight.w600)),
-        Text(count, style: const TextStyle(color: _kMuted, fontSize: 10)),
-      ]),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                  color: _kCream, fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+          ),
+          trailing,
+        ],
+      ),
+    );
+  }
+}
+
+// ─── SAYFA 4: TİPLER ────────────────────────────────────────────────────────
+
+class _TypesPage extends StatefulWidget {
+  const _TypesPage();
+
+  @override
+  State<_TypesPage> createState() => _TypesPageState();
+}
+
+class _TypesPageState extends State<_TypesPage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _fade;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 700));
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
+    Future.delayed(const Duration(milliseconds: 900), () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _PageShell(
+      visual: Row(
+        children: [
+          // Sol: tipsiz
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(l10n.onboardingTypesWithout,
+                    style: const TextStyle(
+                        color: _kMuted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                _MockCard(
+                  padding: const EdgeInsets.all(10),
+                  children: [
+                    _EmptyFieldHint(),
+                    const SizedBox(height: 6),
+                    _EmptyFieldHint(),
+                    const SizedBox(height: 6),
+                    _EmptyFieldHint(),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 26,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                            color: const Color(0xFF1E2820)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.add, size: 12, color: _kMuted),
+                          const SizedBox(width: 4),
+                          Text(l10n.addItemAddFieldButton,
+                              style: const TextStyle(
+                                  color: _kMuted, fontSize: 10)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Sağ: tip seçilince
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(l10n.onboardingTypesWith,
+                    style: const TextStyle(
+                        color: _kOrange,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                // Tip kartı
+                FadeTransition(
+                  opacity: _fade,
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: _kOrange.withAlpha(20),
+                      border:
+                          Border.all(color: _kOrange.withAlpha(80)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.lock_outline,
+                            size: 14, color: _kOrange),
+                        const SizedBox(width: 6),
+                        const Text('Giriş Bilgileri',
+                            style: TextStyle(
+                                color: _kOrange,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700)),
+                      ],
+                    ),
+                  ),
+                ),
+                _MockCard(
+                  padding: const EdgeInsets.all(10),
+                  children: [
+                    FadeTransition(
+                        opacity: _fade,
+                        child: _FilledFieldHint('Kullanıcı Adı')),
+                    const SizedBox(height: 6),
+                    FadeTransition(
+                        opacity: _fade,
+                        child: _FilledFieldHint('Şifre', isSecret: true)),
+                    const SizedBox(height: 6),
+                    FadeTransition(
+                        opacity: _fade, child: _FilledFieldHint('Not')),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      title: l10n.onboardingTypesTitle,
+      subtitle: l10n.onboardingTypesSubtitle,
+      chips: [
+        _FeatureChip(icon: Icons.extension_outlined, label: l10n.onboardingTypesChipTemplate),
+        _FeatureChip(icon: Icons.bolt_outlined, label: l10n.onboardingTypesChipSpeed),
+        _FeatureChip(icon: Icons.tune_outlined, label: l10n.onboardingTypesChipCustomize),
+      ],
+    );
+  }
+}
+
+class _EmptyFieldHint extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 28,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        color: const Color(0xFF1A2020),
+        border: Border.all(color: const Color(0xFF1E2820)),
+      ),
+    );
+  }
+}
+
+class _FilledFieldHint extends StatelessWidget {
+  final String label;
+  final bool isSecret;
+  const _FilledFieldHint(this.label, {this.isSecret = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 28,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        color: const Color(0xFF1A2020),
+        border: Border.all(color: _kOrange.withAlpha(60)),
+      ),
+      child: Row(
+        children: [
+          Text(label,
+              style: const TextStyle(color: _kMuted, fontSize: 10)),
+          const Spacer(),
+          if (isSecret)
+            const Icon(Icons.visibility_off_outlined,
+                size: 12, color: _kMuted),
+        ],
+      ),
     );
   }
 }
