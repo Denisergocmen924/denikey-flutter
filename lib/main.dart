@@ -238,6 +238,7 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindingObserver {
   bool _wasBlurred = false;
   DateTime? _blurTime;
+  Timer? _boundsTimer;
 
   @override
   void initState() {
@@ -251,6 +252,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
 
   @override
   void dispose() {
+    _boundsTimer?.cancel();
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       windowManager.removeListener(this);
     } else {
@@ -258,6 +260,27 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
     }
     super.dispose();
   }
+
+  void _saveWindowBounds() {
+    _boundsTimer?.cancel();
+    _boundsTimer = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final size  = await windowManager.getSize();
+        final pos   = await windowManager.getPosition();
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setDouble('win_w', size.width);
+        prefs.setDouble('win_h', size.height);
+        prefs.setDouble('win_x', pos.dx);
+        prefs.setDouble('win_y', pos.dy);
+      } catch (_) {}
+    });
+  }
+
+  @override
+  void onWindowResize() => _saveWindowBounds();
+
+  @override
+  void onWindowMove() => _saveWindowBounds();
 
   // Android / iOS yaşam döngüsü
   @override
@@ -298,16 +321,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
   @override
   void onWindowClose() async {
     if (!Platform.isWindows) return;
-    // Pencere boyutunu kaydet, sonra hemen çık
-    try {
-      final size  = await windowManager.getSize();
-      final pos   = await windowManager.getPosition();
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setDouble('win_w', size.width);
-      prefs.setDouble('win_h', size.height);
-      prefs.setDouble('win_x', pos.dx);
-      prefs.setDouble('win_y', pos.dy);
-    } catch (_) {}
+    await TrayService.instance.destroy();
     exit(0);
   }
 
