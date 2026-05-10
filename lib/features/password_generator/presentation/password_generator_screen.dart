@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/password_generator_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../../../core/presentation/app_nav_bar.dart';
 
 class PasswordGeneratorScreen extends ConsumerWidget {
   const PasswordGeneratorScreen({super.key});
@@ -15,6 +16,7 @@ class PasswordGeneratorScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.passwordGeneratorTitle)),
+      bottomNavigationBar: const AppNavBar(currentIndex: 3),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(

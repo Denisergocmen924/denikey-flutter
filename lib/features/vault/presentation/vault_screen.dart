@@ -249,7 +249,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 ),
               ],
             ),
-      bottomNavigationBar: _selectionMode ? null : const AppNavBar(currentIndex: 0),
+      bottomNavigationBar: _selectionMode ? null : const AppNavBar(currentIndex: 2),
       body: Column(
         children: [
           // Çevrimdışı banner

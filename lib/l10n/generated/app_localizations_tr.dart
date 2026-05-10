@@ -1410,10 +1410,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get forceUpdatePermissionUnderstand => 'Anladım';
 
   @override
-  String get navBarVault => 'Kasam';
+  String get navBarSupport => 'Destek';
 
   @override
   String get navBarLibrary => 'Kütüphane';
+
+  @override
+  String get navBarVault => 'Kasam';
+
+  @override
+  String get navBarGenerator => 'Üretici';
 
   @override
   String get navBarSettings => 'Ayarlar';
@@ -1792,6 +1798,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get trayExit => 'Çıkış';
+
+  @override
+  String get shortcutSupport => 'Destek Talebi';
 
   @override
   String get shortcutVault => 'Kasama git';

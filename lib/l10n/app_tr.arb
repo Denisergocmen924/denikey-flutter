@@ -596,8 +596,10 @@
   "forceUpdatePermissionOpenSettings": "Ayarları Aç",
   "forceUpdatePermissionUnderstand": "Anladım",
 
-  "navBarVault": "Kasam",
+  "navBarSupport": "Destek",
   "navBarLibrary": "Kütüphane",
+  "navBarVault": "Kasam",
+  "navBarGenerator": "Üretici",
   "navBarSettings": "Ayarlar",
 
   "desktopOnboardingTitle": "Masaüstü Kısayolları",
@@ -751,6 +753,7 @@
   "trayOpen": "DeniKey'i Aç",
   "trayExit": "Çıkış",
 
+  "shortcutSupport": "Destek Talebi",
   "shortcutVault": "Kasama git",
   "shortcutLibrary": "Kütüphaneye git",
   "shortcutSettings": "Ayarlara git",

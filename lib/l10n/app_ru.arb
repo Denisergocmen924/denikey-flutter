@@ -596,8 +596,10 @@
   "forceUpdatePermissionOpenSettings": "Открыть настройки",
   "forceUpdatePermissionUnderstand": "Понятно",
 
-  "navBarVault": "Мой сейф",
+  "navBarSupport": "Поддержка",
   "navBarLibrary": "Библиотека",
+  "navBarVault": "Мой сейф",
+  "navBarGenerator": "Генератор",
   "navBarSettings": "Настройки",
 
   "desktopOnboardingTitle": "Горячие клавиши",
@@ -751,6 +753,7 @@
   "trayOpen": "Открыть DeniKey",
   "trayExit": "Выход",
 
+  "shortcutSupport": "Служба поддержки",
   "shortcutVault": "Перейти в хранилище",
   "shortcutLibrary": "Перейти в библиотеку",
   "shortcutSettings": "Перейти в настройки",

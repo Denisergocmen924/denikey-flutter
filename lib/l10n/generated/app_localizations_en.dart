@@ -1412,10 +1412,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forceUpdatePermissionUnderstand => 'Got It';
 
   @override
-  String get navBarVault => 'My Vault';
+  String get navBarSupport => 'Support';
 
   @override
   String get navBarLibrary => 'Library';
+
+  @override
+  String get navBarVault => 'My Vault';
+
+  @override
+  String get navBarGenerator => 'Generator';
 
   @override
   String get navBarSettings => 'Settings';
@@ -1793,6 +1799,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trayExit => 'Exit';
+
+  @override
+  String get shortcutSupport => 'Support Ticket';
 
   @override
   String get shortcutVault => 'Go to Vault';

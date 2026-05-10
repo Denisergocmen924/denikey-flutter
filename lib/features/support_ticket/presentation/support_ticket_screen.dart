@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/support_ticket_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../../../core/presentation/app_nav_bar.dart';
 
 class SupportTicketScreen extends ConsumerStatefulWidget {
   const SupportTicketScreen({super.key});
@@ -223,6 +224,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.supportTicketTitle)),
+      bottomNavigationBar: const AppNavBar(currentIndex: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(

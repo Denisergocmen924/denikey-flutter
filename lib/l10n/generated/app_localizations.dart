@@ -2710,17 +2710,29 @@ abstract class AppLocalizations {
   /// **'Anladım'**
   String get forceUpdatePermissionUnderstand;
 
-  /// No description provided for @navBarVault.
+  /// No description provided for @navBarSupport.
   ///
   /// In tr, this message translates to:
-  /// **'Kasam'**
-  String get navBarVault;
+  /// **'Destek'**
+  String get navBarSupport;
 
   /// No description provided for @navBarLibrary.
   ///
   /// In tr, this message translates to:
   /// **'Kütüphane'**
   String get navBarLibrary;
+
+  /// No description provided for @navBarVault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kasam'**
+  String get navBarVault;
+
+  /// No description provided for @navBarGenerator.
+  ///
+  /// In tr, this message translates to:
+  /// **'Üretici'**
+  String get navBarGenerator;
 
   /// No description provided for @navBarSettings.
   ///
@@ -3405,6 +3417,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Çıkış'**
   String get trayExit;
+
+  /// No description provided for @shortcutSupport.
+  ///
+  /// In tr, this message translates to:
+  /// **'Destek Talebi'**
+  String get shortcutSupport;
 
   /// No description provided for @shortcutVault.
   ///

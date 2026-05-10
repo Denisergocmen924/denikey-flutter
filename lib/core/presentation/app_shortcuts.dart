@@ -61,34 +61,43 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
     // --- Ctrl kısayolları ---
     if (ctrl && !inText) {
       if (key == LogicalKeyboardKey.digit1) {
-        router.go('/vault');       return true;
+        router.go('/support-ticket');      return true;
       }
       if (key == LogicalKeyboardKey.digit2) {
-        router.go('/categories');  return true;
+        router.go('/categories');          return true;
       }
       if (key == LogicalKeyboardKey.digit3) {
-        router.go('/settings');    return true;
+        router.go('/vault');               return true;
+      }
+      if (key == LogicalKeyboardKey.digit4 ||
+          key == LogicalKeyboardKey.keyG) {
+        router.go('/password-generator'); return true;
+      }
+      if (key == LogicalKeyboardKey.digit5) {
+        router.go('/settings');            return true;
       }
       if (key == LogicalKeyboardKey.keyF) {
-        router.push('/search');    return true;
+        router.push('/search');            return true;
       }
       if (key == LogicalKeyboardKey.keyN) {
-        router.push('/add-item');  return true;
-      }
-      if (key == LogicalKeyboardKey.keyG) {
-        router.push('/password-generator'); return true;
+        router.push('/add-item');          return true;
       }
     }
 
     // --- Ok tuşları: sekmeler arası ---
+    // Sıra: support-ticket(0) → categories(1) → vault(2) → password-generator(3) → settings(4)
     if (!inText) {
       if (key == LogicalKeyboardKey.arrowLeft) {
-        if (loc.startsWith('/categories')) { router.go('/vault');      return true; }
-        if (loc.startsWith('/settings'))   { router.go('/categories'); return true; }
+        if (loc.startsWith('/categories'))        { router.go('/support-ticket');      return true; }
+        if (loc.startsWith('/vault'))             { router.go('/categories');           return true; }
+        if (loc.startsWith('/password-generator')){ router.go('/vault');               return true; }
+        if (loc.startsWith('/settings'))          { router.go('/password-generator'); return true; }
       }
       if (key == LogicalKeyboardKey.arrowRight) {
-        if (loc.startsWith('/vault'))      { router.go('/categories'); return true; }
-        if (loc.startsWith('/categories')) { router.go('/settings');   return true; }
+        if (loc.startsWith('/support-ticket'))    { router.go('/categories');           return true; }
+        if (loc.startsWith('/categories'))        { router.go('/vault');               return true; }
+        if (loc.startsWith('/vault'))             { router.go('/password-generator'); return true; }
+        if (loc.startsWith('/password-generator')){ router.go('/settings');            return true; }
       }
 
       // + → Yeni şifre (kasam ekranı)
@@ -124,12 +133,13 @@ class ShortcutHintCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
     final shortcuts = [
-      ('Ctrl + 1', l10n.shortcutVault),
+      ('Ctrl + 1', l10n.shortcutSupport),
       ('Ctrl + 2', l10n.shortcutLibrary),
-      ('Ctrl + 3', l10n.shortcutSettings),
+      ('Ctrl + 3', l10n.shortcutVault),
+      ('Ctrl + 4 / Ctrl + G', l10n.shortcutGenerator),
+      ('Ctrl + 5', l10n.shortcutSettings),
       ('Ctrl + N', l10n.shortcutNewPassword),
       ('Ctrl + F', l10n.shortcutSearch),
-      ('Ctrl + G', l10n.shortcutGenerator),
       ('+ / NumPad+', l10n.shortcutNewPasswordVault),
       ('← →', l10n.shortcutTabSwitch),
       ('Escape', l10n.shortcutBack),

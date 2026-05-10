@@ -1411,10 +1411,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get forceUpdatePermissionUnderstand => 'Понятно';
 
   @override
-  String get navBarVault => 'Мой сейф';
+  String get navBarSupport => 'Поддержка';
 
   @override
   String get navBarLibrary => 'Библиотека';
+
+  @override
+  String get navBarVault => 'Мой сейф';
+
+  @override
+  String get navBarGenerator => 'Генератор';
 
   @override
   String get navBarSettings => 'Настройки';
@@ -1796,6 +1802,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get trayExit => 'Выход';
+
+  @override
+  String get shortcutSupport => 'Служба поддержки';
 
   @override
   String get shortcutVault => 'Перейти в хранилище';

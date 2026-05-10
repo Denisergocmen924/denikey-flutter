@@ -13,24 +13,33 @@ class AppNavBar extends StatelessWidget {
       selectedIndex: currentIndex,
       onDestinationSelected: (index) {
         switch (index) {
-          case 0:
-            context.go('/vault');
-          case 1:
-            context.go('/categories');
-          case 2:
-            context.go('/settings');
+          case 0: context.go('/support-ticket');
+          case 1: context.go('/categories');
+          case 2: context.go('/vault');
+          case 3: context.go('/password-generator');
+          case 4: context.go('/settings');
         }
       },
       destinations: [
+        NavigationDestination(
+          icon: const Icon(Icons.support_agent_outlined),
+          selectedIcon: const Icon(Icons.support_agent),
+          label: l10n.navBarSupport,
+        ),
+        NavigationDestination(
+          icon: const Icon(Icons.grid_view_outlined),
+          selectedIcon: const Icon(Icons.grid_view),
+          label: l10n.navBarLibrary,
+        ),
         NavigationDestination(
           icon: const Icon(Icons.shield_outlined),
           selectedIcon: const Icon(Icons.shield),
           label: l10n.navBarVault,
         ),
         NavigationDestination(
-          icon: const Icon(Icons.grid_view_outlined),
-          selectedIcon: const Icon(Icons.grid_view),
-          label: l10n.navBarLibrary,
+          icon: const Icon(Icons.password_outlined),
+          selectedIcon: const Icon(Icons.password),
+          label: l10n.navBarGenerator,
         ),
         NavigationDestination(
           icon: const Icon(Icons.settings_outlined),

@@ -596,8 +596,10 @@
   "forceUpdatePermissionOpenSettings": "Open Settings",
   "forceUpdatePermissionUnderstand": "Got It",
 
-  "navBarVault": "My Vault",
+  "navBarSupport": "Support",
   "navBarLibrary": "Library",
+  "navBarVault": "My Vault",
+  "navBarGenerator": "Generator",
   "navBarSettings": "Settings",
 
   "desktopOnboardingTitle": "Desktop Shortcuts",
@@ -751,6 +753,7 @@
   "trayOpen": "Open DeniKey",
   "trayExit": "Exit",
 
+  "shortcutSupport": "Support Ticket",
   "shortcutVault": "Go to Vault",
   "shortcutLibrary": "Go to Library",
   "shortcutSettings": "Go to Settings",

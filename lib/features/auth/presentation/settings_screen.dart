@@ -302,7 +302,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
-      bottomNavigationBar: const AppNavBar(currentIndex: 2),
+      bottomNavigationBar: const AppNavBar(currentIndex: 4),
       body: ListView(
         children: [
           // Kullanıcı bilgisi
