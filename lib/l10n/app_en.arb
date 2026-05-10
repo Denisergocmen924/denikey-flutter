@@ -734,5 +734,52 @@
   "onboardingTypesWithDesc": "Fields are ready to go!",
   "onboardingTypesChipTemplate": "Template",
   "onboardingTypesChipSpeed": "Quick Save",
-  "onboardingTypesChipCustomize": "Customize"
+  "onboardingTypesChipCustomize": "Customize",
+
+  "notifAutoLockTitle": "DeniKey Locked",
+  "notifAutoLockBody": "Auto-lock activated. Enter your master password to continue.",
+  "notifNewDeviceTitle": "New Device Login",
+  "notifNewDeviceBody": "A new device attempted to access your account. If this wasn't you, change your password immediately.",
+  "notifChannelName": "DeniKey Notifications",
+  "notifChannelDesc": "Security reminders and important notifications",
+
+  "biometricFaceLabel": "Unlock with Face ID",
+  "biometricFingerprintLabel": "Unlock with Fingerprint",
+  "biometricPinLabel": "Unlock with Device PIN",
+  "biometricReason": "Authenticate to access DeniKey",
+
+  "trayOpen": "Open DeniKey",
+  "trayExit": "Exit",
+
+  "shortcutVault": "Go to Vault",
+  "shortcutLibrary": "Go to Library",
+  "shortcutSettings": "Go to Settings",
+  "shortcutNewPassword": "Add new password",
+  "shortcutSearch": "Search",
+  "shortcutGenerator": "Password Generator",
+  "shortcutNewPasswordVault": "New password (vault screen)",
+  "shortcutTabSwitch": "Switch between tabs",
+  "shortcutBack": "Go back",
+
+  "authLoadingLogin": "Signing in...",
+  "authLoadingRegister": "Creating account...",
+  "authErrorLogin": "Login failed.",
+  "authErrorRegister": "Registration failed.",
+
+  "vaultLoadingVault": "Loading vault...",
+  "vaultLoadingSaving": "Saving...",
+  "vaultLoadingUpdating": "Updating...",
+  "vaultLoadingDeleting": "Deleting...",
+  "vaultLoadingMoving": "Moving...",
+  "vaultLoadingDeletingCount": "Deleting {count} records...",
+  "vaultErrorTimeout": "Server did not respond. Please try again.",
+  "vaultErrorLoad": "Could not load.",
+  "vaultErrorOffline": "No internet connection.",
+  "vaultSampleTitle": "DeniKey Sample Entry",
+  "vaultSampleNotes": "This is an automatically created sample entry. You can delete it after adding your own account details.",
+
+  "errorCouldNotLoad": "Could not load",
+  "errorCouldNotCreate": "Could not create",
+  "errorCouldNotUpdate": "Could not update",
+  "errorCouldNotDelete": "Could not delete"
 }

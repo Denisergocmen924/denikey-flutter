@@ -734,5 +734,57 @@
   "onboardingTypesWithDesc": "Alanlar hazır geliyor!",
   "onboardingTypesChipTemplate": "Şablon",
   "onboardingTypesChipSpeed": "Hızlı Kayıt",
-  "onboardingTypesChipCustomize": "Özelleştir"
+  "onboardingTypesChipCustomize": "Özelleştir",
+
+  "notifAutoLockTitle": "DeniKey Kilitlendi",
+  "notifAutoLockBody": "Otomatik kilit devreye girdi. Devam etmek için master şifrenizi girin.",
+  "notifNewDeviceTitle": "Yeni Cihaz Girişi",
+  "notifNewDeviceBody": "Hesabınıza yeni bir cihazdan giriş denemesi var. Siz değilseniz şifrenizi hemen değiştirin.",
+  "notifChannelName": "DeniKey Bildirimleri",
+  "notifChannelDesc": "Güvenlik hatırlatıcıları ve önemli bildirimler",
+
+  "biometricFaceLabel": "Yüz Tanıma ile Aç",
+  "biometricFingerprintLabel": "Parmak İzi ile Aç",
+  "biometricPinLabel": "Cihaz Kilidi ile Aç",
+  "biometricReason": "DeniKey'e erişmek için kimliğinizi doğrulayın",
+
+  "trayOpen": "DeniKey'i Aç",
+  "trayExit": "Çıkış",
+
+  "shortcutVault": "Kasama git",
+  "shortcutLibrary": "Kütüphaneye git",
+  "shortcutSettings": "Ayarlara git",
+  "shortcutNewPassword": "Yeni şifre ekle",
+  "shortcutSearch": "Arama",
+  "shortcutGenerator": "Şifre Üretici",
+  "shortcutNewPasswordVault": "Yeni şifre (kasam ekranı)",
+  "shortcutTabSwitch": "Sekmeler arası geçiş",
+  "shortcutBack": "Geri git",
+
+  "authLoadingLogin": "Giriş yapılıyor...",
+  "authLoadingRegister": "Hesap oluşturuluyor...",
+  "authErrorLogin": "Giriş başarısız.",
+  "authErrorRegister": "Kayıt başarısız.",
+
+  "vaultLoadingVault": "Kasa yükleniyor...",
+  "vaultLoadingSaving": "Kaydediliyor...",
+  "vaultLoadingUpdating": "Güncelleniyor...",
+  "vaultLoadingDeleting": "Siliniyor...",
+  "vaultLoadingMoving": "Taşınıyor...",
+  "vaultLoadingDeletingCount": "{count} kayıt siliniyor...",
+  "@vaultLoadingDeletingCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vaultErrorTimeout": "Sunucu yanıt vermedi. Lütfen tekrar deneyin.",
+  "vaultErrorLoad": "Yüklenemedi.",
+  "vaultErrorOffline": "İnternet bağlantısı yok.",
+  "vaultSampleTitle": "DeniKey Örnek Kayıt",
+  "vaultSampleNotes": "Bu otomatik oluşturulan bir örnek kayıttır. Kendi hesap bilgilerinizi ekledikten sonra silebilirsiniz.",
+
+  "errorCouldNotLoad": "Yüklenemedi",
+  "errorCouldNotCreate": "Oluşturulamadı",
+  "errorCouldNotUpdate": "Güncellenemedi",
+  "errorCouldNotDelete": "Silinemedi"
 }

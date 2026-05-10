@@ -1752,4 +1752,132 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingTypesChipCustomize => 'Özelleştir';
+
+  @override
+  String get notifAutoLockTitle => 'DeniKey Kilitlendi';
+
+  @override
+  String get notifAutoLockBody =>
+      'Otomatik kilit devreye girdi. Devam etmek için master şifrenizi girin.';
+
+  @override
+  String get notifNewDeviceTitle => 'Yeni Cihaz Girişi';
+
+  @override
+  String get notifNewDeviceBody =>
+      'Hesabınıza yeni bir cihazdan giriş denemesi var. Siz değilseniz şifrenizi hemen değiştirin.';
+
+  @override
+  String get notifChannelName => 'DeniKey Bildirimleri';
+
+  @override
+  String get notifChannelDesc =>
+      'Güvenlik hatırlatıcıları ve önemli bildirimler';
+
+  @override
+  String get biometricFaceLabel => 'Yüz Tanıma ile Aç';
+
+  @override
+  String get biometricFingerprintLabel => 'Parmak İzi ile Aç';
+
+  @override
+  String get biometricPinLabel => 'Cihaz Kilidi ile Aç';
+
+  @override
+  String get biometricReason =>
+      'DeniKey\'e erişmek için kimliğinizi doğrulayın';
+
+  @override
+  String get trayOpen => 'DeniKey\'i Aç';
+
+  @override
+  String get trayExit => 'Çıkış';
+
+  @override
+  String get shortcutVault => 'Kasama git';
+
+  @override
+  String get shortcutLibrary => 'Kütüphaneye git';
+
+  @override
+  String get shortcutSettings => 'Ayarlara git';
+
+  @override
+  String get shortcutNewPassword => 'Yeni şifre ekle';
+
+  @override
+  String get shortcutSearch => 'Arama';
+
+  @override
+  String get shortcutGenerator => 'Şifre Üretici';
+
+  @override
+  String get shortcutNewPasswordVault => 'Yeni şifre (kasam ekranı)';
+
+  @override
+  String get shortcutTabSwitch => 'Sekmeler arası geçiş';
+
+  @override
+  String get shortcutBack => 'Geri git';
+
+  @override
+  String get authLoadingLogin => 'Giriş yapılıyor...';
+
+  @override
+  String get authLoadingRegister => 'Hesap oluşturuluyor...';
+
+  @override
+  String get authErrorLogin => 'Giriş başarısız.';
+
+  @override
+  String get authErrorRegister => 'Kayıt başarısız.';
+
+  @override
+  String get vaultLoadingVault => 'Kasa yükleniyor...';
+
+  @override
+  String get vaultLoadingSaving => 'Kaydediliyor...';
+
+  @override
+  String get vaultLoadingUpdating => 'Güncelleniyor...';
+
+  @override
+  String get vaultLoadingDeleting => 'Siliniyor...';
+
+  @override
+  String get vaultLoadingMoving => 'Taşınıyor...';
+
+  @override
+  String vaultLoadingDeletingCount(int count) {
+    return '$count kayıt siliniyor...';
+  }
+
+  @override
+  String get vaultErrorTimeout =>
+      'Sunucu yanıt vermedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get vaultErrorLoad => 'Yüklenemedi.';
+
+  @override
+  String get vaultErrorOffline => 'İnternet bağlantısı yok.';
+
+  @override
+  String get vaultSampleTitle => 'DeniKey Örnek Kayıt';
+
+  @override
+  String get vaultSampleNotes =>
+      'Bu otomatik oluşturulan bir örnek kayıttır. Kendi hesap bilgilerinizi ekledikten sonra silebilirsiniz.';
+
+  @override
+  String get errorCouldNotLoad => 'Yüklenemedi';
+
+  @override
+  String get errorCouldNotCreate => 'Oluşturulamadı';
+
+  @override
+  String get errorCouldNotUpdate => 'Güncellenemedi';
+
+  @override
+  String get errorCouldNotDelete => 'Silinemedi';
 }

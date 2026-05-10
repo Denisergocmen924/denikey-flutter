@@ -2,6 +2,7 @@ import 'dart:io' show Platform, exit;
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:path/path.dart' as path;
+import '../localization/l10n.dart';
 
 class TrayService with TrayListener {
   TrayService._();
@@ -33,9 +34,9 @@ class TrayService with TrayListener {
 
   Future<void> _setMenu() async {
     await trayManager.setContextMenu(Menu(items: [
-      MenuItem(key: 'show', label: 'DeniKey\'i Aç'),
+      MenuItem(key: 'show', label: L10n.s.trayOpen),
       MenuItem.separator(),
-      MenuItem(key: 'exit', label: 'Çıkış'),
+      MenuItem(key: 'exit', label: L10n.s.trayExit),
     ]));
   }
 

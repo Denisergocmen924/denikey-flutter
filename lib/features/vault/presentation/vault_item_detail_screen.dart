@@ -561,9 +561,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             final isSecret = field['field_type'] == 'secret';
             return _infoTile(fieldName, fieldValue,
               isSecret: isSecret,
-              showSecret: _showCustomField[i] ?? true,
+              showSecret: _showCustomField[i] ?? !isSecret,
               onToggleSecret: () => setState(() =>
-                _showCustomField[i] = !(_showCustomField[i] ?? true)),
+                _showCustomField[i] = !(_showCustomField[i] ?? !isSecret)),
             );
           }),
         ],

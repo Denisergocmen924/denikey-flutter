@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import '../localization/l10n.dart';
 
 class NotificationService {
   NotificationService._();
@@ -40,8 +41,8 @@ class NotificationService {
     if (!_isSupported) return;
     await _showNotification(
       id: 1003,
-      title: 'DeniKey Kilitlendi',
-      body: 'Otomatik kilit devreye girdi. Devam etmek için master şifrenizi girin.',
+      title: L10n.s.notifAutoLockTitle,
+      body: L10n.s.notifAutoLockBody,
     );
   }
 
@@ -50,9 +51,8 @@ class NotificationService {
     if (!_isSupported) return;
     await _showNotification(
       id: 1002,
-      title: 'Yeni Cihaz Girişi',
-      body: 'Hesabınıza yeni bir cihazdan giriş denemesi var. '
-          'Siz değilseniz şifrenizi hemen değiştirin.',
+      title: L10n.s.notifNewDeviceTitle,
+      body: L10n.s.notifNewDeviceBody,
     );
   }
 
@@ -62,16 +62,15 @@ class NotificationService {
     required String title,
     required String body,
   }) async {
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'denikey_channel',
-      'DeniKey Bildirimleri',
-      channelDescription: 'Güvenlik hatırlatıcıları ve önemli bildirimler',
+      L10n.s.notifChannelName,
+      channelDescription: L10n.s.notifChannelDesc,
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     );
     const iosDetails = DarwinNotificationDetails();
-    const details =
-        NotificationDetails(android: androidDetails, iOS: iosDetails);
+    final details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
     await _plugin.show(id, title, body, details);
   }

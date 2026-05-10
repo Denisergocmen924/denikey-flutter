@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/vault_repository.dart';
 import '../../../core/presentation/loading_overlay.dart';
+import '../../../core/localization/l10n.dart';
 
 enum VaultStatus { idle, loading, success, error }
 
@@ -41,7 +42,7 @@ class VaultNotifier extends StateNotifier<VaultState> {
 
   Future<void> loadItems() async {
     state = state.copyWith(status: VaultStatus.loading);
-    LoadingOverlay.showGlobal(message: 'Kasa yükleniyor...');
+    LoadingOverlay.showGlobal(message: L10n.s.vaultLoadingVault);
     try {
       final online = await _repo.isOnline();
       final items = await _repo
@@ -57,11 +58,11 @@ class VaultNotifier extends StateNotifier<VaultState> {
       LoadingOverlay.hideGlobal();
       state = state.copyWith(
         status: VaultStatus.error,
-        errorMessage: 'Sunucu yanıt vermedi. Lütfen tekrar deneyin.',
+        errorMessage: L10n.s.vaultErrorTimeout,
       );
     } on DioException catch (e) {
       LoadingOverlay.hideGlobal();
-      final msg = e.response?.data['detail'] ?? 'Yüklenemedi.';
+      final msg = e.response?.data['detail'] ?? L10n.s.vaultErrorLoad;
       state = state.copyWith(status: VaultStatus.error, errorMessage: msg.toString());
     } catch (e) {
       LoadingOverlay.hideGlobal();
@@ -70,14 +71,14 @@ class VaultNotifier extends StateNotifier<VaultState> {
   }
 
   Future<void> createItem(Map<String, dynamic> data) async {
-    LoadingOverlay.showGlobal(message: 'Kaydediliyor...');
+    LoadingOverlay.showGlobal(message: L10n.s.vaultLoadingSaving);
     try {
       await _repo.createItem(data);
       await loadItems();
     } on Exception catch (e) {
       LoadingOverlay.hideGlobal();
       if (e.toString().contains('offline')) {
-        state = state.copyWith(errorMessage: 'İnternet bağlantısı yok.');
+        state = state.copyWith(errorMessage: L10n.s.vaultErrorOffline);
       } else {
         state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
       }
@@ -86,14 +87,14 @@ class VaultNotifier extends StateNotifier<VaultState> {
   }
 
   Future<void> updateItem(String id, Map<String, dynamic> data) async {
-    LoadingOverlay.showGlobal(message: 'Güncelleniyor...');
+    LoadingOverlay.showGlobal(message: L10n.s.vaultLoadingUpdating);
     try {
       await _repo.updateItem(id, data);
       await loadItems();
     } on Exception catch (e) {
       LoadingOverlay.hideGlobal();
       if (e.toString().contains('offline')) {
-        state = state.copyWith(errorMessage: 'İnternet bağlantısı yok.');
+        state = state.copyWith(errorMessage: L10n.s.vaultErrorOffline);
       } else {
         state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
       }
@@ -101,14 +102,14 @@ class VaultNotifier extends StateNotifier<VaultState> {
   }
 
   Future<void> deleteItem(String id) async {
-    LoadingOverlay.showGlobal(message: 'Siliniyor...');
+    LoadingOverlay.showGlobal(message: L10n.s.vaultLoadingDeleting);
     try {
       await _repo.deleteItem(id);
       await loadItems();
     } on Exception catch (e) {
       LoadingOverlay.hideGlobal();
       if (e.toString().contains('offline')) {
-        state = state.copyWith(errorMessage: 'İnternet bağlantısı yok.');
+        state = state.copyWith(errorMessage: L10n.s.vaultErrorOffline);
       } else {
         state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
       }
@@ -134,14 +135,14 @@ class VaultNotifier extends StateNotifier<VaultState> {
   }
 
   Future<void> deleteItems(List<String> ids) async {
-    LoadingOverlay.showGlobal(message: '${ids.length} kayıt siliniyor...');
+    LoadingOverlay.showGlobal(message: L10n.s.vaultLoadingDeletingCount(ids.length));
     try {
       await Future.wait(ids.map((id) => _repo.deleteItem(id)));
       await loadItems();
     } on Exception catch (e) {
       LoadingOverlay.hideGlobal();
       if (e.toString().contains('offline')) {
-        state = state.copyWith(errorMessage: 'İnternet bağlantısı yok.');
+        state = state.copyWith(errorMessage: L10n.s.vaultErrorOffline);
       } else {
         state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
       }
@@ -165,14 +166,14 @@ class VaultNotifier extends StateNotifier<VaultState> {
   }
 
   Future<void> moveItemsToCategory(List<String> ids, String? categoryId) async {
-    LoadingOverlay.showGlobal(message: 'Taşınıyor...');
+    LoadingOverlay.showGlobal(message: L10n.s.vaultLoadingMoving);
     try {
       await Future.wait(ids.map((id) => _repo.moveItemToCategory(id, categoryId)));
       await loadItems();
     } on Exception catch (e) {
       LoadingOverlay.hideGlobal();
       if (e.toString().contains('offline')) {
-        state = state.copyWith(errorMessage: 'İnternet bağlantısı yok.');
+        state = state.copyWith(errorMessage: L10n.s.vaultErrorOffline);
       } else {
         state = state.copyWith(status: VaultStatus.error, errorMessage: e.toString());
       }
@@ -186,12 +187,11 @@ class VaultNotifier extends StateNotifier<VaultState> {
     if (state.items.isNotEmpty) return;
     try {
       await _repo.createItem({
-        'title': 'DeniKey Örnek Kayıt',
+        'title': L10n.s.vaultSampleTitle,
         'username': 'ornek_kullanici',
         'email': 'ornek@denikey.website',
         'password': 'Değiştir123!',
-        'notes': 'Bu otomatik oluşturulan bir örnek kayıttır. '
-            'Kendi hesap bilgilerinizi ekledikten sonra silebilirsiniz.',
+        'notes': L10n.s.vaultSampleNotes,
         'url': 'https://denikey.website',
       });
       await loadItems();

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/shortcuts_provider.dart';
 import '../router/app_router.dart';
+import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 /// HardwareKeyboard global handler kullanır — focus state'ten bağımsız çalışır.
 /// Focus widget'ı alt widget'lar focus aldığında event iletmediği için bu yöntem seçildi.
@@ -121,16 +122,17 @@ class ShortcutHintCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    const shortcuts = [
-      ('Ctrl + 1', 'Kasama git'),
-      ('Ctrl + 2', 'Kütüphaneye git'),
-      ('Ctrl + 3', 'Ayarlara git'),
-      ('Ctrl + N', 'Yeni şifre ekle'),
-      ('Ctrl + F', 'Arama'),
-      ('Ctrl + G', 'Şifre Üretici'),
-      ('+ / NumPad+', 'Yeni şifre (kasam ekranı)'),
-      ('← →', 'Sekmeler arası geçiş'),
-      ('Escape', 'Geri git'),
+    final l10n = AppLocalizations.of(context);
+    final shortcuts = [
+      ('Ctrl + 1', l10n.shortcutVault),
+      ('Ctrl + 2', l10n.shortcutLibrary),
+      ('Ctrl + 3', l10n.shortcutSettings),
+      ('Ctrl + N', l10n.shortcutNewPassword),
+      ('Ctrl + F', l10n.shortcutSearch),
+      ('Ctrl + G', l10n.shortcutGenerator),
+      ('+ / NumPad+', l10n.shortcutNewPasswordVault),
+      ('← →', l10n.shortcutTabSwitch),
+      ('Escape', l10n.shortcutBack),
     ];
 
     return Card(

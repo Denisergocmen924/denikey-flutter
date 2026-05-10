@@ -1754,4 +1754,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingTypesChipCustomize => 'Customize';
+
+  @override
+  String get notifAutoLockTitle => 'DeniKey Locked';
+
+  @override
+  String get notifAutoLockBody =>
+      'Auto-lock activated. Enter your master password to continue.';
+
+  @override
+  String get notifNewDeviceTitle => 'New Device Login';
+
+  @override
+  String get notifNewDeviceBody =>
+      'A new device attempted to access your account. If this wasn\'t you, change your password immediately.';
+
+  @override
+  String get notifChannelName => 'DeniKey Notifications';
+
+  @override
+  String get notifChannelDesc =>
+      'Security reminders and important notifications';
+
+  @override
+  String get biometricFaceLabel => 'Unlock with Face ID';
+
+  @override
+  String get biometricFingerprintLabel => 'Unlock with Fingerprint';
+
+  @override
+  String get biometricPinLabel => 'Unlock with Device PIN';
+
+  @override
+  String get biometricReason => 'Authenticate to access DeniKey';
+
+  @override
+  String get trayOpen => 'Open DeniKey';
+
+  @override
+  String get trayExit => 'Exit';
+
+  @override
+  String get shortcutVault => 'Go to Vault';
+
+  @override
+  String get shortcutLibrary => 'Go to Library';
+
+  @override
+  String get shortcutSettings => 'Go to Settings';
+
+  @override
+  String get shortcutNewPassword => 'Add new password';
+
+  @override
+  String get shortcutSearch => 'Search';
+
+  @override
+  String get shortcutGenerator => 'Password Generator';
+
+  @override
+  String get shortcutNewPasswordVault => 'New password (vault screen)';
+
+  @override
+  String get shortcutTabSwitch => 'Switch between tabs';
+
+  @override
+  String get shortcutBack => 'Go back';
+
+  @override
+  String get authLoadingLogin => 'Signing in...';
+
+  @override
+  String get authLoadingRegister => 'Creating account...';
+
+  @override
+  String get authErrorLogin => 'Login failed.';
+
+  @override
+  String get authErrorRegister => 'Registration failed.';
+
+  @override
+  String get vaultLoadingVault => 'Loading vault...';
+
+  @override
+  String get vaultLoadingSaving => 'Saving...';
+
+  @override
+  String get vaultLoadingUpdating => 'Updating...';
+
+  @override
+  String get vaultLoadingDeleting => 'Deleting...';
+
+  @override
+  String get vaultLoadingMoving => 'Moving...';
+
+  @override
+  String vaultLoadingDeletingCount(int count) {
+    return 'Deleting $count records...';
+  }
+
+  @override
+  String get vaultErrorTimeout => 'Server did not respond. Please try again.';
+
+  @override
+  String get vaultErrorLoad => 'Could not load.';
+
+  @override
+  String get vaultErrorOffline => 'No internet connection.';
+
+  @override
+  String get vaultSampleTitle => 'DeniKey Sample Entry';
+
+  @override
+  String get vaultSampleNotes =>
+      'This is an automatically created sample entry. You can delete it after adding your own account details.';
+
+  @override
+  String get errorCouldNotLoad => 'Could not load';
+
+  @override
+  String get errorCouldNotCreate => 'Could not create';
+
+  @override
+  String get errorCouldNotUpdate => 'Could not update';
+
+  @override
+  String get errorCouldNotDelete => 'Could not delete';
 }

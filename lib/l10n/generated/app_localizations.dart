@@ -3333,6 +3333,246 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Özelleştir'**
   String get onboardingTypesChipCustomize;
+
+  /// No description provided for @notifAutoLockTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'DeniKey Kilitlendi'**
+  String get notifAutoLockTitle;
+
+  /// No description provided for @notifAutoLockBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Otomatik kilit devreye girdi. Devam etmek için master şifrenizi girin.'**
+  String get notifAutoLockBody;
+
+  /// No description provided for @notifNewDeviceTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Cihaz Girişi'**
+  String get notifNewDeviceTitle;
+
+  /// No description provided for @notifNewDeviceBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabınıza yeni bir cihazdan giriş denemesi var. Siz değilseniz şifrenizi hemen değiştirin.'**
+  String get notifNewDeviceBody;
+
+  /// No description provided for @notifChannelName.
+  ///
+  /// In tr, this message translates to:
+  /// **'DeniKey Bildirimleri'**
+  String get notifChannelName;
+
+  /// No description provided for @notifChannelDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenlik hatırlatıcıları ve önemli bildirimler'**
+  String get notifChannelDesc;
+
+  /// No description provided for @biometricFaceLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüz Tanıma ile Aç'**
+  String get biometricFaceLabel;
+
+  /// No description provided for @biometricFingerprintLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parmak İzi ile Aç'**
+  String get biometricFingerprintLabel;
+
+  /// No description provided for @biometricPinLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihaz Kilidi ile Aç'**
+  String get biometricPinLabel;
+
+  /// No description provided for @biometricReason.
+  ///
+  /// In tr, this message translates to:
+  /// **'DeniKey\'e erişmek için kimliğinizi doğrulayın'**
+  String get biometricReason;
+
+  /// No description provided for @trayOpen.
+  ///
+  /// In tr, this message translates to:
+  /// **'DeniKey\'i Aç'**
+  String get trayOpen;
+
+  /// No description provided for @trayExit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkış'**
+  String get trayExit;
+
+  /// No description provided for @shortcutVault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kasama git'**
+  String get shortcutVault;
+
+  /// No description provided for @shortcutLibrary.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kütüphaneye git'**
+  String get shortcutLibrary;
+
+  /// No description provided for @shortcutSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarlara git'**
+  String get shortcutSettings;
+
+  /// No description provided for @shortcutNewPassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni şifre ekle'**
+  String get shortcutNewPassword;
+
+  /// No description provided for @shortcutSearch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arama'**
+  String get shortcutSearch;
+
+  /// No description provided for @shortcutGenerator.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre Üretici'**
+  String get shortcutGenerator;
+
+  /// No description provided for @shortcutNewPasswordVault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni şifre (kasam ekranı)'**
+  String get shortcutNewPasswordVault;
+
+  /// No description provided for @shortcutTabSwitch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sekmeler arası geçiş'**
+  String get shortcutTabSwitch;
+
+  /// No description provided for @shortcutBack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri git'**
+  String get shortcutBack;
+
+  /// No description provided for @authLoadingLogin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş yapılıyor...'**
+  String get authLoadingLogin;
+
+  /// No description provided for @authLoadingRegister.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap oluşturuluyor...'**
+  String get authLoadingRegister;
+
+  /// No description provided for @authErrorLogin.
+  ///
+  /// In tr, this message translates to:
+  /// **'Giriş başarısız.'**
+  String get authErrorLogin;
+
+  /// No description provided for @authErrorRegister.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt başarısız.'**
+  String get authErrorRegister;
+
+  /// No description provided for @vaultLoadingVault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kasa yükleniyor...'**
+  String get vaultLoadingVault;
+
+  /// No description provided for @vaultLoadingSaving.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydediliyor...'**
+  String get vaultLoadingSaving;
+
+  /// No description provided for @vaultLoadingUpdating.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güncelleniyor...'**
+  String get vaultLoadingUpdating;
+
+  /// No description provided for @vaultLoadingDeleting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Siliniyor...'**
+  String get vaultLoadingDeleting;
+
+  /// No description provided for @vaultLoadingMoving.
+  ///
+  /// In tr, this message translates to:
+  /// **'Taşınıyor...'**
+  String get vaultLoadingMoving;
+
+  /// No description provided for @vaultLoadingDeletingCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} kayıt siliniyor...'**
+  String vaultLoadingDeletingCount(int count);
+
+  /// No description provided for @vaultErrorTimeout.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucu yanıt vermedi. Lütfen tekrar deneyin.'**
+  String get vaultErrorTimeout;
+
+  /// No description provided for @vaultErrorLoad.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüklenemedi.'**
+  String get vaultErrorLoad;
+
+  /// No description provided for @vaultErrorOffline.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnternet bağlantısı yok.'**
+  String get vaultErrorOffline;
+
+  /// No description provided for @vaultSampleTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'DeniKey Örnek Kayıt'**
+  String get vaultSampleTitle;
+
+  /// No description provided for @vaultSampleNotes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu otomatik oluşturulan bir örnek kayıttır. Kendi hesap bilgilerinizi ekledikten sonra silebilirsiniz.'**
+  String get vaultSampleNotes;
+
+  /// No description provided for @errorCouldNotLoad.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüklenemedi'**
+  String get errorCouldNotLoad;
+
+  /// No description provided for @errorCouldNotCreate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oluşturulamadı'**
+  String get errorCouldNotCreate;
+
+  /// No description provided for @errorCouldNotUpdate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güncellenemedi'**
+  String get errorCouldNotUpdate;
+
+  /// No description provided for @errorCouldNotDelete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Silinemedi'**
+  String get errorCouldNotDelete;
 }
 
 class _AppLocalizationsDelegate

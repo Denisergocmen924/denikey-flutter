@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../data/auth_repository.dart';
 import '../../../core/presentation/loading_overlay.dart';
+import '../../../core/localization/l10n.dart';
 
 enum AuthStatus { idle, loading, success, needsDeviceVerification, deviceBanned, error }
 
@@ -43,7 +44,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> login(String username, String password) async {
     state = state.copyWith(status: AuthStatus.loading);
-    LoadingOverlay.showGlobal(message: 'Giriş yapılıyor...');
+    LoadingOverlay.showGlobal(message: L10n.s.authLoadingLogin);
     try {
       final result = await _repo.login(username: username, masterPassword: password);
       if (result['needs_device_verification'] == true) {
@@ -66,7 +67,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: _extractError(e, 'Giriş başarısız.'),
+        errorMessage: _extractError(e, L10n.s.authErrorLogin),
       );
     } finally {
       LoadingOverlay.hideGlobal();
@@ -75,7 +76,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> register(String username, String email, String password) async {
     state = state.copyWith(status: AuthStatus.loading);
-    LoadingOverlay.showGlobal(message: 'Hesap oluşturuluyor...');
+    LoadingOverlay.showGlobal(message: L10n.s.authLoadingRegister);
     try {
       final result = await _repo.register(
         username: username,
@@ -90,7 +91,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: _extractError(e, 'Kayıt başarısız.'),
+        errorMessage: _extractError(e, L10n.s.authErrorRegister),
       );
     } finally {
       LoadingOverlay.hideGlobal();

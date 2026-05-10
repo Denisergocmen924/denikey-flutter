@@ -734,5 +734,52 @@
   "onboardingTypesWithDesc": "Поля уже готовы!",
   "onboardingTypesChipTemplate": "Шаблон",
   "onboardingTypesChipSpeed": "Быстрое сохранение",
-  "onboardingTypesChipCustomize": "Настроить"
+  "onboardingTypesChipCustomize": "Настроить",
+
+  "notifAutoLockTitle": "DeniKey заблокирован",
+  "notifAutoLockBody": "Автоблокировка активирована. Введите мастер-пароль для продолжения.",
+  "notifNewDeviceTitle": "Вход с нового устройства",
+  "notifNewDeviceBody": "Новое устройство пытается получить доступ к вашему аккаунту. Если это не вы, немедленно смените пароль.",
+  "notifChannelName": "Уведомления DeniKey",
+  "notifChannelDesc": "Напоминания безопасности и важные уведомления",
+
+  "biometricFaceLabel": "Разблокировать с Face ID",
+  "biometricFingerprintLabel": "Разблокировать по отпечатку",
+  "biometricPinLabel": "Разблокировать с PIN-кодом",
+  "biometricReason": "Подтвердите личность для доступа к DeniKey",
+
+  "trayOpen": "Открыть DeniKey",
+  "trayExit": "Выход",
+
+  "shortcutVault": "Перейти в хранилище",
+  "shortcutLibrary": "Перейти в библиотеку",
+  "shortcutSettings": "Перейти в настройки",
+  "shortcutNewPassword": "Добавить новый пароль",
+  "shortcutSearch": "Поиск",
+  "shortcutGenerator": "Генератор паролей",
+  "shortcutNewPasswordVault": "Новый пароль (экран хранилища)",
+  "shortcutTabSwitch": "Переключение между вкладками",
+  "shortcutBack": "Назад",
+
+  "authLoadingLogin": "Выполняется вход...",
+  "authLoadingRegister": "Создание аккаунта...",
+  "authErrorLogin": "Ошибка входа.",
+  "authErrorRegister": "Ошибка регистрации.",
+
+  "vaultLoadingVault": "Загрузка хранилища...",
+  "vaultLoadingSaving": "Сохранение...",
+  "vaultLoadingUpdating": "Обновление...",
+  "vaultLoadingDeleting": "Удаление...",
+  "vaultLoadingMoving": "Перемещение...",
+  "vaultLoadingDeletingCount": "Удаление {count} записей...",
+  "vaultErrorTimeout": "Сервер не отвечает. Попробуйте ещё раз.",
+  "vaultErrorLoad": "Не удалось загрузить.",
+  "vaultErrorOffline": "Нет подключения к интернету.",
+  "vaultSampleTitle": "Образец записи DeniKey",
+  "vaultSampleNotes": "Это автоматически созданная образцовая запись. Вы можете удалить её после добавления своих данных.",
+
+  "errorCouldNotLoad": "Не удалось загрузить",
+  "errorCouldNotCreate": "Не удалось создать",
+  "errorCouldNotUpdate": "Не удалось обновить",
+  "errorCouldNotDelete": "Не удалось удалить"
 }

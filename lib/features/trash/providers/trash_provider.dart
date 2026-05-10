@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../data/trash_repository.dart';
 import '../../vault/providers/vault_provider.dart';
+import '../../../core/localization/l10n.dart';
 
 enum TrashStatus { idle, loading, success, error }
 
@@ -41,7 +42,7 @@ class TrashNotifier extends StateNotifier<TrashState> {
     } on DioException catch (e) {
       state = state.copyWith(
         status: TrashStatus.error,
-        error: e.response?.data['detail'] ?? 'Yüklenemedi',
+        error: e.response?.data['detail'] ?? L10n.s.errorCouldNotLoad,
       );
     }
   }

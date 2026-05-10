@@ -16,6 +16,7 @@ import 'core/presentation/loading_overlay.dart';
 import 'core/presentation/app_shortcuts.dart';
 import 'core/storage/secure_storage.dart';
 import 'core/services/tray_service.dart';
+import 'core/localization/l10n.dart';
 
 // Tek instance kilidi için sabit port
 const _kSingleInstancePort = 47821;
@@ -339,12 +340,15 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
       darkTheme: _buildTheme(Brightness.dark),
       themeMode: themeMode,
       routerConfig: router,
-      builder: (context, child) => LoadingOverlay(
+      builder: (context, child) {
+        L10n.update(AppLocalizations.of(context));
+        return LoadingOverlay(
         key: loadingOverlayKey,
         child: AppShortcuts(
           child: child ?? const SizedBox.shrink(),
         ),
-      ),
+        );
+      },
     );
   }
 }

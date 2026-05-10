@@ -1757,4 +1757,130 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onboardingTypesChipCustomize => 'Настроить';
+
+  @override
+  String get notifAutoLockTitle => 'DeniKey заблокирован';
+
+  @override
+  String get notifAutoLockBody =>
+      'Автоблокировка активирована. Введите мастер-пароль для продолжения.';
+
+  @override
+  String get notifNewDeviceTitle => 'Вход с нового устройства';
+
+  @override
+  String get notifNewDeviceBody =>
+      'Новое устройство пытается получить доступ к вашему аккаунту. Если это не вы, немедленно смените пароль.';
+
+  @override
+  String get notifChannelName => 'Уведомления DeniKey';
+
+  @override
+  String get notifChannelDesc =>
+      'Напоминания безопасности и важные уведомления';
+
+  @override
+  String get biometricFaceLabel => 'Разблокировать с Face ID';
+
+  @override
+  String get biometricFingerprintLabel => 'Разблокировать по отпечатку';
+
+  @override
+  String get biometricPinLabel => 'Разблокировать с PIN-кодом';
+
+  @override
+  String get biometricReason => 'Подтвердите личность для доступа к DeniKey';
+
+  @override
+  String get trayOpen => 'Открыть DeniKey';
+
+  @override
+  String get trayExit => 'Выход';
+
+  @override
+  String get shortcutVault => 'Перейти в хранилище';
+
+  @override
+  String get shortcutLibrary => 'Перейти в библиотеку';
+
+  @override
+  String get shortcutSettings => 'Перейти в настройки';
+
+  @override
+  String get shortcutNewPassword => 'Добавить новый пароль';
+
+  @override
+  String get shortcutSearch => 'Поиск';
+
+  @override
+  String get shortcutGenerator => 'Генератор паролей';
+
+  @override
+  String get shortcutNewPasswordVault => 'Новый пароль (экран хранилища)';
+
+  @override
+  String get shortcutTabSwitch => 'Переключение между вкладками';
+
+  @override
+  String get shortcutBack => 'Назад';
+
+  @override
+  String get authLoadingLogin => 'Выполняется вход...';
+
+  @override
+  String get authLoadingRegister => 'Создание аккаунта...';
+
+  @override
+  String get authErrorLogin => 'Ошибка входа.';
+
+  @override
+  String get authErrorRegister => 'Ошибка регистрации.';
+
+  @override
+  String get vaultLoadingVault => 'Загрузка хранилища...';
+
+  @override
+  String get vaultLoadingSaving => 'Сохранение...';
+
+  @override
+  String get vaultLoadingUpdating => 'Обновление...';
+
+  @override
+  String get vaultLoadingDeleting => 'Удаление...';
+
+  @override
+  String get vaultLoadingMoving => 'Перемещение...';
+
+  @override
+  String vaultLoadingDeletingCount(int count) {
+    return 'Удаление $count записей...';
+  }
+
+  @override
+  String get vaultErrorTimeout => 'Сервер не отвечает. Попробуйте ещё раз.';
+
+  @override
+  String get vaultErrorLoad => 'Не удалось загрузить.';
+
+  @override
+  String get vaultErrorOffline => 'Нет подключения к интернету.';
+
+  @override
+  String get vaultSampleTitle => 'Образец записи DeniKey';
+
+  @override
+  String get vaultSampleNotes =>
+      'Это автоматически созданная образцовая запись. Вы можете удалить её после добавления своих данных.';
+
+  @override
+  String get errorCouldNotLoad => 'Не удалось загрузить';
+
+  @override
+  String get errorCouldNotCreate => 'Не удалось создать';
+
+  @override
+  String get errorCouldNotUpdate => 'Не удалось обновить';
+
+  @override
+  String get errorCouldNotDelete => 'Не удалось удалить';
 }

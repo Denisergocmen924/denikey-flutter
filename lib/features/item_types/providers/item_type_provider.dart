@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import '../data/item_type_repository.dart';
+import '../../../core/localization/l10n.dart';
 
 class ItemTypeState {
   final List<Map<String, dynamic>> itemTypes;
@@ -38,7 +39,7 @@ class ItemTypeNotifier extends StateNotifier<ItemTypeState> {
     } on DioException catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: e.response?.data['detail'] ?? 'Yüklenemedi',
+        error: e.response?.data['detail'] ?? L10n.s.errorCouldNotLoad,
       );
     }
   }
@@ -53,7 +54,7 @@ class ItemTypeNotifier extends StateNotifier<ItemTypeState> {
       final newType = await _repo.createItemType(nameTr, icon, color, fields: fields);
       state = state.copyWith(itemTypes: [...state.itemTypes, newType]);
     } on DioException catch (e) {
-      state = state.copyWith(error: e.response?.data['detail'] ?? 'Oluşturulamadı');
+      state = state.copyWith(error: e.response?.data['detail'] ?? L10n.s.errorCouldNotCreate);
     }
   }
 
@@ -71,7 +72,7 @@ class ItemTypeNotifier extends StateNotifier<ItemTypeState> {
         itemTypes: state.itemTypes.map((t) => t['id'] == id ? updated : t).toList(),
       );
     } on DioException catch (e) {
-      state = state.copyWith(error: e.response?.data['detail'] ?? 'Güncellenemedi');
+      state = state.copyWith(error: e.response?.data['detail'] ?? L10n.s.errorCouldNotUpdate);
     }
   }
 
@@ -82,7 +83,7 @@ class ItemTypeNotifier extends StateNotifier<ItemTypeState> {
         itemTypes: state.itemTypes.where((t) => t['id'] != id).toList(),
       );
     } on DioException catch (e) {
-      state = state.copyWith(error: e.response?.data['detail'] ?? 'Silinemedi');
+      state = state.copyWith(error: e.response?.data['detail'] ?? L10n.s.errorCouldNotDelete);
     }
   }
 }

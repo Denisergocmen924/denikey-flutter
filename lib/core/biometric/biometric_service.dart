@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../localization/l10n.dart';
 
 class BiometricService {
   BiometricService._();
@@ -64,17 +65,17 @@ class BiometricService {
     try {
       final types = await _auth.getAvailableBiometrics();
       if (types.contains(BiometricType.face)) {
-        return (icon: Icons.face_outlined, label: 'Yüz Tanıma ile Aç');
+        return (icon: Icons.face_outlined, label: L10n.s.biometricFaceLabel);
       }
       if (types.contains(BiometricType.fingerprint) ||
           types.contains(BiometricType.strong) ||
           types.contains(BiometricType.weak)) {
-        return (icon: Icons.fingerprint, label: 'Parmak İzi ile Aç');
+        return (icon: Icons.fingerprint, label: L10n.s.biometricFingerprintLabel);
       }
       // Biyometrik yok ama cihaz PIN/desen destekliyorsa
       final supported = await _auth.isDeviceSupported();
       if (supported) {
-        return (icon: Icons.pin_outlined, label: 'Cihaz Kilidi ile Aç');
+        return (icon: Icons.pin_outlined, label: L10n.s.biometricPinLabel);
       }
     } catch (_) {}
     return null;
@@ -84,7 +85,7 @@ class BiometricService {
     if (!_isSupported) return true;
     try {
       return await _auth.authenticate(
-        localizedReason: 'DeniKey\'e erişmek için kimliğinizi doğrulayın',
+        localizedReason: L10n.s.biometricReason,
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: false,
