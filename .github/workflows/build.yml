@@ -204,6 +204,9 @@ jobs:
           GH_REPO: ${{ github.repository }}
       - name: denikey-releases reposuna yükle
         run: |
+          gh release delete ${{ github.ref_name }} \
+            --repo Denisergocmen924/denikey-releases \
+            --yes 2>/dev/null || true
           gh release create ${{ github.ref_name }} \
             DeniKey-Android.apk \
             DeniKey-Setup.exe \
