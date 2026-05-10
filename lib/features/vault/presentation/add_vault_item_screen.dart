@@ -125,34 +125,22 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
 
     if (hasError) return;
 
-    // İlk secret alan → password
-    String password = '';
-    int? firstSecretIdx;
-    for (int i = 0; i < _fields.length; i++) {
-      if (_fields[i].isSecret) {
-        firstSecretIdx = i;
-        password = _fields[i].valueCtr.text.trim();
-        break;
-      }
-    }
-
     final customFieldsData = <Map<String, String>>[];
-    for (int i = 0; i < _fields.length; i++) {
-      if (i == firstSecretIdx) continue;
-      final name = _fields[i].nameCtr.text.trim();
-      final value = _fields[i].valueCtr.text.trim();
+    for (final field in _fields) {
+      final name = field.nameCtr.text.trim();
+      final value = field.valueCtr.text.trim();
       if (name.isNotEmpty) {
         customFieldsData.add({
           'field_name': name,
           'value': value,
-          'field_type': _fields[i].isSecret ? 'secret' : 'text',
+          'field_type': field.isSecret ? 'secret' : 'text',
         });
       }
     }
 
     final data = <String, dynamic>{
       'title': _titleCtrl.text.trim(),
-      'password': password,
+      'password': '',
       if (_selectedCategoryId != null) 'category_id': _selectedCategoryId,
       if (_selectedItemType != null) 'item_type_id': _selectedItemType!['id'],
       if (_selectedItemType != null) 'icon': _selectedItemType!['icon'],
@@ -476,6 +464,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   }
 
   Widget _buildFieldRow(_FieldEntry entry) {
+    final isTypeField = entry.backendFieldId != null;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -484,20 +473,22 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Alan adı
-              SizedBox(
-                width: 110,
-                child: TextField(
-                  controller: entry.nameCtr,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context).addItemExtraFieldKeyLabel,
-                    border: const OutlineInputBorder(),
-                    isDense: true,
+              // Tip alanı değilse alan adı düzenlenebilir; tip alanıysa isim label olarak gösterilir
+              if (!isTypeField) ...[
+                SizedBox(
+                  width: 110,
+                  child: TextField(
+                    controller: entry.nameCtr,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context).addItemExtraFieldKeyLabel,
+                      border: const OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    style: const TextStyle(fontSize: 13),
                   ),
-                  style: const TextStyle(fontSize: 13),
                 ),
-              ),
-              const SizedBox(width: 6),
+                const SizedBox(width: 6),
+              ],
               // Değer
               Expanded(
                 child: TextField(
@@ -507,7 +498,9 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                     if (entry.error != null) setState(() => entry.error = null);
                   },
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context).addItemExtraFieldValueLabel,
+                    labelText: isTypeField
+                        ? entry.nameCtr.text
+                        : AppLocalizations.of(context).addItemExtraFieldValueLabel,
                     errorText: entry.error,
                     border: const OutlineInputBorder(),
                     isDense: true,
@@ -525,7 +518,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                   style: const TextStyle(fontSize: 13),
                 ),
               ),
-              // Gizle toggle
+              // Kilit toggle — aktif edilince otomatik gizle
               IconButton(
                 tooltip: entry.isSecret ? 'Gizli alan' : 'Normal alan',
                 icon: Icon(
@@ -535,8 +528,10 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                       ? const Color(0xFFFF5900)
                       : Colors.grey,
                 ),
-                onPressed: () =>
-                    setState(() => entry.isSecret = !entry.isSecret),
+                onPressed: () => setState(() {
+                  entry.isSecret = !entry.isSecret;
+                  if (entry.isSecret) entry.obscure = true;
+                }),
               ),
               // Sil
               IconButton(

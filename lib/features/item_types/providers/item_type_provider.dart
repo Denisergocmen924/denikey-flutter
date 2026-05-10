@@ -57,6 +57,22 @@ class ItemTypeNotifier extends StateNotifier<ItemTypeState> {
     }
   }
 
+  Future<void> updateItemType(
+    String id,
+    String nameTr,
+    String icon,
+    String color,
+  ) async {
+    try {
+      final updated = await _repo.updateItemType(id, nameTr, icon, color);
+      state = state.copyWith(
+        itemTypes: state.itemTypes.map((t) => t['id'] == id ? updated : t).toList(),
+      );
+    } on DioException catch (e) {
+      state = state.copyWith(error: e.response?.data['detail'] ?? 'Güncellenemedi');
+    }
+  }
+
   Future<void> deleteItemType(String id) async {
     try {
       await _repo.deleteItemType(id);

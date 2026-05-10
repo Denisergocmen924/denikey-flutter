@@ -388,6 +388,142 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     );
   }
 
+  void _showEditItemTypeDialog(Map<String, dynamic> type) {
+    final nameCtrl = TextEditingController(text: type['name_tr'] as String? ?? '');
+    _selectedColor = _parseColor(type['color'] as String?);
+    _selectedIcon = type['icon'] as String? ?? 'category';
+    final fields = (type['fields'] as List<dynamic>? ?? []);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setS) {
+          final cs = Theme.of(context).colorScheme;
+          final l10n = AppLocalizations.of(context);
+          return AlertDialog(
+            title: Text(l10n.libraryTypesTab),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: nameCtrl,
+                      decoration: InputDecoration(labelText: l10n.addItemTypeNameLabel),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(l10n.addItemTypeSelectIcon, style: TextStyle(
+                      fontWeight: FontWeight.w600, color: cs.onSurface)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _iconOptions.map((e) {
+                        final sel = _selectedIcon == e.key;
+                        return GestureDetector(
+                          onTap: () => setS(() => _selectedIcon = e.key),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: sel
+                                  ? _selectedColor.withAlpha(51)
+                                  : cs.surfaceContainerHigh,
+                              borderRadius: BorderRadius.circular(8),
+                              border: sel
+                                  ? Border.all(color: _selectedColor, width: 2)
+                                  : null,
+                            ),
+                            child: Icon(e.value,
+                                size: 22,
+                                color: sel ? _selectedColor : cs.onSurfaceVariant),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(l10n.libraryCategoryColorSelect, style: TextStyle(
+                      fontWeight: FontWeight.w600, color: cs.onSurface)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _colorPalette.map((c) {
+                        final sel = _selectedColor == c;
+                        return GestureDetector(
+                          onTap: () => setS(() => _selectedColor = c),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: c,
+                              shape: BoxShape.circle,
+                              border: sel
+                                  ? Border.all(color: cs.onSurface, width: 3)
+                                  : null,
+                            ),
+                            child: sel
+                                ? const Icon(Icons.check, color: Colors.white, size: 18)
+                                : null,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    if (fields.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Text(l10n.addItemTypeFixedFields,
+                        style: TextStyle(fontWeight: FontWeight.w600, color: cs.onSurface)),
+                      const SizedBox(height: 8),
+                      ...fields.map((f) {
+                        final fieldName = f['field_name_tr'] as String? ?? '';
+                        final fieldType = f['field_type'] as String? ?? 'text';
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Row(
+                            children: [
+                              Icon(
+                                fieldType == 'secret' ? Icons.lock_outline : Icons.text_fields,
+                                size: 16,
+                                color: cs.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(fieldName, style: TextStyle(color: cs.onSurface, fontSize: 13)),
+                              const SizedBox(width: 8),
+                              Text('($fieldType)',
+                                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11)),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.libraryCancel)),
+              FilledButton(
+                onPressed: () {
+                  if (nameCtrl.text.trim().isEmpty) return;
+                  ref.read(itemTypeProvider.notifier).updateItemType(
+                    type['id'].toString(),
+                    nameCtrl.text.trim(),
+                    _selectedIcon,
+                    _colorToHex(_selectedColor),
+                  );
+                  Navigator.pop(ctx);
+                },
+                child: Text(l10n.libraryAddButton),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   void _confirmDeleteItemType(String id, bool isSystem) {
     if (isSystem) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -450,6 +586,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
             parseColor: _parseColor,
             iconDataFor: _iconDataFor,
             onAdd: _showAddItemTypeDialog,
+            onEdit: _showEditItemTypeDialog,
             onDelete: _confirmDeleteItemType,
           ),
         ],
@@ -542,6 +679,7 @@ class _ItemTypesTab extends StatelessWidget {
   final Color Function(String?) parseColor;
   final IconData Function(String?) iconDataFor;
   final VoidCallback onAdd;
+  final void Function(Map<String, dynamic>) onEdit;
   final void Function(String, bool) onDelete;
 
   const _ItemTypesTab({
@@ -549,6 +687,7 @@ class _ItemTypesTab extends StatelessWidget {
     required this.parseColor,
     required this.iconDataFor,
     required this.onAdd,
+    required this.onEdit,
     required this.onDelete,
   });
 
@@ -588,10 +727,20 @@ class _ItemTypesTab extends StatelessWidget {
             ),
             trailing: isSystem
                 ? const Icon(Icons.lock_outline, size: 16, color: Colors.grey)
-                : IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () => onDelete(type['id'].toString(), isSystem),
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, color: Colors.grey),
+                        onPressed: () => onEdit(type),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.red),
+                        onPressed: () => onDelete(type['id'].toString(), isSystem),
+                      ),
+                    ],
                   ),
+            onTap: isSystem ? null : () => onEdit(type),
           ),
         );
       },

@@ -15,6 +15,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     with TickerProviderStateMixin {
   final PageController _pageCtrl = PageController();
   int _currentPage = 0;
+  bool _canAdvance = true;
 
   static const _orange  = Color(0xFFFF5900);
   static const _muted   = Color(0xFF9BABA4);
@@ -51,7 +52,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     }
   }
 
+  void _prev() {
+    _pageCtrl.previousPage(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+    );
+  }
+
   void _next() {
+    if (!_canAdvance) return;
     _pageCtrl.nextPage(
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeInOut,
@@ -69,22 +78,24 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           children: [
             // Üst bar
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              padding: const EdgeInsets.fromLTRB(8, 12, 20, 0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  if (_currentPage > 0)
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                          color: _muted, size: 18),
+                      onPressed: _prev,
+                    )
+                  else
+                    const SizedBox(width: 48),
+                  const Spacer(),
                   Text(
                     '${_currentPage + 1} / 7',
                     style: const TextStyle(color: _muted, fontSize: 13),
                   ),
-                  if (!isLast)
-                    TextButton(
-                      onPressed: _finish,
-                      child: Text(l10n.onboardingSkip,
-                          style: const TextStyle(color: _muted, fontSize: 14)),
-                    )
-                  else
-                    const SizedBox(width: 60),
+                  const Spacer(),
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
@@ -93,7 +104,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             Expanded(
               child: PageView(
                 controller: _pageCtrl,
-                onPageChanged: (i) => setState(() => _currentPage = i),
+                onPageChanged: (i) {
+                  setState(() {
+                    _currentPage = i;
+                    _canAdvance = false;
+                  });
+                  Future.delayed(const Duration(seconds: 1), () {
+                    if (mounted && _currentPage == i) {
+                      setState(() => _canAdvance = true);
+                    }
+                  });
+                },
                 children: [
                   _WelcomePage(pulseCtrl: _pulseCtrl),
                   const _VaultPage(),
@@ -134,10 +155,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: isLast ? _finish : _next,
+                  onPressed: isLast ? _finish : (_canAdvance ? _next : null),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _orange,
+                    disabledBackgroundColor: _orange.withAlpha(100),
                     foregroundColor: Colors.white,
+                    disabledForegroundColor: Colors.white70,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
