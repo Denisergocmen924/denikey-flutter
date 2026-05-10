@@ -61,10 +61,11 @@ class ItemTypeNotifier extends StateNotifier<ItemTypeState> {
     String id,
     String nameTr,
     String icon,
-    String color,
-  ) async {
+    String color, {
+    List<Map<String, dynamic>>? fields,
+  }) async {
     try {
-      final updated = await _repo.updateItemType(id, nameTr, icon, color);
+      final updated = await _repo.updateItemType(id, nameTr, icon, color, fields: fields);
       state = state.copyWith(
         itemTypes: state.itemTypes.map((t) => t['id'] == id ? updated : t).toList(),
       );

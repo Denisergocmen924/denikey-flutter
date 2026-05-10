@@ -393,6 +393,11 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     _selectedColor = _parseColor(type['color'] as String?);
     _selectedIcon = type['icon'] as String? ?? 'category';
     final fields = (type['fields'] as List<dynamic>? ?? []);
+    final fieldControllers = <String, TextEditingController>{
+      for (final f in fields)
+        if (f['id'] != null)
+          f['id'] as String: TextEditingController(text: f['field_name_tr'] as String? ?? ''),
+    };
 
     showDialog(
       context: context,
@@ -473,14 +478,13 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                     ),
                     if (fields.isNotEmpty) ...[
                       const SizedBox(height: 20),
-                      Text(l10n.addItemTypeFixedFields,
-                        style: TextStyle(fontWeight: FontWeight.w600, color: cs.onSurface)),
-                      const SizedBox(height: 8),
+                      Divider(color: cs.outlineVariant),
+                      const SizedBox(height: 4),
                       ...fields.map((f) {
-                        final fieldName = f['field_name_tr'] as String? ?? '';
+                        final fid = f['id'] as String? ?? '';
                         final fieldType = f['field_type'] as String? ?? 'text';
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
                             children: [
                               Icon(
@@ -489,10 +493,17 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                                 color: cs.onSurfaceVariant,
                               ),
                               const SizedBox(width: 8),
-                              Text(fieldName, style: TextStyle(color: cs.onSurface, fontSize: 13)),
-                              const SizedBox(width: 8),
-                              Text('($fieldType)',
-                                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11)),
+                              Expanded(
+                                child: TextField(
+                                  controller: fieldControllers[fid],
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  ),
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                              ),
                             ],
                           ),
                         );
@@ -507,11 +518,22 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
               FilledButton(
                 onPressed: () {
                   if (nameCtrl.text.trim().isEmpty) return;
+                  final fieldUpdates = fields
+                      .where((f) => f['id'] != null)
+                      .map((f) {
+                        final fid = f['id'] as String;
+                        return {
+                          'id': fid,
+                          'field_name': fieldControllers[fid]?.text.trim() ?? f['field_name_tr'] as String? ?? '',
+                        };
+                      })
+                      .toList();
                   ref.read(itemTypeProvider.notifier).updateItemType(
                     type['id'].toString(),
                     nameCtrl.text.trim(),
                     _selectedIcon,
                     _colorToHex(_selectedColor),
+                    fields: fieldUpdates.isNotEmpty ? fieldUpdates : null,
                   );
                   Navigator.pop(ctx);
                 },

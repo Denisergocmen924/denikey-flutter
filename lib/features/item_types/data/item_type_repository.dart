@@ -28,12 +28,14 @@ class ItemTypeRepository {
     String id,
     String nameTr,
     String icon,
-    String color,
-  ) async {
+    String color, {
+    List<Map<String, dynamic>>? fields,
+  }) async {
     final response = await _dio.patch('/api/v1/item-types/$id', data: {
       'name_tr': nameTr,
       'icon': icon,
       'color': color,
+      if (fields != null && fields.isNotEmpty) 'fields': fields,
     });
     return Map<String, dynamic>.from(response.data);
   }

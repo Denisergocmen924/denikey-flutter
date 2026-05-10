@@ -504,34 +504,17 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                     errorText: entry.error,
                     border: const OutlineInputBorder(),
                     isDense: true,
-                    suffixIcon: entry.isSecret
-                        ? IconButton(
-                            iconSize: 18,
-                            icon: Icon(entry.obscure
-                                ? Icons.visibility_off
-                                : Icons.visibility),
-                            onPressed: () =>
-                                setState(() => entry.obscure = !entry.obscure),
-                          )
-                        : null,
+                    suffixIcon: IconButton(
+                        iconSize: 18,
+                        icon: Icon(entry.obscure
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () =>
+                            setState(() => entry.obscure = !entry.obscure),
+                      ),
                   ),
                   style: const TextStyle(fontSize: 13),
                 ),
-              ),
-              // Kilit toggle — aktif edilince otomatik gizle
-              IconButton(
-                tooltip: entry.isSecret ? 'Gizli alan' : 'Normal alan',
-                icon: Icon(
-                  entry.isSecret ? Icons.lock_outline : Icons.lock_open_outlined,
-                  size: 18,
-                  color: entry.isSecret
-                      ? const Color(0xFFFF5900)
-                      : Colors.grey,
-                ),
-                onPressed: () => setState(() {
-                  entry.isSecret = !entry.isSecret;
-                  if (entry.isSecret) entry.obscure = true;
-                }),
               ),
               // Sil
               IconButton(

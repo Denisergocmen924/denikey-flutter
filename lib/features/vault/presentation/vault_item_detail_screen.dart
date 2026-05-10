@@ -551,13 +551,8 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
         ),
         if (_customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8, left: 4),
-            child: Text(l10n.detailExtraInfoSection,
-              style: TextStyle(fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurfaceVariant)),
-          ),
+          Divider(color: Theme.of(context).colorScheme.outlineVariant),
+          const SizedBox(height: 4),
           ..._customFields.asMap().entries.map((entry) {
             final i = entry.key;
             final field = entry.value;
