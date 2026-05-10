@@ -398,6 +398,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
         if (f['id'] != null)
           f['id'] as String: TextEditingController(text: f['field_name_tr'] as String? ?? ''),
     };
+    final newFields = <Map<String, dynamic>>[]; // {nameCtrl, isSecret}
 
     showDialog(
       context: context,
@@ -509,6 +510,49 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                         );
                       }),
                     ],
+                    const SizedBox(height: 12),
+                    ...newFields.asMap().entries.map((e) {
+                      final i = e.key;
+                      final nf = e.value;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              tooltip: nf['isSecret'] == true ? 'Gizli' : 'Normal',
+                              icon: Icon(
+                                nf['isSecret'] == true ? Icons.lock_outline : Icons.text_fields,
+                                size: 18,
+                                color: nf['isSecret'] == true ? const Color(0xFFFF5900) : cs.onSurfaceVariant,
+                              ),
+                              onPressed: () => setS(() => nf['isSecret'] = !(nf['isSecret'] as bool)),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: nf['nameCtrl'] as TextEditingController,
+                                decoration: InputDecoration(
+                                  labelText: l10n.addItemExtraFieldKeyLabel,
+                                  border: const OutlineInputBorder(),
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                ),
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline, color: Colors.red, size: 18),
+                              onPressed: () => setS(() => newFields.removeAt(i)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    TextButton.icon(
+                      onPressed: () => setS(() => newFields.add({'nameCtrl': TextEditingController(), 'isSecret': false})),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.addItemAddFieldButton),
+                      style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF5900)),
+                    ),
                   ],
                 ),
               ),
@@ -534,6 +578,13 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                     _selectedIcon,
                     _colorToHex(_selectedColor),
                     fields: fieldUpdates.isNotEmpty ? fieldUpdates : null,
+                    newFields: newFields
+                        .where((nf) => (nf['nameCtrl'] as TextEditingController).text.trim().isNotEmpty)
+                        .map((nf) => {
+                          'field_name': (nf['nameCtrl'] as TextEditingController).text.trim(),
+                          'field_type': nf['isSecret'] == true ? 'secret' : 'text',
+                        })
+                        .toList(),
                   );
                   Navigator.pop(ctx);
                 },
