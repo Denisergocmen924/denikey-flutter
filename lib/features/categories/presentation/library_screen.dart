@@ -716,7 +716,7 @@ class _CategoriesTab extends StatelessWidget {
         final cat = state.categories[index];
         final isSystem = cat['is_system'] == true;
         final color = parseColor(cat['color'] as String?);
-        final name = cat['name_tr'] ?? cat['name_en'] ?? '';
+        final name = isSystem ? l10n.categoriesUncategorized : (cat['name_tr'] ?? cat['name_en'] ?? '');
 
         return Card(
           child: ListTile(

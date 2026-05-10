@@ -24,7 +24,7 @@ class _FieldEntry {
     this.isSecret = false,
   })  : nameCtr = TextEditingController(text: name),
         valueCtr = TextEditingController(),
-        obscure = isSecret;
+        obscure = false;
 
   void dispose() {
     nameCtr.dispose();

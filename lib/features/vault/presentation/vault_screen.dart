@@ -139,7 +139,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 return ListTile(
                   leading: Icon(Icons.folder_outlined,
                     color: _parseColor(cat['color'] as String?)),
-                  title: Text(cat['name_tr'] ?? cat['name_en'] ?? ''),
+                  title: Text(cat['is_system'] == true ? l10n.categoriesUncategorized : (cat['name_tr'] ?? cat['name_en'] ?? '')),
                   onTap: () {
                     Navigator.pop(ctx);
                     _exitSelectionMode();
@@ -633,7 +633,7 @@ class _CategoryBar extends StatelessWidget {
                 ),
                 ...categories.map((cat) {
                   final id = cat['id']?.toString();
-                  final name = cat['name_tr'] ?? cat['name_en'] ?? '';
+                  final name = cat['is_system'] == true ? l10n.categoriesUncategorized : (cat['name_tr'] ?? cat['name_en'] ?? '');
                   final color = parseColor(cat['color'] as String?);
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
