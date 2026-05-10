@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -728,19 +729,22 @@ class _CountdownDialog extends StatefulWidget {
 
 class _CountdownDialogState extends State<_CountdownDialog> {
   int _seconds = 10;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _tick();
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) { t.cancel(); return; }
+      setState(() => _seconds--);
+      if (_seconds <= 0) t.cancel();
+    });
   }
 
-  void _tick() {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (!mounted) return;
-      setState(() => _seconds--);
-      if (_seconds > 0) _tick();
-    });
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override

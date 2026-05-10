@@ -24,8 +24,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   void initState() {
     super.initState();
     Future.microtask(() async {
-      await ref.read(vaultProvider.notifier).loadItems();
-      ref.read(categoryProvider.notifier).loadCategories();
+      await Future.wait([
+        ref.read(vaultProvider.notifier).loadItems(),
+        ref.read(categoryProvider.notifier).loadCategories(),
+      ]);
       if (mounted) await showDesktopOnboardingIfNeeded(context);
       await ref.read(vaultProvider.notifier).createSampleItemIfNeeded();
     });
