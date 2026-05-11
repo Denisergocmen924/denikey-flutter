@@ -2632,6 +2632,42 @@ abstract class AppLocalizations {
   /// **'Mesajınız'**
   String get supportTicketDetailMessage;
 
+  /// No description provided for @supportTicketDeleteConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talep Silinsin mi?'**
+  String get supportTicketDeleteConfirmTitle;
+
+  /// No description provided for @supportTicketDeleteConfirmMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu destek talebi kalıcı olarak silinecek.'**
+  String get supportTicketDeleteConfirmMessage;
+
+  /// No description provided for @supportTicketDeleteCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get supportTicketDeleteCancel;
+
+  /// No description provided for @supportTicketDeleteConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sil'**
+  String get supportTicketDeleteConfirm;
+
+  /// No description provided for @supportTicketDeleteSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talep silindi'**
+  String get supportTicketDeleteSuccess;
+
+  /// No description provided for @supportTicketDeleteError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Talep silinemedi'**
+  String get supportTicketDeleteError;
+
   /// No description provided for @forceUpdateTitle.
   ///
   /// In tr, this message translates to:

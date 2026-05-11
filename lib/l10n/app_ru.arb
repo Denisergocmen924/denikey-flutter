@@ -561,6 +561,12 @@
   "supportTicketLoadingError": "Не удалось загрузить обращения",
   "supportTicketLoadingRetry": "Повторить",
   "supportTicketDetailMessage": "Ваше сообщение",
+  "supportTicketDeleteConfirmTitle": "Удалить запрос?",
+  "supportTicketDeleteConfirmMessage": "Этот запрос поддержки будет удалён без возможности восстановления.",
+  "supportTicketDeleteCancel": "Отмена",
+  "supportTicketDeleteConfirm": "Удалить",
+  "supportTicketDeleteSuccess": "Запрос удалён",
+  "supportTicketDeleteError": "Не удалось удалить запрос",
 
   "forceUpdateTitle": "Требуется обновление",
   "forceUpdateDescription": "Эта версия больше не поддерживается.\nПожалуйста, обновите приложение для продолжения.",

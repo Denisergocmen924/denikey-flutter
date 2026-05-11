@@ -1362,6 +1362,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get supportTicketDetailMessage => 'Ваше сообщение';
 
   @override
+  String get supportTicketDeleteConfirmTitle => 'Удалить запрос?';
+
+  @override
+  String get supportTicketDeleteConfirmMessage =>
+      'Этот запрос поддержки будет удалён без возможности восстановления.';
+
+  @override
+  String get supportTicketDeleteCancel => 'Отмена';
+
+  @override
+  String get supportTicketDeleteConfirm => 'Удалить';
+
+  @override
+  String get supportTicketDeleteSuccess => 'Запрос удалён';
+
+  @override
+  String get supportTicketDeleteError => 'Не удалось удалить запрос';
+
+  @override
   String get forceUpdateTitle => 'Требуется обновление';
 
   @override

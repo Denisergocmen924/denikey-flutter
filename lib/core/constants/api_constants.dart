@@ -36,6 +36,7 @@ class ApiConstants {
 
   // Support ticket
   static const String supportTickets = '/api/v1/support-ticket/';
+  static String supportTicket(String id) => '/api/v1/support-ticket/$id';
 
   // Item types
   static const String itemTypes = '/api/v1/item-types/';

@@ -76,6 +76,20 @@ class SupportTicketNotifier extends StateNotifier<SupportTicketState> {
     }
   }
 
+  Future<void> deleteTicket(String id) async {
+    state = state.copyWith(status: SupportTicketStatus.loading);
+    try {
+      await _repo.deleteTicket(id);
+      state = state.copyWith(
+        status: SupportTicketStatus.success,
+        tickets: state.tickets.where((t) => t['id'] != id).toList(),
+      );
+    } on DioException catch (e) {
+      final msg = e.response?.data['detail'] ?? 'Talep silinemedi';
+      state = state.copyWith(status: SupportTicketStatus.error, errorMessage: msg.toString());
+    }
+  }
+
   void reset() => state = state.copyWith(status: SupportTicketStatus.idle, errorMessage: null);
 }
 

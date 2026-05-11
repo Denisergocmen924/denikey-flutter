@@ -561,6 +561,12 @@
   "supportTicketLoadingError": "Talepler yüklenemedi",
   "supportTicketLoadingRetry": "Tekrar Dene",
   "supportTicketDetailMessage": "Mesajınız",
+  "supportTicketDeleteConfirmTitle": "Talep Silinsin mi?",
+  "supportTicketDeleteConfirmMessage": "Bu destek talebi kalıcı olarak silinecek.",
+  "supportTicketDeleteCancel": "İptal",
+  "supportTicketDeleteConfirm": "Sil",
+  "supportTicketDeleteSuccess": "Talep silindi",
+  "supportTicketDeleteError": "Talep silinemedi",
 
   "forceUpdateTitle": "Güncelleme Gerekli",
   "forceUpdateDescription": "Bu sürüm artık desteklenmiyor.\nDevam etmek için lütfen uygulamayı güncelleyin.",

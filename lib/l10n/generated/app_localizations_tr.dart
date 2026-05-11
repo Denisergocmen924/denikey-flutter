@@ -1361,6 +1361,25 @@ class AppLocalizationsTr extends AppLocalizations {
   String get supportTicketDetailMessage => 'Mesajınız';
 
   @override
+  String get supportTicketDeleteConfirmTitle => 'Talep Silinsin mi?';
+
+  @override
+  String get supportTicketDeleteConfirmMessage =>
+      'Bu destek talebi kalıcı olarak silinecek.';
+
+  @override
+  String get supportTicketDeleteCancel => 'İptal';
+
+  @override
+  String get supportTicketDeleteConfirm => 'Sil';
+
+  @override
+  String get supportTicketDeleteSuccess => 'Talep silindi';
+
+  @override
+  String get supportTicketDeleteError => 'Talep silinemedi';
+
+  @override
   String get forceUpdateTitle => 'Güncelleme Gerekli';
 
   @override

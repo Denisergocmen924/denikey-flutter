@@ -561,6 +561,12 @@
   "supportTicketLoadingError": "Failed to load tickets",
   "supportTicketLoadingRetry": "Retry",
   "supportTicketDetailMessage": "Your Message",
+  "supportTicketDeleteConfirmTitle": "Delete Ticket?",
+  "supportTicketDeleteConfirmMessage": "This support ticket will be permanently deleted.",
+  "supportTicketDeleteCancel": "Cancel",
+  "supportTicketDeleteConfirm": "Delete",
+  "supportTicketDeleteSuccess": "Ticket deleted",
+  "supportTicketDeleteError": "Could not delete ticket",
 
   "forceUpdateTitle": "Update Required",
   "forceUpdateDescription": "This version is no longer supported.\nPlease update the app to continue.",

@@ -26,4 +26,8 @@ class SupportTicketRepository {
     final response = await _dio.get(ApiConstants.supportTickets);
     return List<Map<String, dynamic>>.from(response.data);
   }
+
+  Future<void> deleteTicket(String id) async {
+    await _dio.delete(ApiConstants.supportTicket(id));
+  }
 }

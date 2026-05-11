@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/support_ticket_provider.dart';
@@ -65,6 +66,56 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
       message: _messageCtrl.text.trim(),
       priority: _priority,
     );
+  }
+
+  void _showDeleteDialog(Map<String, dynamic> ticket) {
+    final l10n = AppLocalizations.of(context);
+    int countdown = 2;
+    Timer? timer;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          timer ??= Timer.periodic(const Duration(seconds: 1), (t) {
+            if (countdown > 0) {
+              setDialogState(() => countdown--);
+            } else {
+              t.cancel();
+            }
+          });
+
+          return AlertDialog(
+            title: Text(l10n.supportTicketDeleteConfirmTitle),
+            content: Text(l10n.supportTicketDeleteConfirmMessage),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  timer?.cancel();
+                  Navigator.of(ctx).pop();
+                },
+                child: Text(l10n.supportTicketDeleteCancel),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: countdown > 0
+                    ? null
+                    : () async {
+                        timer?.cancel();
+                        Navigator.of(ctx).pop();
+                        await ref.read(supportTicketProvider.notifier).deleteTicket(ticket['id'] as String);
+                      },
+                child: Text(
+                  countdown > 0
+                      ? '${l10n.supportTicketDeleteConfirm} ($countdown)'
+                      : l10n.supportTicketDeleteConfirm,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    ).then((_) => timer?.cancel());
   }
 
   void _showTicketDetail(Map<String, dynamic> ticket) {
@@ -204,14 +255,17 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
     final priorities = _priorityLabels(l10n);
     final statusLabels = _statusLabels(l10n);
 
-    ref.listen(supportTicketProvider, (_, next) {
+    ref.listen(supportTicketProvider, (prev, next) {
       if (next.status == SupportTicketStatus.success) {
+        final isDelete = prev?.tickets.length != next.tickets.length && next.tickets.length < (prev?.tickets.length ?? 0);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.supportTicketSuccess)),
+          SnackBar(content: Text(isDelete ? l10n.supportTicketDeleteSuccess : l10n.supportTicketSuccess)),
         );
-        _subjectCtrl.clear();
-        _messageCtrl.clear();
-        setState(() { _category = 'bug'; _priority = 'normal'; });
+        if (!isDelete) {
+          _subjectCtrl.clear();
+          _messageCtrl.clear();
+          setState(() { _category = 'bug'; _priority = 'normal'; });
+        }
         ref.read(supportTicketProvider.notifier).reset();
       }
       if (next.status == SupportTicketStatus.error) {
@@ -326,16 +380,29 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                         color: hasReply ? Theme.of(context).colorScheme.primary : Colors.grey,
                       ),
                     ),
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: statusColor.withAlpha(20),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        statusLabel,
-                        style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w600),
-                      ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: statusColor.withAlpha(20),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            statusLabel,
+                            style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, size: 20),
+                          color: Colors.red.shade300,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => _showDeleteDialog(t),
+                        ),
+                      ],
                     ),
                   ),
                 );

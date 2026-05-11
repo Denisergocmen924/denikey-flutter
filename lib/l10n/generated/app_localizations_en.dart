@@ -1363,6 +1363,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportTicketDetailMessage => 'Your Message';
 
   @override
+  String get supportTicketDeleteConfirmTitle => 'Delete Ticket?';
+
+  @override
+  String get supportTicketDeleteConfirmMessage =>
+      'This support ticket will be permanently deleted.';
+
+  @override
+  String get supportTicketDeleteCancel => 'Cancel';
+
+  @override
+  String get supportTicketDeleteConfirm => 'Delete';
+
+  @override
+  String get supportTicketDeleteSuccess => 'Ticket deleted';
+
+  @override
+  String get supportTicketDeleteError => 'Could not delete ticket';
+
+  @override
   String get forceUpdateTitle => 'Update Required';
 
   @override
