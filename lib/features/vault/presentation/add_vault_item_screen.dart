@@ -133,7 +133,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
         customFieldsData.add({
           'field_name': name,
           'value': value,
-          'field_type': field.isSecret ? 'secret' : 'text',
+          'field_type': (field.isSecret || field.obscure) ? 'secret' : 'text',
         });
       }
     }
