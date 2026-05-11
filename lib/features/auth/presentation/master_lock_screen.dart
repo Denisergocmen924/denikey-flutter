@@ -130,9 +130,15 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                 children: [
                   const SizedBox(height: 48),
                   Center(
-                    child: Image.asset(
-                      'assets/icon/denikey_logo.png',
-                      width: 100,
+                    child: Container(
+                      width: 88,
+                      height: 88,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF090C08),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: Image.asset('assets/icon/denikey_emblem.png'),
                     ),
                   ),
                   const SizedBox(height: 20),

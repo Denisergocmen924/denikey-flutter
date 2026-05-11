@@ -167,12 +167,19 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final bgColor      = isDark ? _onyx                  : const Color(0xFFF5F6F5);
+    final glowColor    = isDark ? _jet.withAlpha(120)     : const Color(0xFFCFD8DC).withAlpha(180);
+    final titleColor   = isDark ? const Color(0xFFE8EDE9) : const Color(0xFF0D1B13);
+    final subtitleColor= isDark ? const Color(0xFF9BABA4) : const Color(0xFF5C7268);
+    final versionColor = isDark ? const Color(0xFF455550) : const Color(0xFF9BABA4);
 
     return Scaffold(
-      backgroundColor: _onyx,
+      backgroundColor: bgColor,
       body: Stack(
         children: [
-          // Arka plan ışıma (jet black daire)
+          // Arka plan ışıma
           FadeTransition(
             opacity: _bgGlow,
             child: Center(
@@ -183,8 +190,8 @@ class _SplashScreenState extends State<SplashScreen>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      _jet.withAlpha(120),
-                      _onyx.withAlpha(0),
+                      glowColor,
+                      bgColor.withAlpha(0),
                     ],
                   ),
                 ),
@@ -227,9 +234,15 @@ class _SplashScreenState extends State<SplashScreen>
                           opacity: _shieldFade.value.clamp(0.0, 1.0),
                           child: Transform.scale(
                             scale: _shieldScale.value * _pulse.value,
-                            child: Image.asset(
-                              'assets/icon/denikey_emblem.png',
+                            child: Container(
                               width: 160,
+                              height: 160,
+                              decoration: BoxDecoration(
+                                color: _onyx,
+                                borderRadius: BorderRadius.circular(36),
+                              ),
+                              padding: const EdgeInsets.all(20),
+                              child: Image.asset('assets/icon/denikey_emblem.png'),
                             ),
                           ),
                         ),
@@ -247,12 +260,12 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _titleFade.value.clamp(0.0, 1.0),
                     child: Transform.translate(
                       offset: Offset(0, _titleSlide.value),
-                      child: const Text(
+                      child: Text(
                         'DeniKey',
                         style: TextStyle(
                           fontSize: 42,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFFE8EDE9),
+                          color: titleColor,
                           letterSpacing: -1.0,
                         ),
                       ),
@@ -269,9 +282,9 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _subtitleFade.value.clamp(0.0, 1.0),
                     child: Text(
                       AppLocalizations.of(context).splashSubtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF9BABA4),
+                        color: subtitleColor,
                         letterSpacing: 1.2,
                         fontWeight: FontWeight.w400,
                       ),
@@ -317,7 +330,7 @@ class _SplashScreenState extends State<SplashScreen>
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Color(0xFF455550),
+                  color: versionColor,
                   letterSpacing: 1.0,
                 ),
               ),

@@ -74,9 +74,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   const SizedBox(height: 48),
                   Center(
-                    child: Image.asset(
-                      'assets/icon/denikey_logo.png',
-                      width: 160,
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF090C08),
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Image.asset('assets/icon/denikey_emblem.png'),
                     ),
                   ),
                   const SizedBox(height: 20),
