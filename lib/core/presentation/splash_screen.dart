@@ -227,12 +227,9 @@ class _SplashScreenState extends State<SplashScreen>
                           opacity: _shieldFade.value.clamp(0.0, 1.0),
                           child: Transform.scale(
                             scale: _shieldScale.value * _pulse.value,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(45),
-                              child: Image.asset(
-                                'assets/icon/denikey_logo.png',
-                                width: 200,
-                              ),
+                            child: Image.asset(
+                              'assets/icon/denikey_emblem.png',
+                              width: 160,
                             ),
                           ),
                         ),

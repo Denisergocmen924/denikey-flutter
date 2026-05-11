@@ -24,7 +24,7 @@ class _FieldEntry {
     this.isSecret = false,
   })  : nameCtr = TextEditingController(text: name),
         valueCtr = TextEditingController(),
-        obscure = false;
+        obscure = isSecret;
 
   void dispose() {
     nameCtr.dispose();
@@ -507,8 +507,8 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                     suffixIcon: IconButton(
                         iconSize: 18,
                         icon: Icon(entry.obscure
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                            ? Icons.visibility
+                            : Icons.visibility_off),
                         onPressed: () =>
                             setState(() => entry.obscure = !entry.obscure),
                       ),
