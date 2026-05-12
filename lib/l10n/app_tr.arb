@@ -573,6 +573,7 @@
   "forceUpdateCurrentVersion": "Mevcut sürüm",
   "forceUpdateMinimumVersion": "Gerekli sürüm",
   "forceUpdateButton": "Güncelle",
+  "forceUpdateButtonResume": "Devam Et",
   "forceUpdateDownloading": "İndiriliyor... %{progress}",
   "@forceUpdateDownloading": {
     "placeholders": {

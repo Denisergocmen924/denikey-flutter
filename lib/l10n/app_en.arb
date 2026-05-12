@@ -573,6 +573,7 @@
   "forceUpdateCurrentVersion": "Current version",
   "forceUpdateMinimumVersion": "Required version",
   "forceUpdateButton": "Update",
+  "forceUpdateButtonResume": "Resume",
   "forceUpdateDownloading": "Downloading... %{progress}",
   "@forceUpdateDownloading": {
     "placeholders": {

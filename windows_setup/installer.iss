@@ -23,7 +23,9 @@ WizardStyle=modern
 PrivilegesRequired=lowest
 
 [Languages]
-Name: "turkish"; MessagesFile: "Turkish.isl"
+Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Masaüstüne kısayol oluştur"; GroupDescription: "Ek görevler:"; Flags: unchecked

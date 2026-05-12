@@ -573,6 +573,7 @@
   "forceUpdateCurrentVersion": "Текущая версия",
   "forceUpdateMinimumVersion": "Требуемая версия",
   "forceUpdateButton": "Обновить",
+  "forceUpdateButtonResume": "Продолжить",
   "forceUpdateDownloading": "Загрузка... %{progress}",
   "@forceUpdateDownloading": {
     "placeholders": {

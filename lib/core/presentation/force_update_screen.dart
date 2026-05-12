@@ -23,26 +23,57 @@ class ForceUpdateScreen extends StatefulWidget {
   State<ForceUpdateScreen> createState() => _ForceUpdateScreenState();
 }
 
-class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
+class _ForceUpdateScreenState extends State<ForceUpdateScreen>
+    with WidgetsBindingObserver {
   static const _onyx   = Color(0xFF090C08);
   static const _orange = Color(0xFFFF5900);
   static const _cream  = Color(0xFFE8EDE9);
   static const _muted  = Color(0xFF9BABA4);
+  static const _green  = Color(0xFF4CAF50);
 
-  bool _downloading = false;
-  double _progress  = 0;
+  bool _downloading          = false;
+  bool _isPaused             = false;
+  double _progress           = 0;
   String? _error;
-  int _androidSdk   = 0;
+  int _androidSdk            = 0;
+  bool _hasInstallPermission = false;
+  CancelToken? _cancelToken;
+  int _downloadedBytes       = 0;
+  String? _savePath;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid) _loadAndroidSdk();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused && _downloading) {
+      _pauseDownload();
+    } else if (state == AppLifecycleState.resumed) {
+      if (Platform.isAndroid && _androidSdk >= 26) _checkInstallPermission();
+      if (_isPaused) _resumeDownload();
+    }
   }
 
   Future<void> _loadAndroidSdk() async {
     final info = await DeviceInfoPlugin().androidInfo;
-    if (mounted) setState(() => _androidSdk = info.version.sdkInt);
+    if (!mounted) return;
+    setState(() => _androidSdk = info.version.sdkInt);
+    if (_androidSdk >= 26) _checkInstallPermission();
+  }
+
+  Future<void> _checkInstallPermission() async {
+    final status = await Permission.requestInstallPackages.status;
+    if (mounted) setState(() => _hasInstallPermission = status.isGranted);
   }
 
   String get _installPath {
@@ -63,8 +94,6 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
   }
 
   Future<void> _update() async {
-    final l10n = AppLocalizations.of(context);
-
     if (Platform.isLinux) {
       await launchUrl(Uri.parse(ApiConstants.releasesPage), mode: LaunchMode.externalApplication);
       return;
@@ -79,49 +108,120 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
     }
 
     setState(() {
-      _downloading = true;
-      _progress    = 0;
-      _error       = null;
+      _downloading     = true;
+      _isPaused        = false;
+      _downloadedBytes = 0;
+      _progress        = 0;
+      _error           = null;
     });
 
+    await _startDownload();
+  }
+
+  Future<void> _startDownload() async {
+    final l10n = AppLocalizations.of(context);
     try {
       final dir      = await getTemporaryDirectory();
       final fileName = Platform.isAndroid ? 'DeniKey-Update.apk' : 'DeniKey-Setup.exe';
-      final savePath = '${dir.path}/$fileName';
+      _savePath = '${dir.path}/$fileName';
 
-      await Dio().download(
+      if (_downloadedBytes == 0) {
+        final existing = File(_savePath!);
+        if (await existing.exists()) await existing.delete();
+      }
+
+      _cancelToken = CancelToken();
+
+      final response = await Dio().get<ResponseBody>(
         _downloadUrl,
-        savePath,
-        onReceiveProgress: (received, total) {
-          if (total > 0) setState(() => _progress = received / total);
-        },
+        cancelToken: _cancelToken,
+        options: Options(
+          responseType: ResponseType.stream,
+          followRedirects: true,
+          maxRedirects: 5,
+          headers: _downloadedBytes > 0
+              ? {'Range': 'bytes=$_downloadedBytes-'}
+              : null,
+        ),
       );
 
+      final contentLength = int.tryParse(
+        response.headers.value('content-length') ?? '',
+      ) ?? 0;
+      final totalBytes = _downloadedBytes + contentLength;
+
+      final sink = File(_savePath!).openWrite(
+        mode: _downloadedBytes > 0 ? FileMode.append : FileMode.write,
+      );
+
+      await for (final chunk in response.data!.stream) {
+        sink.add(chunk);
+        _downloadedBytes += chunk.length;
+        if (mounted && totalBytes > 0) {
+          setState(() => _progress = _downloadedBytes / totalBytes);
+        }
+      }
+
+      await sink.flush();
+      await sink.close();
+
+      if (!mounted) return;
+      setState(() => _downloading = false);
+
       if (Platform.isAndroid) {
-        final result = await OpenFile.open(savePath);
+        final result = await OpenFile.open(_savePath!);
         if (result.type != ResultType.done) {
           setState(() => _error = l10n.forceUpdateInstallError(result.message));
         }
       } else if (Platform.isWindows) {
-        await Process.start(savePath, ['/SILENT', '/TASKS=']);
+        await Process.start(_savePath!, ['/SILENT', '/TASKS=']);
+      }
+    } on DioException catch (e) {
+      if (CancelToken.isCancel(e)) return;
+      if (mounted) {
+        setState(() {
+          _downloading = false;
+          _error = l10n.forceUpdateError(e.message ?? e.toString());
+        });
       }
     } catch (e) {
-      setState(() => _error = l10n.forceUpdateError(e.toString()));
-    } finally {
-      if (mounted) setState(() => _downloading = false);
+      if (mounted) {
+        setState(() {
+          _downloading = false;
+          _error = l10n.forceUpdateError(e.toString());
+        });
+      }
     }
+  }
+
+  void _pauseDownload() {
+    _cancelToken?.cancel('paused');
+    if (mounted) {
+      setState(() {
+        _isPaused    = true;
+        _downloading = false;
+      });
+    }
+  }
+
+  void _resumeDownload() {
+    if (!mounted) return;
+    setState(() {
+      _isPaused    = false;
+      _downloading = true;
+    });
+    _startDownload();
   }
 
   void _showInstallPermissionDialog() {
     final l10n = AppLocalizations.of(context);
-    final canOpenSettings = _androidSdk >= 26;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.forceUpdatePermissionTitle),
         content: Text(l10n.forceUpdatePermissionContent),
         actions: [
-          if (canOpenSettings)
+          if (_androidSdk >= 26)
             TextButton(
               onPressed: () async {
                 Navigator.pop(ctx);
@@ -140,7 +240,10 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n        = AppLocalizations.of(context);
+    final isAndroid26 = Platform.isAndroid && _androidSdk >= 26;
+    final buttonColor = isAndroid26 && _hasInstallPermission ? _green : _orange;
+
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -259,22 +362,26 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
                     height: 52,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _orange,
+                        backgroundColor: buttonColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 0,
                       ),
-                      icon: const Icon(Icons.download_outlined),
+                      icon: Icon(
+                        _isPaused
+                            ? Icons.play_arrow_outlined
+                            : Icons.download_outlined,
+                      ),
                       label: Text(
-                        l10n.forceUpdateButton,
+                        _isPaused ? l10n.forceUpdateButtonResume : l10n.forceUpdateButton,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      onPressed: _update,
+                      onPressed: _isPaused ? _resumeDownload : _update,
                     ),
                   ),
                   if (_error != null) ...[
