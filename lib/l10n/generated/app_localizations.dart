@@ -2698,6 +2698,12 @@ abstract class AppLocalizations {
   /// **'Güncelle'**
   String get forceUpdateButton;
 
+  /// No description provided for @forceUpdateButtonResume.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam Et'**
+  String get forceUpdateButtonResume;
+
   /// No description provided for @forceUpdateDownloading.
   ///
   /// In tr, this message translates to:
@@ -3627,6 +3633,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Silinemedi'**
   String get errorCouldNotDelete;
+
+  /// No description provided for @offlineTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ne yazık ki internetsiz DeniKey\'e erişemezsiniz'**
+  String get offlineTitle;
+
+  /// No description provided for @offlineMessage.
+  ///
+  /// In tr, this message translates to:
+  /// **'Merak etmeyin, bu bir sorun değildir. Hesabınız ve içerikleriniz güvende. Tekrar internet bağlantısı sağladığınızda tam erişim geri gelecektir.'**
+  String get offlineMessage;
+
+  /// No description provided for @addItemFieldNameRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu alanı doldurmak zorunludur'**
+  String get addItemFieldNameRequired;
 }
 
 class _AppLocalizationsDelegate

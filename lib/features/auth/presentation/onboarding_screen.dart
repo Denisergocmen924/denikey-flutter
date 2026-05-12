@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
@@ -22,6 +23,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   static const _border  = Color(0xFF1E2820);
 
   late final AnimationController _pulseCtrl;
+  late final AnimationController _shakeCtrl;
+  late final Animation<double> _shakeAnim;
 
   @override
   void initState() {
@@ -30,13 +33,31 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+
+    _shakeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 420),
+    );
+    _shakeAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -12.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -12.0, end: 12.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 12.0, end: -8.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -8.0, end: 8.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 8.0, end: 0.0), weight: 1),
+    ]).animate(_shakeCtrl);
   }
 
   @override
   void dispose() {
     _pageCtrl.dispose();
     _pulseCtrl.dispose();
+    _shakeCtrl.dispose();
     super.dispose();
+  }
+
+  void _triggerShake() {
+    HapticFeedback.mediumImpact();
+    _shakeCtrl.forward(from: 0);
   }
 
   Future<void> _finish() async {
@@ -102,28 +123,42 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
             // Sayfalar
             Expanded(
-              child: PageView(
-                controller: _pageCtrl,
-                onPageChanged: (i) {
-                  setState(() {
-                    _currentPage = i;
-                    _canAdvance = false;
-                  });
-                  Future.delayed(const Duration(seconds: 1), () {
-                    if (mounted && _currentPage == i) {
-                      setState(() => _canAdvance = true);
-                    }
-                  });
-                },
-                children: [
-                  _WelcomePage(pulseCtrl: _pulseCtrl),
-                  const _VaultPage(),
-                  const _CategoriesPage(),
-                  const _TypesPage(),
-                  const _GeneratorPage(),
-                  const _SecurityPage(),
-                  _ReadyPage(isReplay: widget.isReplay),
-                ],
+              child: AnimatedBuilder(
+                animation: _shakeAnim,
+                builder: (context, child) => Transform.translate(
+                  offset: Offset(_shakeAnim.value, 0),
+                  child: child,
+                ),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onHorizontalDragEnd: (details) {
+                    if (!_canAdvance) _triggerShake();
+                  },
+                  child: PageView(
+                    controller: _pageCtrl,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (i) {
+                      setState(() {
+                        _currentPage = i;
+                        _canAdvance = false;
+                      });
+                      Future.delayed(const Duration(seconds: 1), () {
+                        if (mounted && _currentPage == i) {
+                          setState(() => _canAdvance = true);
+                        }
+                      });
+                    },
+                    children: [
+                      _WelcomePage(pulseCtrl: _pulseCtrl),
+                      const _VaultPage(),
+                      const _CategoriesPage(),
+                      const _TypesPage(),
+                      const _GeneratorPage(),
+                      const _SecurityPage(),
+                      _ReadyPage(isReplay: widget.isReplay),
+                    ],
+                  ),
+                ),
               ),
             ),
 

@@ -123,6 +123,17 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       hasError = true;
     }
 
+    for (final field in _fields) {
+      if (field.backendFieldId == null) {
+        final name  = field.nameCtr.text.trim();
+        final value = field.valueCtr.text.trim();
+        if (value.isNotEmpty && name.isEmpty) {
+          setState(() => field.error = l10n.addItemFieldNameRequired);
+          hasError = true;
+        }
+      }
+    }
+
     if (hasError) return;
 
     final customFieldsData = <Map<String, String>>[];
@@ -479,8 +490,12 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                   width: 110,
                   child: TextField(
                     controller: entry.nameCtr,
+                    onChanged: (_) {
+                      if (entry.error != null) setState(() => entry.error = null);
+                    },
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context).addItemExtraFieldKeyLabel,
+                      errorText: entry.error,
                       border: const OutlineInputBorder(),
                       isDense: true,
                     ),
@@ -494,14 +509,10 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                 child: TextField(
                   controller: entry.valueCtr,
                   obscureText: entry.obscure,
-                  onChanged: (_) {
-                    if (entry.error != null) setState(() => entry.error = null);
-                  },
                   decoration: InputDecoration(
                     labelText: isTypeField
                         ? entry.nameCtr.text
                         : AppLocalizations.of(context).addItemExtraFieldValueLabel,
-                    errorText: entry.error,
                     border: const OutlineInputBorder(),
                     isDense: true,
                     suffixIcon: IconButton(

@@ -1397,6 +1397,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get forceUpdateButton => 'Обновить';
 
   @override
+  String get forceUpdateButtonResume => 'Продолжить';
+
+  @override
   String forceUpdateDownloading(int progress) {
     return 'Загрузка... %$progress';
   }
@@ -1911,4 +1914,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get errorCouldNotDelete => 'Не удалось удалить';
+
+  @override
+  String get offlineTitle =>
+      'К сожалению, без интернета вы не можете получить доступ к DeniKey';
+
+  @override
+  String get offlineMessage =>
+      'Не волнуйтесь, это не проблема. Ваш аккаунт и содержимое в безопасности. Полный доступ вернётся, когда вы снова подключитесь к интернету.';
+
+  @override
+  String get addItemFieldNameRequired => 'Это поле обязательно для заполнения';
 }

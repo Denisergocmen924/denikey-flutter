@@ -1396,6 +1396,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get forceUpdateButton => 'Güncelle';
 
   @override
+  String get forceUpdateButtonResume => 'Devam Et';
+
+  @override
   String forceUpdateDownloading(int progress) {
     return 'İndiriliyor... %$progress';
   }
@@ -1908,4 +1911,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errorCouldNotDelete => 'Silinemedi';
+
+  @override
+  String get offlineTitle => 'Ne yazık ki internetsiz DeniKey\'e erişemezsiniz';
+
+  @override
+  String get offlineMessage =>
+      'Merak etmeyin, bu bir sorun değildir. Hesabınız ve içerikleriniz güvende. Tekrar internet bağlantısı sağladığınızda tam erişim geri gelecektir.';
+
+  @override
+  String get addItemFieldNameRequired => 'Bu alanı doldurmak zorunludur';
 }

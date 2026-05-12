@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../../core/presentation/app_nav_bar.dart';
+import '../../../core/presentation/app_error_widget.dart';
 import '../../../core/presentation/desktop_onboarding_dialog.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
@@ -288,21 +289,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 return Center(child: Text(l10n.vaultLoading));
               }
               if (state.status == VaultStatus.error) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.error_outline, size: 48, color: cs.error),
-                      const SizedBox(height: 12),
-                      Text(state.errorMessage ?? l10n.vaultError,
-                        style: TextStyle(color: cs.onSurfaceVariant)),
-                      const SizedBox(height: 16),
-                      FilledButton(
-                        onPressed: () => ref.read(vaultProvider.notifier).loadItems(),
-                        child: Text(l10n.vaultRetry),
-                      ),
-                    ],
-                  ),
+                return AppErrorWidget(
+                  message: state.errorMessage ?? l10n.vaultError,
+                  retryLabel: l10n.vaultRetry,
+                  onRetry: () => ref.read(vaultProvider.notifier).loadItems(),
                 );
               }
               if (state.items.isEmpty) {

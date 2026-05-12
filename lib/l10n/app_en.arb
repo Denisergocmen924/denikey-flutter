@@ -794,5 +794,7 @@
   "errorCouldNotDelete": "Could not delete",
 
   "offlineTitle": "Unfortunately, you can't access DeniKey without internet",
-  "offlineMessage": "Don't worry, this is not a problem. Your account and content are safe. Full access will return when you reconnect to the internet."
+  "offlineMessage": "Don't worry, this is not a problem. Your account and content are safe. Full access will return when you reconnect to the internet.",
+
+  "addItemFieldNameRequired": "This field is required"
 }
