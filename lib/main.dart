@@ -17,6 +17,8 @@ import 'core/presentation/app_shortcuts.dart';
 import 'core/storage/secure_storage.dart';
 import 'core/services/tray_service.dart';
 import 'core/localization/l10n.dart';
+import 'core/providers/connectivity_provider.dart';
+import 'core/presentation/offline_screen.dart';
 
 // Tek instance kilidi için sabit port
 const _kSingleInstancePort = 47821;
@@ -356,11 +358,17 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
       routerConfig: router,
       builder: (context, child) {
         L10n.update(AppLocalizations.of(context));
-        return LoadingOverlay(
-        key: loadingOverlayKey,
-        child: AppShortcuts(
-          child: child ?? const SizedBox.shrink(),
-        ),
+        return Consumer(
+          builder: (context, ref, _) {
+            final isOffline = ref.watch(connectivityProvider).valueOrNull ?? false;
+            if (isOffline) return const OfflineScreen();
+            return LoadingOverlay(
+              key: loadingOverlayKey,
+              child: AppShortcuts(
+                child: child ?? const SizedBox.shrink(),
+              ),
+            );
+          },
         );
       },
     );

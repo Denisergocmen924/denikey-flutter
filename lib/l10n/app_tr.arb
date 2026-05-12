@@ -796,5 +796,8 @@
   "errorCouldNotLoad": "Yüklenemedi",
   "errorCouldNotCreate": "Oluşturulamadı",
   "errorCouldNotUpdate": "Güncellenemedi",
-  "errorCouldNotDelete": "Silinemedi"
+  "errorCouldNotDelete": "Silinemedi",
+
+  "offlineTitle": "Ne yazık ki internetsiz DeniKey'e erişemezsiniz",
+  "offlineMessage": "Merak etmeyin, bu bir sorun değildir. Hesabınız ve içerikleriniz güvende. Tekrar internet bağlantısı sağladığınızda tam erişim geri gelecektir."
 }

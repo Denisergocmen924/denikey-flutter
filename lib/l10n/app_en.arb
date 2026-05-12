@@ -791,5 +791,8 @@
   "errorCouldNotLoad": "Could not load",
   "errorCouldNotCreate": "Could not create",
   "errorCouldNotUpdate": "Could not update",
-  "errorCouldNotDelete": "Could not delete"
+  "errorCouldNotDelete": "Could not delete",
+
+  "offlineTitle": "Unfortunately, you can't access DeniKey without internet",
+  "offlineMessage": "Don't worry, this is not a problem. Your account and content are safe. Full access will return when you reconnect to the internet."
 }
