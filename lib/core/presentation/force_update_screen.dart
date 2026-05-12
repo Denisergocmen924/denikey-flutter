@@ -124,20 +124,7 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
             TextButton(
               onPressed: () async {
                 Navigator.pop(ctx);
-                try {
-                  final uri = Uri.parse(
-                    'intent:#Intent;action=android.settings.MANAGE_UNKNOWN_APP_SOURCES;'
-                    'data=package%3Acom.denikey.denikey_app;end',
-                  );
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                } catch (_) {
-                  try {
-                    await launchUrl(
-                      Uri.parse('package:com.denikey.denikey_app'),
-                      mode: LaunchMode.externalApplication,
-                    );
-                  } catch (_) {}
-                }
+                await openAppSettings();
               },
               child: Text(l10n.forceUpdatePermissionOpenSettings),
             ),
