@@ -8,7 +8,7 @@ class LocaleNotifier extends Notifier<Locale> {
   @override
   Locale build() {
     _load();
-    return const Locale('tr');
+    return const Locale('en');
   }
 
   Future<void> _load() async {
