@@ -170,7 +170,9 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen>
 
       if (Platform.isAndroid) {
         final result = await OpenFile.open(_savePath!);
-        if (result.type != ResultType.done) {
+        if (result.type == ResultType.done) {
+          exit(0);
+        } else {
           setState(() => _error = l10n.forceUpdateInstallError(result.message));
         }
       } else if (Platform.isWindows) {
