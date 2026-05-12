@@ -45,6 +45,13 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
     if (mounted) setState(() => _androidSdk = info.version.sdkInt);
   }
 
+  String get _installPath {
+    if (Platform.isWindows) {
+      return File(Platform.resolvedExecutable).parent.path;
+    }
+    return '';
+  }
+
   String get _downloadUrl {
     final v = widget.minimumVersion;
     if (Platform.isAndroid) {
@@ -96,13 +103,7 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
           setState(() => _error = l10n.forceUpdateInstallError(result.message));
         }
       } else if (Platform.isWindows) {
-        final launched = await launchUrl(
-          Uri.file(savePath),
-          mode: LaunchMode.externalApplication,
-        );
-        if (!launched) {
-          setState(() => _error = l10n.forceUpdateInstallErrorFilePath(savePath));
-        }
+        await Process.start(savePath, ['/SILENT', '/TASKS=']);
       }
     } catch (e) {
       setState(() => _error = l10n.forceUpdateError(e.toString()));
@@ -218,6 +219,24 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen> {
                     ],
                   ),
                 ),
+
+                if (Platform.isWindows) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.folder_outlined, size: 12, color: _muted),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          _installPath,
+                          style: const TextStyle(fontSize: 11, color: _muted),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
 
                 const SizedBox(height: 40),
 
