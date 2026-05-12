@@ -70,7 +70,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
 
   void _showDeleteDialog(Map<String, dynamic> ticket) {
     final l10n = AppLocalizations.of(context);
-    int countdown = 2;
+    int countdown = 3;
     Timer? timer;
 
     showDialog(
