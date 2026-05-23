@@ -19,6 +19,11 @@ class ApiConstants {
   static const String updateProfile      = '/api/v1/auth/profile';
   static const String logout             = '/api/v1/auth/logout';
   static const String deleteAccount      = '/api/v1/auth/delete-account';
+  static const String totpStatus         = '/api/v1/auth/totp/status';
+  static const String totpSetup          = '/api/v1/auth/totp/setup';
+  static const String totpEnable         = '/api/v1/auth/totp/enable';
+  static const String totpDisable        = '/api/v1/auth/totp/disable';
+  static const String totpVerifyLogin    = '/api/v1/auth/totp/verify-login';
 
   // Vault
   static const String vaultItems = '/api/v1/vault/items';

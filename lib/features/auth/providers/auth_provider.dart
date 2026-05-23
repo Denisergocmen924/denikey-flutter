@@ -4,14 +4,16 @@ import '../data/auth_repository.dart';
 import '../../../core/presentation/loading_overlay.dart';
 import '../../../core/localization/l10n.dart';
 
-enum AuthStatus { idle, loading, success, needsDeviceVerification, deviceBanned, error }
+enum AuthStatus { idle, loading, success, needsDeviceVerification, deviceBanned, needsTotp, error }
 
 class AuthState {
   final AuthStatus status;
   final String? errorMessage;
   final String? userId;
   final String? email;
-  final String? masterPassword; // device verify için geçici tutar
+  final String? masterPassword; // device verify ve totp için geçici tutar
+  final String? totpTempToken;
+  final String? username;
 
   const AuthState({
     this.status = AuthStatus.idle,
@@ -19,6 +21,8 @@ class AuthState {
     this.userId,
     this.email,
     this.masterPassword,
+    this.totpTempToken,
+    this.username,
   });
 
   AuthState copyWith({
@@ -27,6 +31,8 @@ class AuthState {
     String? userId,
     String? email,
     String? masterPassword,
+    String? totpTempToken,
+    String? username,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -34,6 +40,8 @@ class AuthState {
       userId: userId ?? this.userId,
       email: email ?? this.email,
       masterPassword: masterPassword ?? this.masterPassword,
+      totpTempToken: totpTempToken ?? this.totpTempToken,
+      username: username ?? this.username,
     );
   }
 }
@@ -53,6 +61,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
           userId: result['user_id'],
           email: result['email'],
           masterPassword: password,
+        );
+      } else if (result['needs_totp'] == true) {
+        state = state.copyWith(
+          status: AuthStatus.needsTotp,
+          totpTempToken: result['totp_temp_token'],
+          masterPassword: password,
+          username: username,
         );
       } else {
         state = state.copyWith(status: AuthStatus.success);

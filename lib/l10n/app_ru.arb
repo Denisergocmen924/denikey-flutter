@@ -1,6 +1,5 @@
 {
   "@@locale": "ru",
-
   "loginTagline": "Ваши пароли в безопасности",
   "loginUsernameLabel": "Имя пользователя или Email",
   "loginUsernameError": "Требуется имя пользователя или email",
@@ -13,7 +12,6 @@
   "loginRegisterButton": "Зарегистрироваться",
   "loginForgotButton": "Забыл пароль",
   "loginError": "Ошибка",
-
   "registerAppBarTitle": "Регистрация",
   "registerHeading": "Создать аккаунт",
   "registerSubheading": "Ваша личность остаётся конфиденциальной.",
@@ -36,19 +34,22 @@
   "registerAgeRestriction": "Для использования DeniKey вам должно быть не менее 13 лет",
   "registerSubmitButton": "Зарегистрироваться",
   "registerError": "Ошибка",
-
   "verifyEmailTitle": "Подтверждение Email",
   "verifyDeviceTitle": "Подтверждение устройства",
   "verifyEmailSubtitle": "Введите 6-значный код,\nотправленный на {email}",
   "@verifyEmailSubtitle": {
     "placeholders": {
-      "email": { "type": "String" }
+      "email": {
+        "type": "String"
+      }
     }
   },
   "verifyDeviceSubtitle": "Вы впервые входите с этого устройства.\nВведите 6-значный код, отправленный на {email}.",
   "@verifyDeviceSubtitle": {
     "placeholders": {
-      "email": { "type": "String" }
+      "email": {
+        "type": "String"
+      }
     }
   },
   "verifySpamWarning": "Проверьте папку Спам/Нежелательные",
@@ -57,7 +58,6 @@
   "verifyResendButton": "Отправить код повторно",
   "verifySendSuccess": "Код отправлен повторно",
   "verifySendError": "Не удалось отправить код",
-
   "forgotPasswordTitle": "Забыл пароль",
   "forgotPasswordHeading": "Сброс пароля",
   "forgotPasswordDescription": "На ваш зарегистрированный email будет отправлен код подтверждения.",
@@ -67,13 +67,14 @@
   "forgotPasswordSubmitButton": "Отправить код",
   "forgotPasswordError": "Не удалось отправить код подтверждения, попробуйте снова",
   "forgotPasswordApiError": "Произошла ошибка",
-
   "resetPasswordTitle": "Установить новый пароль",
   "resetPasswordHeading": "Сброс пароля",
   "resetPasswordDescription": "Введите код, отправленный на {email}, и ваш новый пароль.",
   "@resetPasswordDescription": {
     "placeholders": {
-      "email": { "type": "String" }
+      "email": {
+        "type": "String"
+      }
     }
   },
   "resetPasswordCodeLabel": "Код подтверждения",
@@ -88,7 +89,6 @@
   "resetPasswordSubmitButton": "Сбросить пароль",
   "resetPasswordSuccess": "Ваш пароль успешно сброшен",
   "resetPasswordApiError": "Произошла ошибка",
-
   "changeEmailTitle": "Изменить Email",
   "changeEmailHeading": "Новый адрес Email",
   "changeEmailDescription": "На ваш новый email будет отправлен код подтверждения.",
@@ -97,13 +97,14 @@
   "changeEmailFormatError": "Введите корректный email",
   "changeEmailSubmitButton": "Отправить код",
   "changeEmailApiError": "Произошла ошибка",
-
   "confirmEmailChangeTitle": "Подтверждение Email",
   "confirmEmailChangeHeading": "Подтвердите код",
   "confirmEmailChangeDescription": "Введите 6-значный код, отправленный на {newEmail}.",
   "@confirmEmailChangeDescription": {
     "placeholders": {
-      "newEmail": { "type": "String" }
+      "newEmail": {
+        "type": "String"
+      }
     }
   },
   "confirmEmailChangeCodeLabel": "Код подтверждения",
@@ -112,7 +113,6 @@
   "confirmEmailChangeSubmitButton": "Подтвердить",
   "confirmEmailChangeSuccess": "Ваш email успешно обновлён",
   "confirmEmailChangeApiError": "Произошла ошибка",
-
   "masterLockTitle": "DeniKey заблокирован",
   "masterLockPassword": "Введите мастер-пароль для продолжения",
   "masterLockBiometricExpired": "7-дневный период биометрии истёк.\nВведите мастер-пароль в целях безопасности.",
@@ -125,22 +125,21 @@
   "masterLockBiometricDaysRemaining": "Пароль потребуется через {days} дн.",
   "@masterLockBiometricDaysRemaining": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "masterLockBiometricTomorrow": "Пароль потребуется завтра",
   "masterLockDifferentAccount": "Войти с другим аккаунтом",
-
   "lockTitle": "DeniKey заблокирован",
   "lockDescription": "Подтвердите личность для продолжения",
   "lockBiometricButton": "Разблокировать биометрией",
   "lockLogoutButton": "Выйти",
   "lockAuthFailed": "Ошибка аутентификации",
-
   "deviceBannedTitle": "Устройство заблокировано",
   "deviceBannedDescription": "Это устройство нельзя использовать для данного аккаунта.\nВладелец аккаунта ограничил ваш доступ.",
   "deviceBannedBackButton": "Назад",
-
   "settingsTitle": "Настройки",
   "settingsAccountSection": "АККАУНТ",
   "settingsUsernameChange": "Изменить имя пользователя",
@@ -156,7 +155,9 @@
   "settingsBiometricActive": "Активно  ·  Пароль через {days} дн.",
   "@settingsBiometricActive": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "settingsBiometricActiveTomorrow": "Активно  ·  Пароль потребуется завтра",
@@ -166,7 +167,9 @@
   "settingsAutoLockEnabled": "Блокировать через {minutes} мин",
   "@settingsAutoLockEnabled": {
     "placeholders": {
-      "minutes": { "type": "int" }
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "settingsAutoLockFocusLoss": "Без ограничений — блокировать при потере фокуса",
@@ -175,7 +178,9 @@
   "settingsClipboardTimeoutActive": "Скопированный пароль удалится через {timeout} сек",
   "@settingsClipboardTimeoutActive": {
     "placeholders": {
-      "timeout": { "type": "int" }
+      "timeout": {
+        "type": "int"
+      }
     }
   },
   "settingsClipboardTimeoutDisabled": "Без ограничений — буфер не очищается автоматически",
@@ -205,7 +210,9 @@
   "settingsVersion": "DeniKey v{version}",
   "@settingsVersion": {
     "placeholders": {
-      "version": { "type": "String" }
+      "version": {
+        "type": "String"
+      }
     }
   },
   "settingsDevicesTitle": "Мои устройства",
@@ -239,7 +246,9 @@
   "settingsDeleteAccountCountdownWait": "Нужно подождать {seconds} секунд...",
   "@settingsDeleteAccountCountdownWait": {
     "placeholders": {
-      "seconds": { "type": "int" }
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "settingsDeleteAccountCountdownReady": "Вы можете продолжить.",
@@ -251,7 +260,6 @@
   "settingsDeleteAccountFailed": "Не удалось удалить аккаунт",
   "settingsDeleteAccountCancel": "Отмена",
   "settingsDeleteAccountContinue": "Продолжить",
-
   "privacyPolicyTitle": "Политика конфиденциальности",
   "privacyPolicyLastUpdate": "Последнее обновление: апрель 2026",
   "privacyPolicySection1Title": "1. Введение",
@@ -272,7 +280,6 @@
   "privacyPolicySection8Body": "Мы можем обновлять эту политику. О важных изменениях вы будете уведомлены на зарегистрированный email. Актуальная политика всегда доступна в приложении.",
   "privacyPolicySection9Title": "9. Контакты",
   "privacyPolicySection9Body": "По вопросам конфиденциальности вы можете создать обращение в поддержку или воспользоваться экраном «Служба поддержки» в приложении.",
-
   "vaultTitle": "DeniKey",
   "vaultSearchTooltip": "Поиск",
   "vaultTrashTooltip": "Корзина",
@@ -283,14 +290,18 @@
   "vaultBulkDeleteMessage": "{count} записей будет перемещено в корзину. Продолжить?",
   "@vaultBulkDeleteMessage": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "vaultBulkSelectAll": "Все",
   "vaultBulkMoveTitle": "Переместить {count} записей",
   "@vaultBulkMoveTitle": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "vaultBulkMoveUncategorized": "Без категории",
@@ -312,25 +323,21 @@
   "vaultBulkSelectionCount": "{count} выбрано",
   "@vaultBulkSelectionCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "addItemStep0": "Выбрать категорию",
-  "addItemStep1": "Выбрать тип",
   "addItemStep2": "Ввести данные",
   "addItemUncategorized": "Без категории",
   "addItemUncategorizedSubtitle": "Сохранить без категории",
   "addItemCreateCategory": "Создать категорию",
   "addItemCreateCategorySubtitle": "Добавить новую категорию",
-  "addItemSelectType": "Выберите тип",
   "addItemNewCategory": "Новая категория",
   "addItemNewCategoryName": "Название категории",
-  "addItemColorSelect": "Выбрать цвет",
-  "addItemNewItemType": "Новый тип",
   "addItemTypeNameLabel": "Название типа",
   "addItemTypeSelectIcon": "Выбрать иконку",
-  "addItemTypeSelectColor": "Выбрать цвет",
   "addItemTypeFixedFields": "Фиксированные поля",
   "addItemTypeFieldAdd": "Добавить поле",
   "addItemTypeFieldDefault": "Поля не добавлены — по умолчанию будет создано поле «Пароль».",
@@ -342,8 +349,6 @@
   "addItemTypeFieldTypeDate": "Дата",
   "addItemTitleLabel": "Заголовок *",
   "addItemTitleHint": "Напр.: Instagram, Gmail, Netflix",
-  "addItemUrlLabel": "Сайт (URL)",
-  "addItemUrlHint": "Напр.: https://instagram.com",
   "addItemExtraFieldKeyLabel": "Название поля",
   "addItemExtraFieldValueLabel": "Значение",
   "addItemAddFieldButton": "Добавить поле",
@@ -357,9 +362,7 @@
   "addItemCategoryCreate": "Создать",
   "addItemTypeCreate": "Добавить",
   "addItemCancel": "Отмена",
-
   "detailPasswordLabel": "Пароль",
-  "detailExtraInfoSection": "Дополнительная информация",
   "detailCategoryLabel": "Папка",
   "detailCategoryUncategorized": "Без категории",
   "detailCategoryMove": "Переместить в папку",
@@ -367,7 +370,9 @@
   "detailExternalLinkMessage": "DeniKey собирается открыть эту ссылку:\n\n{url}",
   "@detailExternalLinkMessage": {
     "placeholders": {
-      "url": { "type": "String" }
+      "url": {
+        "type": "String"
+      }
     }
   },
   "detailExternalLinkDeny": "Запретить",
@@ -382,7 +387,6 @@
   "detailEditButton": "Редактировать",
   "detailCancelEdit": "Отмена",
   "detailEditTitle": "Заголовок",
-  "detailEditUrl": "Сайт (URL)",
   "detailEditPassword": "Пароль",
   "detailEditCustomFieldKeyLabel": "Заголовок",
   "detailEditCustomFieldValueLabel": "Содержимое",
@@ -392,38 +396,48 @@
   "detailInfoTilePasswordCopied": "{label} скопирован, будет удалён через {timeout} сек",
   "@detailInfoTilePasswordCopied": {
     "placeholders": {
-      "label": { "type": "String" },
-      "timeout": { "type": "int" }
+      "label": {
+        "type": "String"
+      },
+      "timeout": {
+        "type": "int"
+      }
     }
   },
   "detailInfoTileCopied": "{label} скопирован",
   "@detailInfoTileCopied": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "detailLinkOpen": "Открыть ссылку",
   "detailLoadError": "Не удалось загрузить данные: {error}",
   "@detailLoadError": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "detailRetry": "Повторить",
-
   "searchHint": "Поиск...",
   "searchEmpty": "Начните вводить для поиска",
   "searchNoResults": "По запросу \"{query}\" ничего не найдено",
   "@searchNoResults": {
     "placeholders": {
-      "query": { "type": "String" }
+      "query": {
+        "type": "String"
+      }
     }
   },
-
   "passwordHistoryTitle": "{itemTitle} — История",
   "@passwordHistoryTitle": {
     "placeholders": {
-      "itemTitle": { "type": "String" }
+      "itemTitle": {
+        "type": "String"
+      }
     }
   },
   "passwordHistoryClear": "Очистить историю",
@@ -432,10 +446,8 @@
   "passwordHistoryEmpty": "Истории паролей нет",
   "passwordHistoryEmptyHint": "Предыдущие версии появятся здесь при обновлении пароля",
   "passwordHistoryCopy": "Пароль скопирован, будет удалён через 30 сек",
-  "passwordHistoryLoading": "Загрузка...",
   "passwordHistoryError": "Не удалось загрузить",
   "passwordHistoryRetry": "Повторить",
-
   "libraryTitle": "Библиотека",
   "libraryCategoriesTab": "Категории",
   "libraryTypesTab": "Типы",
@@ -449,19 +461,18 @@
   "libraryEmptyCategories": "Категорий пока нет",
   "libraryEmptyTypes": "Типов пока нет",
   "librarySystemLabel": "Система",
-  "librarySystemLock": "Заблокировано",
   "libraryTypeFieldCount": "{count} полей",
   "@libraryTypeFieldCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "libraryCancel": "Отмена",
   "libraryAddButton": "Добавить",
-
   "categoryDetailEmpty": "В этой категории пока нет элементов",
   "categoryDetailItem": "Без названия",
-
   "passwordGeneratorTitle": "Генератор паролей",
   "passwordGeneratorHint": "Нажмите кнопку для генерации пароля",
   "passwordGeneratorGenerate": "Сгенерировать пароль",
@@ -473,7 +484,6 @@
   "passwordGeneratorSymbols": "Символы (!@#$...)",
   "passwordGeneratorCopy": "Копировать",
   "passwordGeneratorCopySuccess": "Пароль скопирован, будет удалён через 30 сек",
-
   "trashTitle": "Корзина",
   "trashEmptyButton": "Удалить все",
   "trashEmptyTitle": "Очистить корзину",
@@ -482,7 +492,9 @@
   "trashDeleteMessage": "Удалить «{title}» безвозвратно?",
   "@trashDeleteMessage": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "trashDeleteButton": "Удалить",
@@ -491,16 +503,16 @@
   "trashDeleteFor": "Будет удалён {date}",
   "@trashDeleteFor": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "trashRestore": "Восстановить",
   "trashDeletePermanent": "Удалить навсегда",
-  "trashLoading": "Загрузка...",
   "trashError": "Ошибка",
   "trashRetry": "Повторить",
   "trashCancel": "Отмена",
-
   "auditLogTitle": "История активности",
   "auditLogFilterAll": "Все",
   "auditLogFilterAccount": "Аккаунт",
@@ -522,13 +534,13 @@
   "auditLogEmptyCategory": "Нет записей в категории {category}",
   "@auditLogEmptyCategory": {
     "placeholders": {
-      "category": { "type": "String" }
+      "category": {
+        "type": "String"
+      }
     }
   },
-  "auditLogLoading": "Загрузка...",
   "auditLogError": "Ошибка",
   "auditLogRetry": "Повторить",
-
   "supportTicketTitle": "Поддержка",
   "supportTicketMyTickets": "Мои обращения",
   "supportTicketNew": "Новое обращение",
@@ -551,7 +563,6 @@
   "supportTicketStatusOpen": "Открыто",
   "supportTicketStatusInProgress": "В работе",
   "supportTicketStatusClosed": "Закрыто",
-  "supportTicketYourMessage": "Ваше сообщение",
   "supportTicketAdminReply": "Ответ поддержки",
   "supportTicketWaitingReply": "Ожидание ответа...",
   "supportTicketReplied": "Получен ответ",
@@ -566,8 +577,6 @@
   "supportTicketDeleteCancel": "Отмена",
   "supportTicketDeleteConfirm": "Удалить",
   "supportTicketDeleteSuccess": "Запрос удалён",
-  "supportTicketDeleteError": "Не удалось удалить запрос",
-
   "forceUpdateTitle": "Требуется обновление",
   "forceUpdateDescription": "Эта версия больше не поддерживается.\nПожалуйста, обновите приложение для продолжения.",
   "forceUpdateCurrentVersion": "Текущая версия",
@@ -577,38 +586,36 @@
   "forceUpdateDownloading": "Загрузка... %{progress}",
   "@forceUpdateDownloading": {
     "placeholders": {
-      "progress": { "type": "int" }
+      "progress": {
+        "type": "int"
+      }
     }
   },
   "forceUpdateError": "Ошибка загрузки: {error}",
   "@forceUpdateError": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "forceUpdateInstallError": "Не удалось запустить установку: {error}",
   "@forceUpdateInstallError": {
     "placeholders": {
-      "error": { "type": "String" }
-    }
-  },
-  "forceUpdateInstallErrorFilePath": "Не удалось запустить установку. Файл: {filePath}",
-  "@forceUpdateInstallErrorFilePath": {
-    "placeholders": {
-      "filePath": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "forceUpdatePermissionTitle": "Требуется разрешение",
   "forceUpdatePermissionContent": "Для установки APK необходимо разрешение «Установка из неизвестных источников».\n\nНастройки → Приложения → DeniKey → Установка из неизвестных источников → Разрешить\n\nПосле предоставления разрешения нажмите «Обновить» снова.",
   "forceUpdatePermissionOpenSettings": "Открыть настройки",
   "forceUpdatePermissionUnderstand": "Понятно",
-
   "navBarSupport": "Поддержка",
   "navBarLibrary": "Библиотека",
   "navBarVault": "Мой сейф",
   "navBarGenerator": "Генератор",
   "navBarSettings": "Настройки",
-
   "desktopOnboardingTitle": "Горячие клавиши",
   "desktopOnboardingDescription": "Попробуйте эти сочетания клавиш для более быстрой работы с DeniKey.",
   "desktopOnboardingShortcut1": "Мой сейф / Библиотека / Настройки",
@@ -619,35 +626,50 @@
   "desktopOnboardingShortcut6": "Назад / закрыть",
   "desktopOnboardingWindowsNote": "Кнопка X закрывает приложение. Вы также можете выйти, нажав правой кнопкой на значок в системном трее.",
   "desktopOnboardingButton": "Понятно",
-
   "splashSubtitle": "Нулевое знание · Полная безопасность",
-  "splashVersionPrefix": "v",
-
   "settingsAutoLockUnlimited": "Без ограничений",
   "settingsAutoLockMinutesChip": "{minutes} мин",
   "@settingsAutoLockMinutesChip": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "settingsClipboardSecondsChip": "{seconds} сек",
   "@settingsClipboardSecondsChip": {
-    "placeholders": { "seconds": { "type": "int" } }
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   },
   "settingsClipboardUnlimited": "Без ограничений",
   "settingsDeviceJustNow": "Только что",
   "settingsDeviceMinutesAgo": "{minutes} мин. назад",
   "@settingsDeviceMinutesAgo": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "settingsDeviceHoursAgo": "{hours} ч. назад",
   "@settingsDeviceHoursAgo": {
-    "placeholders": { "hours": { "type": "int" } }
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
   },
   "settingsDeviceDaysAgo": "{days} дн. назад",
   "@settingsDeviceDaysAgo": {
-    "placeholders": { "days": { "type": "int" } }
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
   },
-
-  "onboardingSkip": "Пропустить",
   "onboardingNext": "Далее",
   "onboardingStart": "Начать",
   "onboardingClose": "Закрыть",
@@ -666,20 +688,8 @@
   "onboardingChipFavorites": "Избранное",
   "onboardingChipHiddenField": "Скрытое поле",
   "onboardingChipTrash": "Корзина",
-  "onboardingLibraryTitle": "Будьте организованы",
-  "onboardingLibrarySubtitle": "Организуйте пароли по категориям. Храните карты, удостоверения и многое другое с помощью типов элементов.",
   "onboardingLibraryCategorySocialMedia": "Соц. сети",
-  "onboardingLibraryCategoryBanking": "Банкинг",
   "onboardingLibraryCategoryWork": "Работа",
-  "onboardingLibraryCategoryDevices": "Устройства",
-  "onboardingLibraryPasswordCount": "{count} паролей",
-  "@onboardingLibraryPasswordCount": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "onboardingLibraryItemTypesHeader": "Типы элементов",
-  "onboardingLibraryItemTypesDesc": "Кредитная карта, удостоверение, SSH-ключ, Wi-Fi и многое другое...",
-  "onboardingChipCategories": "Категории",
-  "onboardingChipItemTypes": "Типы элементов",
   "onboardingChipCustomize": "Настроить",
   "onboardingGeneratorTitle": "Создавайте надёжные пароли",
   "onboardingGeneratorSubtitle": "Создавайте невзламываемые пароли одним касанием — выбирайте длину, регистр, цифры и специальные символы.",
@@ -688,7 +698,11 @@
   "onboardingGeneratorStrengthVeryStrong": "Очень надёжный",
   "onboardingGeneratorLengthOption": "Длина: {n}",
   "@onboardingGeneratorLengthOption": {
-    "placeholders": { "n": { "type": "int" } }
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
   },
   "onboardingChipRefresh": "Обновить",
   "onboardingSecurityTitle": "Полный контроль в ваших руках",
@@ -711,22 +725,12 @@
   "onboardingSummaryAddPassword": "Хранилище → добавляйте и управляйте паролями",
   "onboardingSummaryGenerator": "Создавайте надёжные пароли",
   "onboardingSummaryBiometric": "Быстрый вход с биометрией",
-
   "vaultItemUntitled": "Без названия",
   "vaultItemDetailFallbackTitle": "Детали",
   "categoriesUncategorized": "Без категории",
-  "genericError": "Ошибка: {error}",
-  "@genericError": {
-    "placeholders": {
-      "error": { "type": "String" }
-    }
-  },
   "networkError": "Не удалось подключиться к серверу",
-
   "addItemTypeCreateTitle": "Создать новый тип",
-  "addItemTypeNameLabel": "Название типа",
   "addItemTypeFieldsLabel": "Поля",
-
   "onboardingCategoriesTitle": "Организуй с категориями",
   "onboardingCategoriesSubtitle": "Группируй пароли по папкам. Папка «Без категории» всегда на месте и не может быть удалена.",
   "onboardingCategoriesDefault": "Без категории",
@@ -734,32 +738,25 @@
   "onboardingCategoriesChipDefault": "Папка по умолчанию",
   "onboardingCategoriesChipCustom": "Свои категории",
   "onboardingCategoriesChipOrganize": "Упорядочить",
-
   "onboardingTypesTitle": "Ускорься с шаблонами",
   "onboardingTypesSubtitle": "Определи группы полей один раз. Они будут готовы при каждом добавлении нового пароля.",
   "onboardingTypesWithout": "Без типа",
   "onboardingTypesWith": "С типом",
-  "onboardingTypesWithoutDesc": "Добавить поле, ещё поле, ещё...",
-  "onboardingTypesWithDesc": "Поля уже готовы!",
   "onboardingTypesChipTemplate": "Шаблон",
   "onboardingTypesChipSpeed": "Быстрое сохранение",
   "onboardingTypesChipCustomize": "Настроить",
-
   "notifAutoLockTitle": "DeniKey заблокирован",
   "notifAutoLockBody": "Автоблокировка активирована. Введите мастер-пароль для продолжения.",
   "notifNewDeviceTitle": "Вход с нового устройства",
   "notifNewDeviceBody": "Новое устройство пытается получить доступ к вашему аккаунту. Если это не вы, немедленно смените пароль.",
   "notifChannelName": "Уведомления DeniKey",
   "notifChannelDesc": "Напоминания безопасности и важные уведомления",
-
   "biometricFaceLabel": "Разблокировать с Face ID",
   "biometricFingerprintLabel": "Разблокировать по отпечатку",
   "biometricPinLabel": "Разблокировать с PIN-кодом",
   "biometricReason": "Подтвердите личность для доступа к DeniKey",
-
   "trayOpen": "Открыть DeniKey",
   "trayExit": "Выход",
-
   "shortcutSupport": "Служба поддержки",
   "shortcutVault": "Перейти в хранилище",
   "shortcutLibrary": "Перейти в библиотеку",
@@ -770,12 +767,10 @@
   "shortcutNewPasswordVault": "Новый пароль (экран хранилища)",
   "shortcutTabSwitch": "Переключение между вкладками",
   "shortcutBack": "Назад",
-
   "authLoadingLogin": "Выполняется вход...",
   "authLoadingRegister": "Создание аккаунта...",
   "authErrorLogin": "Ошибка входа.",
   "authErrorRegister": "Ошибка регистрации.",
-
   "vaultLoadingVault": "Загрузка хранилища...",
   "vaultLoadingSaving": "Сохранение...",
   "vaultLoadingUpdating": "Обновление...",
@@ -787,14 +782,35 @@
   "vaultErrorOffline": "Нет подключения к интернету.",
   "vaultSampleTitle": "Образец записи DeniKey",
   "vaultSampleNotes": "Это автоматически созданная образцовая запись. Вы можете удалить её после добавления своих данных.",
-
   "errorCouldNotLoad": "Не удалось загрузить",
   "errorCouldNotCreate": "Не удалось создать",
   "errorCouldNotUpdate": "Не удалось обновить",
   "errorCouldNotDelete": "Не удалось удалить",
-
   "offlineTitle": "К сожалению, без интернета вы не можете получить доступ к DeniKey",
   "offlineMessage": "Не волнуйтесь, это не проблема. Ваш аккаунт и содержимое в безопасности. Полный доступ вернётся, когда вы снова подключитесь к интернету.",
-
-  "addItemFieldNameRequired": "Это поле обязательно для заполнения"
+  "addItemFieldNameRequired": "Это поле обязательно для заполнения",
+  "totpSettingsTitle": "Защита Authenticator",
+  "totpSettingsActiveDesc": "При каждом входе потребуется код из приложения",
+  "totpSettingsInactiveDesc": "Дополнительный код при входе не требуется",
+  "totpSetupTitle": "Настройка защиты Authenticator",
+  "totpSetupStep1": "1. Отсканируйте QR-код",
+  "totpSetupStep1Desc": "Отсканируйте QR-код ниже с помощью Google Authenticator, Authy или аналогичного приложения.",
+  "totpSetupStep2": "2. Введите код подтверждения",
+  "totpSetupStep2Desc": "Введите 6-значный код из приложения для завершения настройки.",
+  "totpSetupManualKey": "Ключ для ручного ввода",
+  "totpSetupActivate": "Активировать",
+  "totpSetupLoadError": "Не удалось загрузить данные настройки",
+  "totpSecretCopied": "Ключ скопирован",
+  "totpCodeLabel": "6-значный код",
+  "totpInvalidCode": "Неверный код, попробуйте ещё раз",
+  "totpEnabledSuccess": "Защита Authenticator включена",
+  "totpVerifyTitle": "Защита Authenticator",
+  "totpVerifyDesc": "Введите 6-значный код из вашего приложения-аутентификатора.",
+  "totpVerifyButton": "Подтвердить",
+  "totpDisableTitle": "Отключить защиту",
+  "totpDisableDesc": "Введите мастер-пароль, чтобы отключить защиту Authenticator.",
+  "totpDisableMasterPasswordLabel": "Мастер-пароль",
+  "totpDisableMasterPasswordError": "Неверный мастер-пароль",
+  "totpDisabledSuccess": "Защита Authenticator отключена",
+  "totpDisableConfirm": "Отключить"
 }

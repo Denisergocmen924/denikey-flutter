@@ -18,6 +18,7 @@ import '../../../core/presentation/app_shortcuts.dart';
 import '../../devices/data/device_repository.dart';
 import '../../devices/providers/device_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../providers/totp_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -68,6 +69,64 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _biometricEnabled = val;
       _biometricRemainingDays = days;
     });
+  }
+
+  Future<void> _showTotpDisableDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    final ctrl = TextEditingController();
+    String? err;
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => AlertDialog(
+          title: Text(l10n.totpDisableTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.totpDisableDesc, style: const TextStyle(fontSize: 14)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: ctrl,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: l10n.totpDisableMasterPasswordLabel,
+                  errorText: err,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () async {
+                try {
+                  await _repo.totpDisable(masterPassword: ctrl.text);
+                  ref.invalidate(totpStatusProvider);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.totpDisabledSuccess)),
+                    );
+                  }
+                } catch (_) {
+                  setS(() => err = l10n.totpDisableMasterPasswordError);
+                }
+              },
+              child: Text(l10n.totpDisableConfirm),
+            ),
+          ],
+        ),
+      ),
+    );
+    ctrl.dispose();
   }
 
   Future<void> _startDeleteAccountFlow() async {
@@ -412,6 +471,49 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showLanguageDialog(context, l10n, currentLocale),
+          ),
+
+          // Authenticator Koruması (TOTP)
+          Consumer(
+            builder: (context, ref, _) {
+              final l10n = AppLocalizations.of(context);
+              final totpAsync = ref.watch(totpStatusProvider);
+              return totpAsync.when(
+                loading: () => const ListTile(
+                  leading: Icon(Icons.verified_user_outlined),
+                  title: Text('Authenticator Koruması'),
+                  trailing: SizedBox(
+                    width: 20, height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+                error: (_, __) => const SizedBox.shrink(),
+                data: (enabled) => ListTile(
+                  leading: Icon(
+                    Icons.verified_user_outlined,
+                    color: enabled ? Theme.of(context).colorScheme.primary : null,
+                  ),
+                  title: Text(l10n.totpSettingsTitle),
+                  subtitle: Text(
+                    enabled
+                        ? l10n.totpSettingsActiveDesc
+                        : l10n.totpSettingsInactiveDesc,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  trailing: Switch(
+                    value: enabled,
+                    onChanged: (val) async {
+                      if (val) {
+                        await context.push('/totp-setup');
+                        ref.invalidate(totpStatusProvider);
+                      } else {
+                        _showTotpDisableDialog(context, ref, l10n);
+                      }
+                    },
+                  ),
+                ),
+              );
+            },
           ),
 
           if (_biometricAvailable) ...[

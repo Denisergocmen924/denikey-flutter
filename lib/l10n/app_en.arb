@@ -1,6 +1,5 @@
 {
   "@@locale": "en",
-
   "loginTagline": "Your passwords are safe",
   "loginUsernameLabel": "Username or Email",
   "loginUsernameError": "Username or email is required",
@@ -13,7 +12,6 @@
   "loginRegisterButton": "Sign Up",
   "loginForgotButton": "Forgot Password",
   "loginError": "Error",
-
   "registerAppBarTitle": "Sign Up",
   "registerHeading": "Create Account",
   "registerSubheading": "Your identity stays private.",
@@ -36,19 +34,22 @@
   "registerAgeRestriction": "You must be at least 13 years old to use DeniKey",
   "registerSubmitButton": "Sign Up",
   "registerError": "Error",
-
   "verifyEmailTitle": "Email Verification",
   "verifyDeviceTitle": "Device Verification",
   "verifyEmailSubtitle": "Enter the 6-digit code\nsent to {email}",
   "@verifyEmailSubtitle": {
     "placeholders": {
-      "email": { "type": "String" }
+      "email": {
+        "type": "String"
+      }
     }
   },
   "verifyDeviceSubtitle": "This is your first sign-in from this device.\nEnter the 6-digit code sent to {email}.",
   "@verifyDeviceSubtitle": {
     "placeholders": {
-      "email": { "type": "String" }
+      "email": {
+        "type": "String"
+      }
     }
   },
   "verifySpamWarning": "Check your Spam/Junk folder",
@@ -57,7 +58,6 @@
   "verifyResendButton": "Resend code",
   "verifySendSuccess": "Code resent",
   "verifySendError": "Failed to send code",
-
   "forgotPasswordTitle": "Forgot Password",
   "forgotPasswordHeading": "Password Reset",
   "forgotPasswordDescription": "A verification code will be sent to your registered email.",
@@ -67,13 +67,14 @@
   "forgotPasswordSubmitButton": "Send Code",
   "forgotPasswordError": "Failed to send verification code, please try again",
   "forgotPasswordApiError": "An error occurred",
-
   "resetPasswordTitle": "Set New Password",
   "resetPasswordHeading": "Reset Your Password",
   "resetPasswordDescription": "Enter the code sent to {email} and your new password.",
   "@resetPasswordDescription": {
     "placeholders": {
-      "email": { "type": "String" }
+      "email": {
+        "type": "String"
+      }
     }
   },
   "resetPasswordCodeLabel": "Verification Code",
@@ -88,7 +89,6 @@
   "resetPasswordSubmitButton": "Reset Password",
   "resetPasswordSuccess": "Your password has been reset successfully",
   "resetPasswordApiError": "An error occurred",
-
   "changeEmailTitle": "Change Email",
   "changeEmailHeading": "New Email Address",
   "changeEmailDescription": "A verification code will be sent to your new email address.",
@@ -97,13 +97,14 @@
   "changeEmailFormatError": "Enter a valid email",
   "changeEmailSubmitButton": "Send Code",
   "changeEmailApiError": "An error occurred",
-
   "confirmEmailChangeTitle": "Email Verification",
   "confirmEmailChangeHeading": "Verify Code",
   "confirmEmailChangeDescription": "Enter the 6-digit code sent to {newEmail}.",
   "@confirmEmailChangeDescription": {
     "placeholders": {
-      "newEmail": { "type": "String" }
+      "newEmail": {
+        "type": "String"
+      }
     }
   },
   "confirmEmailChangeCodeLabel": "Verification Code",
@@ -112,7 +113,6 @@
   "confirmEmailChangeSubmitButton": "Confirm",
   "confirmEmailChangeSuccess": "Your email address has been updated successfully",
   "confirmEmailChangeApiError": "An error occurred",
-
   "masterLockTitle": "DeniKey Locked",
   "masterLockPassword": "Enter your master password to continue",
   "masterLockBiometricExpired": "Your 7-day biometric period has expired.\nPlease enter your master password for security.",
@@ -125,22 +125,21 @@
   "masterLockBiometricDaysRemaining": "Password required in {days} days",
   "@masterLockBiometricDaysRemaining": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "masterLockBiometricTomorrow": "Password required tomorrow",
   "masterLockDifferentAccount": "Sign in with a different account",
-
   "lockTitle": "DeniKey Locked",
   "lockDescription": "Verify your identity to continue",
   "lockBiometricButton": "Unlock with Biometrics",
   "lockLogoutButton": "Sign Out",
   "lockAuthFailed": "Authentication failed",
-
   "deviceBannedTitle": "Device Banned",
   "deviceBannedDescription": "This device cannot be used for this account.\nYour access has been restricted by the account owner.",
   "deviceBannedBackButton": "Go Back",
-
   "settingsTitle": "Settings",
   "settingsAccountSection": "ACCOUNT",
   "settingsUsernameChange": "Change Username",
@@ -156,7 +155,9 @@
   "settingsBiometricActive": "Active  ·  Password required in {days} days",
   "@settingsBiometricActive": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "settingsBiometricActiveTomorrow": "Active  ·  Password required tomorrow",
@@ -166,7 +167,9 @@
   "settingsAutoLockEnabled": "Lock after {minutes} min",
   "@settingsAutoLockEnabled": {
     "placeholders": {
-      "minutes": { "type": "int" }
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "settingsAutoLockFocusLoss": "Unlimited — lock on focus loss",
@@ -175,7 +178,9 @@
   "settingsClipboardTimeoutActive": "Copied password will be cleared after {timeout} sec",
   "@settingsClipboardTimeoutActive": {
     "placeholders": {
-      "timeout": { "type": "int" }
+      "timeout": {
+        "type": "int"
+      }
     }
   },
   "settingsClipboardTimeoutDisabled": "Unlimited — clipboard will not be cleared automatically",
@@ -205,7 +210,9 @@
   "settingsVersion": "DeniKey v{version}",
   "@settingsVersion": {
     "placeholders": {
-      "version": { "type": "String" }
+      "version": {
+        "type": "String"
+      }
     }
   },
   "settingsDevicesTitle": "My Devices",
@@ -239,7 +246,9 @@
   "settingsDeleteAccountCountdownWait": "You must wait {seconds} seconds...",
   "@settingsDeleteAccountCountdownWait": {
     "placeholders": {
-      "seconds": { "type": "int" }
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "settingsDeleteAccountCountdownReady": "You may continue.",
@@ -251,7 +260,6 @@
   "settingsDeleteAccountFailed": "Failed to delete account",
   "settingsDeleteAccountCancel": "Cancel",
   "settingsDeleteAccountContinue": "Continue",
-
   "privacyPolicyTitle": "Privacy Policy",
   "privacyPolicyLastUpdate": "Last updated: April 2026",
   "privacyPolicySection1Title": "1. Introduction",
@@ -272,7 +280,6 @@
   "privacyPolicySection8Body": "We may update this policy. Important changes will be notified to your registered email address. The current policy is always accessible from within the app.",
   "privacyPolicySection9Title": "9. Contact",
   "privacyPolicySection9Body": "For privacy-related questions, you can create a support ticket or use the Support Ticket screen within the app.",
-
   "vaultTitle": "DeniKey",
   "vaultSearchTooltip": "Search",
   "vaultTrashTooltip": "Trash",
@@ -283,14 +290,18 @@
   "vaultBulkDeleteMessage": "{count} records will be moved to trash. Continue?",
   "@vaultBulkDeleteMessage": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "vaultBulkSelectAll": "All",
   "vaultBulkMoveTitle": "Move {count} records",
   "@vaultBulkMoveTitle": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "vaultBulkMoveUncategorized": "Uncategorized",
@@ -312,25 +323,21 @@
   "vaultBulkSelectionCount": "{count} selected",
   "@vaultBulkSelectionCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "addItemStep0": "Select Category",
-  "addItemStep1": "Select Type",
   "addItemStep2": "Enter Details",
   "addItemUncategorized": "Uncategorized",
   "addItemUncategorizedSubtitle": "Store under uncategorized",
   "addItemCreateCategory": "Create Category",
   "addItemCreateCategorySubtitle": "Add new category",
-  "addItemSelectType": "Select Type",
   "addItemNewCategory": "New Category",
   "addItemNewCategoryName": "Category Name",
-  "addItemColorSelect": "Select Color",
-  "addItemNewItemType": "New Type",
   "addItemTypeNameLabel": "Type Name",
   "addItemTypeSelectIcon": "Select Icon",
-  "addItemTypeSelectColor": "Select Color",
   "addItemTypeFixedFields": "Fixed Fields",
   "addItemTypeFieldAdd": "Add Field",
   "addItemTypeFieldDefault": "No fields added — a \"Password\" field will be created by default.",
@@ -342,8 +349,6 @@
   "addItemTypeFieldTypeDate": "Date",
   "addItemTitleLabel": "Title *",
   "addItemTitleHint": "e.g. Instagram, Gmail, Netflix",
-  "addItemUrlLabel": "Website (URL)",
-  "addItemUrlHint": "e.g. https://instagram.com",
   "addItemExtraFieldKeyLabel": "Field Name",
   "addItemExtraFieldValueLabel": "Value",
   "addItemAddFieldButton": "Add Field",
@@ -357,9 +362,7 @@
   "addItemCategoryCreate": "Create",
   "addItemTypeCreate": "Add",
   "addItemCancel": "Cancel",
-
   "detailPasswordLabel": "Password",
-  "detailExtraInfoSection": "Additional Info",
   "detailCategoryLabel": "Folder",
   "detailCategoryUncategorized": "Uncategorized",
   "detailCategoryMove": "Move to Folder",
@@ -367,7 +370,9 @@
   "detailExternalLinkMessage": "DeniKey is about to open this link:\n\n{url}",
   "@detailExternalLinkMessage": {
     "placeholders": {
-      "url": { "type": "String" }
+      "url": {
+        "type": "String"
+      }
     }
   },
   "detailExternalLinkDeny": "Deny",
@@ -382,7 +387,6 @@
   "detailEditButton": "Edit",
   "detailCancelEdit": "Cancel",
   "detailEditTitle": "Title",
-  "detailEditUrl": "Website (URL)",
   "detailEditPassword": "Password",
   "detailEditCustomFieldKeyLabel": "Title",
   "detailEditCustomFieldValueLabel": "Content",
@@ -392,38 +396,48 @@
   "detailInfoTilePasswordCopied": "{label} copied, will be cleared in {timeout} seconds",
   "@detailInfoTilePasswordCopied": {
     "placeholders": {
-      "label": { "type": "String" },
-      "timeout": { "type": "int" }
+      "label": {
+        "type": "String"
+      },
+      "timeout": {
+        "type": "int"
+      }
     }
   },
   "detailInfoTileCopied": "{label} copied",
   "@detailInfoTileCopied": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "detailLinkOpen": "Open Link",
   "detailLoadError": "Failed to load info: {error}",
   "@detailLoadError": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "detailRetry": "Retry",
-
   "searchHint": "Search...",
   "searchEmpty": "Start typing to search",
   "searchNoResults": "No results found for \"{query}\"",
   "@searchNoResults": {
     "placeholders": {
-      "query": { "type": "String" }
+      "query": {
+        "type": "String"
+      }
     }
   },
-
   "passwordHistoryTitle": "{itemTitle} — History",
   "@passwordHistoryTitle": {
     "placeholders": {
-      "itemTitle": { "type": "String" }
+      "itemTitle": {
+        "type": "String"
+      }
     }
   },
   "passwordHistoryClear": "Clear History",
@@ -432,10 +446,8 @@
   "passwordHistoryEmpty": "No password history",
   "passwordHistoryEmptyHint": "Previous versions will appear here when the password is updated",
   "passwordHistoryCopy": "Password copied, will be cleared in 30 sec",
-  "passwordHistoryLoading": "Loading...",
   "passwordHistoryError": "Failed to load",
   "passwordHistoryRetry": "Retry",
-
   "libraryTitle": "Library",
   "libraryCategoriesTab": "Categories",
   "libraryTypesTab": "Types",
@@ -449,19 +461,18 @@
   "libraryEmptyCategories": "No categories yet",
   "libraryEmptyTypes": "No types yet",
   "librarySystemLabel": "System",
-  "librarySystemLock": "Locked",
   "libraryTypeFieldCount": "{count} fields",
   "@libraryTypeFieldCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "libraryCancel": "Cancel",
   "libraryAddButton": "Add",
-
   "categoryDetailEmpty": "No items in this category yet",
   "categoryDetailItem": "Unnamed",
-
   "passwordGeneratorTitle": "Password Generator",
   "passwordGeneratorHint": "Press the button to generate a password",
   "passwordGeneratorGenerate": "Generate Password",
@@ -473,7 +484,6 @@
   "passwordGeneratorSymbols": "Symbols (!@#$...)",
   "passwordGeneratorCopy": "Copy",
   "passwordGeneratorCopySuccess": "Password copied, will be cleared in 30 sec",
-
   "trashTitle": "Trash",
   "trashEmptyButton": "Delete All",
   "trashEmptyTitle": "Empty Trash",
@@ -482,7 +492,9 @@
   "trashDeleteMessage": "Permanently delete \"{title}\"?",
   "@trashDeleteMessage": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "trashDeleteButton": "Delete",
@@ -491,16 +503,16 @@
   "trashDeleteFor": "Will be permanently deleted on {date}",
   "@trashDeleteFor": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "trashRestore": "Restore",
   "trashDeletePermanent": "Permanently Delete",
-  "trashLoading": "Loading...",
   "trashError": "Error",
   "trashRetry": "Retry",
   "trashCancel": "Cancel",
-
   "auditLogTitle": "Activity History",
   "auditLogFilterAll": "All",
   "auditLogFilterAccount": "Account",
@@ -522,13 +534,13 @@
   "auditLogEmptyCategory": "No records in {category} category",
   "@auditLogEmptyCategory": {
     "placeholders": {
-      "category": { "type": "String" }
+      "category": {
+        "type": "String"
+      }
     }
   },
-  "auditLogLoading": "Loading...",
   "auditLogError": "Error",
   "auditLogRetry": "Retry",
-
   "supportTicketTitle": "Support",
   "supportTicketMyTickets": "My Tickets",
   "supportTicketNew": "New Ticket",
@@ -551,7 +563,6 @@
   "supportTicketStatusOpen": "Open",
   "supportTicketStatusInProgress": "In Progress",
   "supportTicketStatusClosed": "Closed",
-  "supportTicketYourMessage": "Your Message",
   "supportTicketAdminReply": "Support Reply",
   "supportTicketWaitingReply": "Waiting for reply...",
   "supportTicketReplied": "Replied",
@@ -566,8 +577,6 @@
   "supportTicketDeleteCancel": "Cancel",
   "supportTicketDeleteConfirm": "Delete",
   "supportTicketDeleteSuccess": "Ticket deleted",
-  "supportTicketDeleteError": "Could not delete ticket",
-
   "forceUpdateTitle": "Update Required",
   "forceUpdateDescription": "This version is no longer supported.\nPlease update the app to continue.",
   "forceUpdateCurrentVersion": "Current version",
@@ -577,38 +586,36 @@
   "forceUpdateDownloading": "Downloading... %{progress}",
   "@forceUpdateDownloading": {
     "placeholders": {
-      "progress": { "type": "int" }
+      "progress": {
+        "type": "int"
+      }
     }
   },
   "forceUpdateError": "Download failed: {error}",
   "@forceUpdateError": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "forceUpdateInstallError": "Failed to start installation: {error}",
   "@forceUpdateInstallError": {
     "placeholders": {
-      "error": { "type": "String" }
-    }
-  },
-  "forceUpdateInstallErrorFilePath": "Failed to start installation. File: {filePath}",
-  "@forceUpdateInstallErrorFilePath": {
-    "placeholders": {
-      "filePath": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "forceUpdatePermissionTitle": "Permission Required",
   "forceUpdatePermissionContent": "To install the APK, you need to grant \"Install unknown apps\" permission.\n\nSettings → Apps → DeniKey → Install unknown apps → Allow\n\nAfter granting permission, tap \"Update\" again.",
   "forceUpdatePermissionOpenSettings": "Open Settings",
   "forceUpdatePermissionUnderstand": "Got It",
-
   "navBarSupport": "Support",
   "navBarLibrary": "Library",
   "navBarVault": "My Vault",
   "navBarGenerator": "Generator",
   "navBarSettings": "Settings",
-
   "desktopOnboardingTitle": "Desktop Shortcuts",
   "desktopOnboardingDescription": "Try these shortcuts to use DeniKey faster.",
   "desktopOnboardingShortcut1": "My Vault / Library / Settings",
@@ -619,35 +626,50 @@
   "desktopOnboardingShortcut6": "Go back / close",
   "desktopOnboardingWindowsNote": "The X button closes the app. You can also exit by right-clicking the system tray icon.",
   "desktopOnboardingButton": "Got It",
-
   "splashSubtitle": "Zero Knowledge · Full Security",
-  "splashVersionPrefix": "v",
-
   "settingsAutoLockUnlimited": "Unlimited",
   "settingsAutoLockMinutesChip": "{minutes} min",
   "@settingsAutoLockMinutesChip": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "settingsClipboardSecondsChip": "{seconds} sec",
   "@settingsClipboardSecondsChip": {
-    "placeholders": { "seconds": { "type": "int" } }
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   },
   "settingsClipboardUnlimited": "Unlimited",
   "settingsDeviceJustNow": "Just now",
   "settingsDeviceMinutesAgo": "{minutes} minutes ago",
   "@settingsDeviceMinutesAgo": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "settingsDeviceHoursAgo": "{hours} hours ago",
   "@settingsDeviceHoursAgo": {
-    "placeholders": { "hours": { "type": "int" } }
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
   },
   "settingsDeviceDaysAgo": "{days} days ago",
   "@settingsDeviceDaysAgo": {
-    "placeholders": { "days": { "type": "int" } }
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
   },
-
-  "onboardingSkip": "Skip",
   "onboardingNext": "Next",
   "onboardingStart": "Get Started",
   "onboardingClose": "Close",
@@ -666,20 +688,8 @@
   "onboardingChipFavorites": "Favorites",
   "onboardingChipHiddenField": "Hidden Field",
   "onboardingChipTrash": "Trash",
-  "onboardingLibraryTitle": "Stay Organized",
-  "onboardingLibrarySubtitle": "Organize passwords with categories. Store credit cards, IDs, and more with item types.",
   "onboardingLibraryCategorySocialMedia": "Social Media",
-  "onboardingLibraryCategoryBanking": "Banking",
   "onboardingLibraryCategoryWork": "Work",
-  "onboardingLibraryCategoryDevices": "Devices",
-  "onboardingLibraryPasswordCount": "{count} passwords",
-  "@onboardingLibraryPasswordCount": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "onboardingLibraryItemTypesHeader": "Item Types",
-  "onboardingLibraryItemTypesDesc": "Credit Card, ID, SSH Key, Wi-Fi and more...",
-  "onboardingChipCategories": "Categories",
-  "onboardingChipItemTypes": "Item Types",
   "onboardingChipCustomize": "Customize",
   "onboardingGeneratorTitle": "Generate Strong Passwords",
   "onboardingGeneratorSubtitle": "Create unbreakable passwords with one tap — choose length, uppercase, lowercase, digits, and special characters.",
@@ -688,7 +698,11 @@
   "onboardingGeneratorStrengthVeryStrong": "Very Strong",
   "onboardingGeneratorLengthOption": "Length: {n}",
   "@onboardingGeneratorLengthOption": {
-    "placeholders": { "n": { "type": "int" } }
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
   },
   "onboardingChipRefresh": "Refresh",
   "onboardingSecurityTitle": "Full Control Is Yours",
@@ -711,22 +725,12 @@
   "onboardingSummaryAddPassword": "Vault → add and manage passwords",
   "onboardingSummaryGenerator": "Generate strong passwords",
   "onboardingSummaryBiometric": "Quick login with biometrics",
-
   "vaultItemUntitled": "Untitled",
   "vaultItemDetailFallbackTitle": "Details",
   "categoriesUncategorized": "Uncategorized",
-  "genericError": "Error: {error}",
-  "@genericError": {
-    "placeholders": {
-      "error": { "type": "String" }
-    }
-  },
   "networkError": "Could not connect to server",
-
   "addItemTypeCreateTitle": "Create New Type",
-  "addItemTypeNameLabel": "Type Name",
   "addItemTypeFieldsLabel": "Fields",
-
   "onboardingCategoriesTitle": "Organize with categories",
   "onboardingCategoriesSubtitle": "Group your passwords into folders. Uncategorized is always there and cannot be deleted.",
   "onboardingCategoriesDefault": "Uncategorized",
@@ -734,32 +738,25 @@
   "onboardingCategoriesChipDefault": "Default Folder",
   "onboardingCategoriesChipCustom": "Custom Categories",
   "onboardingCategoriesChipOrganize": "Organize",
-
   "onboardingTypesTitle": "Speed up with templates",
   "onboardingTypesSubtitle": "Define your common field groups once. They'll be ready every time you add a new password.",
   "onboardingTypesWithout": "Without a type",
   "onboardingTypesWith": "With a type",
-  "onboardingTypesWithoutDesc": "Add field, add field, add field...",
-  "onboardingTypesWithDesc": "Fields are ready to go!",
   "onboardingTypesChipTemplate": "Template",
   "onboardingTypesChipSpeed": "Quick Save",
   "onboardingTypesChipCustomize": "Customize",
-
   "notifAutoLockTitle": "DeniKey Locked",
   "notifAutoLockBody": "Auto-lock activated. Enter your master password to continue.",
   "notifNewDeviceTitle": "New Device Login",
   "notifNewDeviceBody": "A new device attempted to access your account. If this wasn't you, change your password immediately.",
   "notifChannelName": "DeniKey Notifications",
   "notifChannelDesc": "Security reminders and important notifications",
-
   "biometricFaceLabel": "Unlock with Face ID",
   "biometricFingerprintLabel": "Unlock with Fingerprint",
   "biometricPinLabel": "Unlock with Device PIN",
   "biometricReason": "Authenticate to access DeniKey",
-
   "trayOpen": "Open DeniKey",
   "trayExit": "Exit",
-
   "shortcutSupport": "Support Ticket",
   "shortcutVault": "Go to Vault",
   "shortcutLibrary": "Go to Library",
@@ -770,12 +767,10 @@
   "shortcutNewPasswordVault": "New password (vault screen)",
   "shortcutTabSwitch": "Switch between tabs",
   "shortcutBack": "Go back",
-
   "authLoadingLogin": "Signing in...",
   "authLoadingRegister": "Creating account...",
   "authErrorLogin": "Login failed.",
   "authErrorRegister": "Registration failed.",
-
   "vaultLoadingVault": "Loading vault...",
   "vaultLoadingSaving": "Saving...",
   "vaultLoadingUpdating": "Updating...",
@@ -787,14 +782,35 @@
   "vaultErrorOffline": "No internet connection.",
   "vaultSampleTitle": "DeniKey Sample Entry",
   "vaultSampleNotes": "This is an automatically created sample entry. You can delete it after adding your own account details.",
-
   "errorCouldNotLoad": "Could not load",
   "errorCouldNotCreate": "Could not create",
   "errorCouldNotUpdate": "Could not update",
   "errorCouldNotDelete": "Could not delete",
-
   "offlineTitle": "Unfortunately, you can't access DeniKey without internet",
   "offlineMessage": "Don't worry, this is not a problem. Your account and content are safe. Full access will return when you reconnect to the internet.",
-
-  "addItemFieldNameRequired": "This field is required"
+  "addItemFieldNameRequired": "This field is required",
+  "totpSettingsTitle": "Authenticator Protection",
+  "totpSettingsActiveDesc": "An authenticator code will be required on each sign-in",
+  "totpSettingsInactiveDesc": "No extra verification code required on sign-in",
+  "totpSetupTitle": "Authenticator Protection Setup",
+  "totpSetupStep1": "1. Scan the QR Code",
+  "totpSetupStep1Desc": "Scan the QR code below using Google Authenticator, Authy, or any compatible app.",
+  "totpSetupStep2": "2. Enter the Verification Code",
+  "totpSetupStep2Desc": "Enter the 6-digit code shown in your authenticator app to complete the setup.",
+  "totpSetupManualKey": "Manual Entry Key",
+  "totpSetupActivate": "Activate",
+  "totpSetupLoadError": "Could not load setup information",
+  "totpSecretCopied": "Key copied",
+  "totpCodeLabel": "6-digit code",
+  "totpInvalidCode": "Invalid code, please try again",
+  "totpEnabledSuccess": "Authenticator Protection enabled",
+  "totpVerifyTitle": "Authenticator Protection",
+  "totpVerifyDesc": "Enter the 6-digit code shown in your authenticator app.",
+  "totpVerifyButton": "Verify",
+  "totpDisableTitle": "Disable Protection",
+  "totpDisableDesc": "Enter your master password to disable Authenticator Protection.",
+  "totpDisableMasterPasswordLabel": "Master Password",
+  "totpDisableMasterPasswordError": "Incorrect master password",
+  "totpDisabledSuccess": "Authenticator Protection disabled",
+  "totpDisableConfirm": "Disable"
 }

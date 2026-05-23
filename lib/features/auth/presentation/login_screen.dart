@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../providers/auth_provider.dart';
+import '../providers/totp_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -49,6 +50,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           'purpose': 'new_device',
           'master_password': next.masterPassword,
         });
+      }
+      if (next.status == AuthStatus.needsTotp) {
+        ref.read(totpPendingProvider.notifier).set(TotpPendingState(
+          tempToken: next.totpTempToken!,
+          masterPassword: next.masterPassword!,
+          username: next.username!,
+        ));
+        context.push('/totp-verify-login');
       }
       if (next.status == AuthStatus.deviceBanned) {
         context.push('/device-banned');

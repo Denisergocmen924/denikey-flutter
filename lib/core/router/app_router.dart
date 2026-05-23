@@ -24,6 +24,8 @@ import '../presentation/force_update_screen.dart';
 import '../../features/auth/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/privacy_policy_screen.dart';
 import '../../features/auth/presentation/device_banned_screen.dart';
+import '../../features/auth/presentation/totp_setup_screen.dart';
+import '../../features/auth/presentation/totp_verify_login_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
@@ -166,6 +168,14 @@ final router = GoRouter(
       GoRoute(
         path: '/device-banned',
         builder: (context, state) => const DeviceBannedScreen(),
+      ),
+      GoRoute(
+        path: '/totp-setup',
+        builder: (context, state) => const TotpSetupScreen(),
+      ),
+      GoRoute(
+        path: '/totp-verify-login',
+        builder: (context, state) => const TotpVerifyLoginScreen(),
       ),
     ],
 );

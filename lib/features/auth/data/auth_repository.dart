@@ -54,14 +54,56 @@ class AuthRepository {
     if (response.data['needs_device_verification'] == true) {
       return {
         'needs_device_verification': true,
+        'needs_totp': false,
         'user_id': response.data['user_id'],
         'email': response.data['email'],
       };
     }
 
-    final token = response.data['access_token'] as String;
-    final refresh = response.data['refresh_token'] as String;
-    final salt = response.data['encryption_key_salt'] as String;
+    if (response.data['needs_totp'] == true) {
+      return {
+        'needs_device_verification': false,
+        'needs_totp': true,
+        'totp_temp_token': response.data['totp_temp_token'] as String,
+      };
+    }
+
+    await _saveSessionFromResponse(response.data, username, masterPassword);
+    return {'needs_device_verification': false, 'needs_totp': false};
+  }
+
+  Future<Map<String, dynamic>> totpVerifyLogin({
+    required String tempToken,
+    required String code,
+    required String masterPassword,
+    required String username,
+  }) async {
+    final response = await _dio.post(
+      ApiConstants.totpVerifyLogin,
+      data: {'temp_token': tempToken, 'code': code},
+    );
+
+    if (response.data['needs_device_verification'] == true) {
+      return {
+        'needs_device_verification': true,
+        'needs_totp': false,
+        'user_id': response.data['user_id'],
+        'email': response.data['email'],
+      };
+    }
+
+    await _saveSessionFromResponse(response.data, username, masterPassword);
+    return {'needs_device_verification': false, 'needs_totp': false};
+  }
+
+  Future<void> _saveSessionFromResponse(
+    Map<String, dynamic> data,
+    String username,
+    String masterPassword,
+  ) async {
+    final token = data['access_token'] as String;
+    final refresh = data['refresh_token'] as String;
+    final salt = data['encryption_key_salt'] as String;
 
     await SecureStorage.instance.saveToken(token);
     await SecureStorage.instance.saveRefreshToken(refresh);
@@ -76,8 +118,24 @@ class AuthRepository {
     await BiometricService.instance.saveMasterPasswordTimestamp();
     final blob = await EncryptionService.instance.encrypt('denikey-verify', masterKey);
     await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
+  }
 
-    return {'needs_device_verification': false};
+  Future<bool> totpStatus() async {
+    final response = await _dio.get(ApiConstants.totpStatus);
+    return response.data['totp_enabled'] as bool;
+  }
+
+  Future<Map<String, dynamic>> totpSetup() async {
+    final response = await _dio.get(ApiConstants.totpSetup);
+    return Map<String, dynamic>.from(response.data);
+  }
+
+  Future<void> totpEnable({required String secret, required String code}) async {
+    await _dio.post(ApiConstants.totpEnable, data: {'secret': secret, 'code': code});
+  }
+
+  Future<void> totpDisable({required String masterPassword}) async {
+    await _dio.post(ApiConstants.totpDisable, data: {'master_password': masterPassword});
   }
 
   Future<void> verifyDevice({
