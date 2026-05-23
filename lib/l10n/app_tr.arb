@@ -819,5 +819,6 @@
   "totpDisableMasterPasswordLabel": "Master Password",
   "totpDisableMasterPasswordError": "Master password hatalı",
   "totpDisabledSuccess": "Authenticator Koruması devre dışı bırakıldı",
-  "totpDisableConfirm": "Devre Dışı Bırak"
+  "totpDisableConfirm": "Devre Dışı Bırak",
+  "cancel": "İptal"
 }

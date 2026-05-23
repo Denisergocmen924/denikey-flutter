@@ -812,5 +812,6 @@
   "totpDisableMasterPasswordLabel": "Мастер-пароль",
   "totpDisableMasterPasswordError": "Неверный мастер-пароль",
   "totpDisabledSuccess": "Защита Authenticator отключена",
-  "totpDisableConfirm": "Отключить"
+  "totpDisableConfirm": "Отключить",
+  "cancel": "Отмена"
 }

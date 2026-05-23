@@ -812,5 +812,6 @@
   "totpDisableMasterPasswordLabel": "Master Password",
   "totpDisableMasterPasswordError": "Incorrect master password",
   "totpDisabledSuccess": "Authenticator Protection disabled",
-  "totpDisableConfirm": "Disable"
+  "totpDisableConfirm": "Disable",
+  "cancel": "Cancel"
 }
