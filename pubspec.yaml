@@ -1,7 +1,7 @@
 name: denikey_app
 description: "DeniKey - Sıfır bilgi mimarisiyle güvenli şifre yöneticisi."
 publish_to: 'none'
-version: 3.0.5+1
+version: 3.1.0+1
 environment:
   sdk: ^3.11.4
 dependencies:
