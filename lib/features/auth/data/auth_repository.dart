@@ -197,16 +197,15 @@ class AuthRepository {
     await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
   }
 
-  Future<String?> forgotPassword({required String email}) async {
-    final response = await _dio.post(
+  Future<void> forgotPassword({required String email}) async {
+    await _dio.post(
       ApiConstants.forgotPassword,
       data: {'email': email},
     );
-    return response.data['user_id'] as String?;
   }
 
   Future<void> resetPassword({
-    required String userId,
+    required String email,
     required String code,
     required String newMasterPassword,
   }) async {
@@ -214,7 +213,7 @@ class AuthRepository {
     await _dio.post(
       ApiConstants.resetPassword,
       data: {
-        'user_id': userId,
+        'email': email,
         'code': code,
         'new_master_password': newMasterPassword,
         'new_encryption_key_salt': salt,

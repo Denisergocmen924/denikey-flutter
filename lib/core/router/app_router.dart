@@ -118,7 +118,6 @@ final router = GoRouter(
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return ResetPasswordScreen(
-            userId: extra['user_id'] as String? ?? '',
             email: extra['email'] as String? ?? '',
           );
         },

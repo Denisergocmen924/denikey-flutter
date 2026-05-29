@@ -5,12 +5,10 @@ import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../data/auth_repository.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  final String userId;
   final String email;
 
   const ResetPasswordScreen({
     super.key,
-    required this.userId,
     required this.email,
   });
 
@@ -41,7 +39,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     setState(() => _loading = true);
     try {
       await _repo.resetPassword(
-        userId: widget.userId,
+        email: widget.email,
         code: _codeCtrl.text.trim(),
         newMasterPassword: _passwordCtrl.text.trim(),
       );

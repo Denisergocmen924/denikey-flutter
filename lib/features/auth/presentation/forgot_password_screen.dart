@@ -27,16 +27,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
     try {
-      final userId = await _repo.forgotPassword(email: _emailCtrl.text.trim());
+      await _repo.forgotPassword(email: _emailCtrl.text.trim());
       if (!mounted) return;
-      if (userId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).forgotPasswordError)),
-        );
-        return;
-      }
       context.push('/reset-password', extra: {
-        'user_id': userId,
         'email': _emailCtrl.text.trim(),
       });
     } on DioException catch (e) {
