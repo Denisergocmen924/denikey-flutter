@@ -1,6 +1,7 @@
 #include "my_application.h"
 
 #include <flutter_linux/flutter_linux.h>
+#include <unistd.h>
 
 #include "flutter/generated_plugin_registrant.h"
 
@@ -24,7 +25,20 @@ static void my_application_activate(GApplication* application) {
 
   g_set_application_name("DeniKey");
   gtk_window_set_title(window, "DeniKey");
-  gtk_window_set_icon_name(window, "denikey");
+
+  // İkonu bundle dizininden yükle
+  {
+    char exec_path[4096] = {0};
+    ssize_t len = readlink("/proc/self/exe", exec_path, sizeof(exec_path) - 1);
+    if (len > 0) {
+      exec_path[len] = '\0';
+      gchar* exec_dir = g_path_get_dirname(exec_path);
+      gchar* icon_path = g_build_filename(exec_dir, "denikey.png", NULL);
+      gtk_window_set_icon_from_file(window, icon_path, NULL);
+      g_free(icon_path);
+      g_free(exec_dir);
+    }
+  }
 
   gtk_window_set_default_size(window, 1280, 720);
 

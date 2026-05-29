@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=DeniKey
+Comment=Zero-knowledge password manager
+Exec=BUNDLE_PATH/DeniKey
+Icon=BUNDLE_PATH/denikey.png
+Type=Application
+Categories=Utility;Security;
+StartupWMClass=DeniKey
+Terminal=false
