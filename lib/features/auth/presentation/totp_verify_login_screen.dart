@@ -60,7 +60,7 @@ class _TotpVerifyLoginScreenState extends ConsumerState<TotpVerifyLoginScreen> {
         return;
       }
 
-      context.go('/master-lock');
+      context.go('/vault');
     } catch (e) {
       setState(() => _errorText = AppLocalizations.of(context).totpInvalidCode);
     } finally {

@@ -24,6 +24,9 @@ class ApiConstants {
   static const String totpEnable         = '/api/v1/auth/totp/enable';
   static const String totpDisable        = '/api/v1/auth/totp/disable';
   static const String totpVerifyLogin    = '/api/v1/auth/totp/verify-login';
+  static const String totpTrustDuration  = '/api/v1/auth/totp/trust-duration';
+  static const String totpTrustCheck     = '/api/v1/auth/totp/trust-check';
+  static const String totpVerifyUnlock   = '/api/v1/auth/totp/verify-unlock';
 
   // Vault
   static const String vaultItems = '/api/v1/vault/items';

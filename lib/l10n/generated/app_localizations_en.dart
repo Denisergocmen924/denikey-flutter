@@ -783,9 +783,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addItemStep0 => 'Select Category';
 
   @override
-  String get addItemStep1 => 'Select Type';
-
-  @override
   String get addItemStep2 => 'Enter Details';
 
   @override
@@ -801,28 +798,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addItemCreateCategorySubtitle => 'Add new category';
 
   @override
-  String get addItemSelectType => 'Select Type';
-
-  @override
   String get addItemNewCategory => 'New Category';
 
   @override
   String get addItemNewCategoryName => 'Category Name';
 
   @override
-  String get addItemColorSelect => 'Select Color';
-
-  @override
-  String get addItemNewItemType => 'New Type';
-
-  @override
   String get addItemTypeNameLabel => 'Type Name';
 
   @override
   String get addItemTypeSelectIcon => 'Select Icon';
-
-  @override
-  String get addItemTypeSelectColor => 'Select Color';
 
   @override
   String get addItemTypeFixedFields => 'Fixed Fields';
@@ -857,12 +842,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addItemTitleHint => 'e.g. Instagram, Gmail, Netflix';
-
-  @override
-  String get addItemUrlLabel => 'Website (URL)';
-
-  @override
-  String get addItemUrlHint => 'e.g. https://instagram.com';
 
   @override
   String get addItemExtraFieldKeyLabel => 'Field Name';
@@ -905,9 +884,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get detailPasswordLabel => 'Password';
-
-  @override
-  String get detailExtraInfoSection => 'Additional Info';
 
   @override
   String get detailCategoryLabel => 'Folder';
@@ -962,9 +938,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get detailEditTitle => 'Title';
-
-  @override
-  String get detailEditUrl => 'Website (URL)';
 
   @override
   String get detailEditPassword => 'Password';
@@ -1042,9 +1015,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Password copied, will be cleared in 30 sec';
 
   @override
-  String get passwordHistoryLoading => 'Loading...';
-
-  @override
   String get passwordHistoryError => 'Failed to load';
 
   @override
@@ -1090,9 +1060,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get librarySystemLabel => 'System';
-
-  @override
-  String get librarySystemLock => 'Locked';
 
   @override
   String libraryTypeFieldCount(int count) {
@@ -1187,9 +1154,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trashDeletePermanent => 'Permanently Delete';
 
   @override
-  String get trashLoading => 'Loading...';
-
-  @override
   String get trashError => 'Error';
 
   @override
@@ -1256,9 +1220,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String auditLogEmptyCategory(String category) {
     return 'No records in $category category';
   }
-
-  @override
-  String get auditLogLoading => 'Loading...';
 
   @override
   String get auditLogError => 'Error';
@@ -1333,9 +1294,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportTicketStatusClosed => 'Closed';
 
   @override
-  String get supportTicketYourMessage => 'Your Message';
-
-  @override
   String get supportTicketAdminReply => 'Support Reply';
 
   @override
@@ -1379,9 +1337,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportTicketDeleteSuccess => 'Ticket deleted';
 
   @override
-  String get supportTicketDeleteError => 'Could not delete ticket';
-
-  @override
   String get forceUpdateTitle => 'Update Required';
 
   @override
@@ -1413,11 +1368,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String forceUpdateInstallError(String error) {
     return 'Failed to start installation: $error';
-  }
-
-  @override
-  String forceUpdateInstallErrorFilePath(String filePath) {
-    return 'Failed to start installation. File: $filePath';
   }
 
   @override
@@ -1484,9 +1434,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashSubtitle => 'Zero Knowledge · Full Security';
 
   @override
-  String get splashVersionPrefix => 'v';
-
-  @override
   String get settingsAutoLockUnlimited => 'Unlimited';
 
   @override
@@ -1519,9 +1466,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String settingsDeviceDaysAgo(int days) {
     return '$days days ago';
   }
-
-  @override
-  String get onboardingSkip => 'Skip';
 
   @override
   String get onboardingNext => 'Next';
@@ -1580,41 +1524,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingChipTrash => 'Trash';
 
   @override
-  String get onboardingLibraryTitle => 'Stay Organized';
-
-  @override
-  String get onboardingLibrarySubtitle =>
-      'Organize passwords with categories. Store credit cards, IDs, and more with item types.';
-
-  @override
   String get onboardingLibraryCategorySocialMedia => 'Social Media';
 
   @override
-  String get onboardingLibraryCategoryBanking => 'Banking';
-
-  @override
   String get onboardingLibraryCategoryWork => 'Work';
-
-  @override
-  String get onboardingLibraryCategoryDevices => 'Devices';
-
-  @override
-  String onboardingLibraryPasswordCount(int count) {
-    return '$count passwords';
-  }
-
-  @override
-  String get onboardingLibraryItemTypesHeader => 'Item Types';
-
-  @override
-  String get onboardingLibraryItemTypesDesc =>
-      'Credit Card, ID, SSH Key, Wi-Fi and more...';
-
-  @override
-  String get onboardingChipCategories => 'Categories';
-
-  @override
-  String get onboardingChipItemTypes => 'Item Types';
 
   @override
   String get onboardingChipCustomize => 'Customize';
@@ -1720,11 +1633,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoriesUncategorized => 'Uncategorized';
 
   @override
-  String genericError(String error) {
-    return 'Error: $error';
-  }
-
-  @override
   String get networkError => 'Could not connect to server';
 
   @override
@@ -1767,12 +1675,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingTypesWith => 'With a type';
-
-  @override
-  String get onboardingTypesWithoutDesc => 'Add field, add field, add field...';
-
-  @override
-  String get onboardingTypesWithDesc => 'Fields are ready to go!';
 
   @override
   String get onboardingTypesChipTemplate => 'Template';
@@ -1922,4 +1824,106 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addItemFieldNameRequired => 'This field is required';
+
+  @override
+  String get totpSettingsTitle => 'Authenticator Protection';
+
+  @override
+  String get totpSettingsActiveDesc =>
+      'An authenticator code will be required on each sign-in';
+
+  @override
+  String get totpSettingsInactiveDesc =>
+      'No extra verification code required on sign-in';
+
+  @override
+  String get totpSetupTitle => 'Authenticator Protection Setup';
+
+  @override
+  String get totpSetupStep1 => '1. Scan the QR Code';
+
+  @override
+  String get totpSetupStep1Desc =>
+      'Scan the QR code below using Google Authenticator, Authy, or any compatible app.';
+
+  @override
+  String get totpSetupStep2 => '2. Enter the Verification Code';
+
+  @override
+  String get totpSetupStep2Desc =>
+      'Enter the 6-digit code shown in your authenticator app to complete the setup.';
+
+  @override
+  String get totpSetupManualKey => 'Manual Entry Key';
+
+  @override
+  String get totpSetupActivate => 'Activate';
+
+  @override
+  String get totpSetupLoadError => 'Could not load setup information';
+
+  @override
+  String get totpSecretCopied => 'Key copied';
+
+  @override
+  String get totpCodeLabel => '6-digit code';
+
+  @override
+  String get totpInvalidCode => 'Invalid code, please try again';
+
+  @override
+  String get totpEnabledSuccess => 'Authenticator Protection enabled';
+
+  @override
+  String get totpVerifyTitle => 'Authenticator Protection';
+
+  @override
+  String get totpVerifyDesc =>
+      'Enter the 6-digit code shown in your authenticator app.';
+
+  @override
+  String get totpVerifyButton => 'Verify';
+
+  @override
+  String get totpDisableTitle => 'Disable Protection';
+
+  @override
+  String get totpDisableDesc =>
+      'Enter your master password to disable Authenticator Protection.';
+
+  @override
+  String get totpDisableMasterPasswordLabel => 'Master Password';
+
+  @override
+  String get totpDisableMasterPasswordError => 'Incorrect master password';
+
+  @override
+  String get totpDisabledSuccess => 'Authenticator Protection disabled';
+
+  @override
+  String get totpDisableConfirm => 'Disable';
+
+  @override
+  String get totpTrustDurationLabel => 'Verification frequency';
+
+  @override
+  String get totpTrustAlways => 'Every time';
+
+  @override
+  String get totpTrust12h => '12 hours';
+
+  @override
+  String get totpTrust1d => '1 day';
+
+  @override
+  String get totpTrust7d => '7 days';
+
+  @override
+  String get totpTrust30d => '30 days';
+
+  @override
+  String get totpTrust60d => '60 days';
+
+  @override
+  String get cancel => 'Cancel';
 }

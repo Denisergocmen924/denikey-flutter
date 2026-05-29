@@ -1,15 +1,41 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/password_generator_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../../../core/presentation/app_nav_bar.dart';
+import '../../../core/providers/clipboard_timeout_provider.dart';
 
-class PasswordGeneratorScreen extends ConsumerWidget {
+class PasswordGeneratorScreen extends ConsumerStatefulWidget {
   const PasswordGeneratorScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PasswordGeneratorScreen> createState() => _PasswordGeneratorScreenState();
+}
+
+class _PasswordGeneratorScreenState extends ConsumerState<PasswordGeneratorScreen> {
+  Timer? _clipboardTimer;
+
+  @override
+  void dispose() {
+    _clipboardTimer?.cancel();
+    super.dispose();
+  }
+
+  void _copyToClipboard(String password) {
+    final timeout = ref.read(clipboardTimeoutProvider);
+    Clipboard.setData(ClipboardData(text: password));
+    _clipboardTimer?.cancel();
+    if (timeout != null) {
+      _clipboardTimer = Timer(Duration(seconds: timeout), () {
+        Clipboard.setData(const ClipboardData(text: ''));
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(passwordGeneratorProvider);
     final notifier = ref.read(passwordGeneratorProvider.notifier);
@@ -59,12 +85,7 @@ class PasswordGeneratorScreen extends ConsumerWidget {
                       icon: const Icon(Icons.copy_outlined),
                       tooltip: l10n.passwordGeneratorCopy,
                       onPressed: () {
-                        Clipboard.setData(
-                          ClipboardData(text: state.generatedPassword!),
-                        );
-                        Future.delayed(const Duration(seconds: 30), () {
-                          Clipboard.setData(const ClipboardData(text: ''));
-                        });
+                        _copyToClipboard(state.generatedPassword!);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Row(

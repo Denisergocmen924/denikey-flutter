@@ -394,7 +394,9 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                               ? cs.primaryContainer.withAlpha(60)
                               : cs.surface,
                         ),
-                        child: ListTile(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                           contentPadding: const EdgeInsets.only(
@@ -477,6 +479,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                   await context.push('/vault/detail', extra: item);
                                   ref.read(vaultProvider.notifier).loadItems();
                                 },
+                        ),
                         ),
                       ),
                     );

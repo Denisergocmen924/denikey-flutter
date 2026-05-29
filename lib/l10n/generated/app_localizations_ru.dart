@@ -782,9 +782,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addItemStep0 => 'Выбрать категорию';
 
   @override
-  String get addItemStep1 => 'Выбрать тип';
-
-  @override
   String get addItemStep2 => 'Ввести данные';
 
   @override
@@ -800,28 +797,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addItemCreateCategorySubtitle => 'Добавить новую категорию';
 
   @override
-  String get addItemSelectType => 'Выберите тип';
-
-  @override
   String get addItemNewCategory => 'Новая категория';
 
   @override
   String get addItemNewCategoryName => 'Название категории';
 
   @override
-  String get addItemColorSelect => 'Выбрать цвет';
-
-  @override
-  String get addItemNewItemType => 'Новый тип';
-
-  @override
   String get addItemTypeNameLabel => 'Название типа';
 
   @override
   String get addItemTypeSelectIcon => 'Выбрать иконку';
-
-  @override
-  String get addItemTypeSelectColor => 'Выбрать цвет';
 
   @override
   String get addItemTypeFixedFields => 'Фиксированные поля';
@@ -856,12 +841,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get addItemTitleHint => 'Напр.: Instagram, Gmail, Netflix';
-
-  @override
-  String get addItemUrlLabel => 'Сайт (URL)';
-
-  @override
-  String get addItemUrlHint => 'Напр.: https://instagram.com';
 
   @override
   String get addItemExtraFieldKeyLabel => 'Название поля';
@@ -904,9 +883,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get detailPasswordLabel => 'Пароль';
-
-  @override
-  String get detailExtraInfoSection => 'Дополнительная информация';
 
   @override
   String get detailCategoryLabel => 'Папка';
@@ -961,9 +937,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get detailEditTitle => 'Заголовок';
-
-  @override
-  String get detailEditUrl => 'Сайт (URL)';
 
   @override
   String get detailEditPassword => 'Пароль';
@@ -1041,9 +1014,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Пароль скопирован, будет удалён через 30 сек';
 
   @override
-  String get passwordHistoryLoading => 'Загрузка...';
-
-  @override
   String get passwordHistoryError => 'Не удалось загрузить';
 
   @override
@@ -1089,9 +1059,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get librarySystemLabel => 'Система';
-
-  @override
-  String get librarySystemLock => 'Заблокировано';
 
   @override
   String libraryTypeFieldCount(int count) {
@@ -1186,9 +1153,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get trashDeletePermanent => 'Удалить навсегда';
 
   @override
-  String get trashLoading => 'Загрузка...';
-
-  @override
   String get trashError => 'Ошибка';
 
   @override
@@ -1255,9 +1219,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String auditLogEmptyCategory(String category) {
     return 'Нет записей в категории $category';
   }
-
-  @override
-  String get auditLogLoading => 'Загрузка...';
 
   @override
   String get auditLogError => 'Ошибка';
@@ -1332,9 +1293,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get supportTicketStatusClosed => 'Закрыто';
 
   @override
-  String get supportTicketYourMessage => 'Ваше сообщение';
-
-  @override
   String get supportTicketAdminReply => 'Ответ поддержки';
 
   @override
@@ -1378,9 +1336,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get supportTicketDeleteSuccess => 'Запрос удалён';
 
   @override
-  String get supportTicketDeleteError => 'Не удалось удалить запрос';
-
-  @override
   String get forceUpdateTitle => 'Требуется обновление';
 
   @override
@@ -1412,11 +1367,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String forceUpdateInstallError(String error) {
     return 'Не удалось запустить установку: $error';
-  }
-
-  @override
-  String forceUpdateInstallErrorFilePath(String filePath) {
-    return 'Не удалось запустить установку. Файл: $filePath';
   }
 
   @override
@@ -1483,9 +1433,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get splashSubtitle => 'Нулевое знание · Полная безопасность';
 
   @override
-  String get splashVersionPrefix => 'v';
-
-  @override
   String get settingsAutoLockUnlimited => 'Без ограничений';
 
   @override
@@ -1518,9 +1465,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String settingsDeviceDaysAgo(int days) {
     return '$days дн. назад';
   }
-
-  @override
-  String get onboardingSkip => 'Пропустить';
 
   @override
   String get onboardingNext => 'Далее';
@@ -1579,41 +1523,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingChipTrash => 'Корзина';
 
   @override
-  String get onboardingLibraryTitle => 'Будьте организованы';
-
-  @override
-  String get onboardingLibrarySubtitle =>
-      'Организуйте пароли по категориям. Храните карты, удостоверения и многое другое с помощью типов элементов.';
-
-  @override
   String get onboardingLibraryCategorySocialMedia => 'Соц. сети';
 
   @override
-  String get onboardingLibraryCategoryBanking => 'Банкинг';
-
-  @override
   String get onboardingLibraryCategoryWork => 'Работа';
-
-  @override
-  String get onboardingLibraryCategoryDevices => 'Устройства';
-
-  @override
-  String onboardingLibraryPasswordCount(int count) {
-    return '$count паролей';
-  }
-
-  @override
-  String get onboardingLibraryItemTypesHeader => 'Типы элементов';
-
-  @override
-  String get onboardingLibraryItemTypesDesc =>
-      'Кредитная карта, удостоверение, SSH-ключ, Wi-Fi и многое другое...';
-
-  @override
-  String get onboardingChipCategories => 'Категории';
-
-  @override
-  String get onboardingChipItemTypes => 'Типы элементов';
 
   @override
   String get onboardingChipCustomize => 'Настроить';
@@ -1722,11 +1635,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get categoriesUncategorized => 'Без категории';
 
   @override
-  String genericError(String error) {
-    return 'Ошибка: $error';
-  }
-
-  @override
   String get networkError => 'Не удалось подключиться к серверу';
 
   @override
@@ -1770,12 +1678,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get onboardingTypesWith => 'С типом';
-
-  @override
-  String get onboardingTypesWithoutDesc => 'Добавить поле, ещё поле, ещё...';
-
-  @override
-  String get onboardingTypesWithDesc => 'Поля уже готовы!';
 
   @override
   String get onboardingTypesChipTemplate => 'Шаблон';
@@ -1925,4 +1827,106 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get addItemFieldNameRequired => 'Это поле обязательно для заполнения';
+
+  @override
+  String get totpSettingsTitle => 'Защита Authenticator';
+
+  @override
+  String get totpSettingsActiveDesc =>
+      'При каждом входе потребуется код из приложения';
+
+  @override
+  String get totpSettingsInactiveDesc =>
+      'Дополнительный код при входе не требуется';
+
+  @override
+  String get totpSetupTitle => 'Настройка защиты Authenticator';
+
+  @override
+  String get totpSetupStep1 => '1. Отсканируйте QR-код';
+
+  @override
+  String get totpSetupStep1Desc =>
+      'Отсканируйте QR-код ниже с помощью Google Authenticator, Authy или аналогичного приложения.';
+
+  @override
+  String get totpSetupStep2 => '2. Введите код подтверждения';
+
+  @override
+  String get totpSetupStep2Desc =>
+      'Введите 6-значный код из приложения для завершения настройки.';
+
+  @override
+  String get totpSetupManualKey => 'Ключ для ручного ввода';
+
+  @override
+  String get totpSetupActivate => 'Активировать';
+
+  @override
+  String get totpSetupLoadError => 'Не удалось загрузить данные настройки';
+
+  @override
+  String get totpSecretCopied => 'Ключ скопирован';
+
+  @override
+  String get totpCodeLabel => '6-значный код';
+
+  @override
+  String get totpInvalidCode => 'Неверный код, попробуйте ещё раз';
+
+  @override
+  String get totpEnabledSuccess => 'Защита Authenticator включена';
+
+  @override
+  String get totpVerifyTitle => 'Защита Authenticator';
+
+  @override
+  String get totpVerifyDesc =>
+      'Введите 6-значный код из вашего приложения-аутентификатора.';
+
+  @override
+  String get totpVerifyButton => 'Подтвердить';
+
+  @override
+  String get totpDisableTitle => 'Отключить защиту';
+
+  @override
+  String get totpDisableDesc =>
+      'Введите мастер-пароль, чтобы отключить защиту Authenticator.';
+
+  @override
+  String get totpDisableMasterPasswordLabel => 'Мастер-пароль';
+
+  @override
+  String get totpDisableMasterPasswordError => 'Неверный мастер-пароль';
+
+  @override
+  String get totpDisabledSuccess => 'Защита Authenticator отключена';
+
+  @override
+  String get totpDisableConfirm => 'Отключить';
+
+  @override
+  String get totpTrustDurationLabel => 'Частота проверки';
+
+  @override
+  String get totpTrustAlways => 'Каждый раз';
+
+  @override
+  String get totpTrust12h => '12 часов';
+
+  @override
+  String get totpTrust1d => '1 день';
+
+  @override
+  String get totpTrust7d => '7 дней';
+
+  @override
+  String get totpTrust30d => '30 дней';
+
+  @override
+  String get totpTrust60d => '60 дней';
+
+  @override
+  String get cancel => 'Отмена';
 }

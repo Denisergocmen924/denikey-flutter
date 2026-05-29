@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/crypto/encryption_service.dart';
@@ -13,10 +14,15 @@ class VaultRepository {
   Future<bool> isOnline() async {
     if (Platform.isLinux || Platform.isWindows) {
       try {
-        final result = await InternetAddress.lookup('google.com')
-            .timeout(const Duration(seconds: 3));
-        return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-      } catch (_) {
+        final socket = await Socket.connect(
+          'denikey-backend.fly.dev',
+          443,
+          timeout: const Duration(seconds: 5),
+        );
+        socket.destroy();
+        return true;
+      } catch (e) {
+        debugPrint('[isOnline] bağlantı başarısız: $e');
         return false;
       }
     }

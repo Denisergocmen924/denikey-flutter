@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +28,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   final Map<int, bool> _showCustomField = {}; // her custom field için ayrı görünürlük
   List<dynamic> _customFields = [];
   Map<String, dynamic> _fullItem = {};
+  Timer? _clipboardTimer;
 
   // Edit modu
   bool _isEditing = false;
@@ -56,6 +58,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
 
   @override
   void dispose() {
+    _clipboardTimer?.cancel();
     _titleCtrl.dispose();
     _passwordCtrl.dispose();
     _disposeCustomFieldCtrls();
@@ -243,8 +246,9 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
         ),
       ),
     );
+    _clipboardTimer?.cancel();
     if (timeout != null) {
-      Future.delayed(Duration(seconds: timeout), () {
+      _clipboardTimer = Timer(Duration(seconds: timeout), () {
         Clipboard.setData(const ClipboardData(text: ''));
       });
     }

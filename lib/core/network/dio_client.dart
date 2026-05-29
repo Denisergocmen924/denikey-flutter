@@ -60,7 +60,8 @@ class _JwtInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     if (err.response?.statusCode != 401 ||
-        err.requestOptions.path == ApiConstants.refreshToken) {
+        err.requestOptions.path == ApiConstants.refreshToken ||
+        err.requestOptions.path == ApiConstants.totpVerifyLogin) {
       handler.next(err);
       return;
     }

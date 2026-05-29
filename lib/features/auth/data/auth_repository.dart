@@ -120,9 +120,31 @@ class AuthRepository {
     await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
   }
 
-  Future<bool> totpStatus() async {
+  Future<Map<String, dynamic>> totpStatus() async {
     final response = await _dio.get(ApiConstants.totpStatus);
-    return response.data['totp_enabled'] as bool;
+    return {
+      'totp_enabled': response.data['totp_enabled'] as bool,
+      'totp_trust_duration_seconds': response.data['totp_trust_duration_seconds'] as int? ?? 0,
+    };
+  }
+
+  Future<void> setTotpTrustDuration(int durationSeconds) async {
+    await _dio.put(
+      ApiConstants.totpTrustDuration,
+      data: {'duration_seconds': durationSeconds},
+    );
+  }
+
+  Future<Map<String, dynamic>> totpTrustCheck() async {
+    final response = await _dio.get(ApiConstants.totpTrustCheck);
+    return {
+      'totp_enabled': response.data['totp_enabled'] as bool,
+      'trust_valid': response.data['trust_valid'] as bool,
+    };
+  }
+
+  Future<void> totpVerifyUnlock({required String code}) async {
+    await _dio.post(ApiConstants.totpVerifyUnlock, data: {'code': code});
   }
 
   Future<Map<String, dynamic>> totpSetup() async {

@@ -820,5 +820,12 @@
   "totpDisableMasterPasswordError": "Master password hatalı",
   "totpDisabledSuccess": "Authenticator Koruması devre dışı bırakıldı",
   "totpDisableConfirm": "Devre Dışı Bırak",
+  "totpTrustDurationLabel": "Doğrulama sıklığı",
+  "totpTrustAlways": "Her seferinde",
+  "totpTrust12h": "12 saat",
+  "totpTrust1d": "1 gün",
+  "totpTrust7d": "7 gün",
+  "totpTrust30d": "30 gün",
+  "totpTrust60d": "60 gün",
   "cancel": "İptal"
 }

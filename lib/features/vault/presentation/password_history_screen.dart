@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
+import '../../../core/providers/clipboard_timeout_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
-class PasswordHistoryScreen extends StatefulWidget {
+class PasswordHistoryScreen extends ConsumerStatefulWidget {
   final String itemId;
   final String itemTitle;
 
@@ -16,14 +19,15 @@ class PasswordHistoryScreen extends StatefulWidget {
   });
 
   @override
-  State<PasswordHistoryScreen> createState() => _PasswordHistoryScreenState();
+  ConsumerState<PasswordHistoryScreen> createState() => _PasswordHistoryScreenState();
 }
 
-class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
+class _PasswordHistoryScreenState extends ConsumerState<PasswordHistoryScreen> {
   List<Map<String, dynamic>> _history = [];
   bool _loading = true;
   String? _error;
   final Set<int> _revealed = {};
+  Timer? _clipboardTimer;
 
   @override
   void initState() {
@@ -85,14 +89,24 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
     } catch (_) {}
   }
 
+  @override
+  void dispose() {
+    _clipboardTimer?.cancel();
+    super.dispose();
+  }
+
   void _copyToClipboard(String value) {
+    final timeout = ref.read(clipboardTimeoutProvider);
     Clipboard.setData(ClipboardData(text: value));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context).passwordHistoryCopy)),
     );
-    Future.delayed(const Duration(seconds: 30), () {
-      Clipboard.setData(const ClipboardData(text: ''));
-    });
+    _clipboardTimer?.cancel();
+    if (timeout != null) {
+      _clipboardTimer = Timer(Duration(seconds: timeout), () {
+        Clipboard.setData(const ClipboardData(text: ''));
+      });
+    }
   }
 
   @override

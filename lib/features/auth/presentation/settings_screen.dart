@@ -27,6 +27,20 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+const _kTotpTrustOptions = [0, 43200, 86400, 604800, 2592000, 5184000];
+
+String _totpTrustLabel(AppLocalizations l10n, int seconds) {
+  switch (seconds) {
+    case 0:      return l10n.totpTrustAlways;
+    case 43200:  return l10n.totpTrust12h;
+    case 86400:  return l10n.totpTrust1d;
+    case 604800: return l10n.totpTrust7d;
+    case 2592000: return l10n.totpTrust30d;
+    case 5184000: return l10n.totpTrust60d;
+    default:     return l10n.totpTrustAlways;
+  }
+}
+
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _repo = AuthRepository();
   String? _email;
@@ -478,6 +492,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             builder: (context, ref, _) {
               final l10n = AppLocalizations.of(context);
               final totpAsync = ref.watch(totpStatusProvider);
+              final cs = Theme.of(context).colorScheme;
               return totpAsync.when(
                 loading: () => const ListTile(
                   leading: Icon(Icons.verified_user_outlined),
@@ -488,29 +503,66 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 error: (_, __) => const SizedBox.shrink(),
-                data: (enabled) => ListTile(
-                  leading: Icon(
-                    Icons.verified_user_outlined,
-                    color: enabled ? Theme.of(context).colorScheme.primary : null,
-                  ),
-                  title: Text(l10n.totpSettingsTitle),
-                  subtitle: Text(
-                    enabled
-                        ? l10n.totpSettingsActiveDesc
-                        : l10n.totpSettingsInactiveDesc,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  trailing: Switch(
-                    value: enabled,
-                    onChanged: (val) async {
-                      if (val) {
-                        await context.push('/totp-setup');
-                        ref.invalidate(totpStatusProvider);
-                      } else {
-                        _showTotpDisableDialog(context, ref, l10n);
-                      }
-                    },
-                  ),
+                data: (status) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        Icons.verified_user_outlined,
+                        color: status.enabled ? cs.primary : null,
+                      ),
+                      title: Text(l10n.totpSettingsTitle),
+                      subtitle: Text(
+                        status.enabled
+                            ? l10n.totpSettingsActiveDesc
+                            : l10n.totpSettingsInactiveDesc,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      trailing: Switch(
+                        value: status.enabled,
+                        onChanged: (val) async {
+                          if (val) {
+                            await context.push('/totp-setup');
+                            ref.invalidate(totpStatusProvider);
+                          } else {
+                            _showTotpDisableDialog(context, ref, l10n);
+                          }
+                        },
+                      ),
+                    ),
+                    if (status.enabled)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(56, 0, 16, 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.totpTrustDurationLabel,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: cs.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: [
+                                for (final option in _kTotpTrustOptions)
+                                  ChoiceChip(
+                                    label: Text(_totpTrustLabel(l10n, option)),
+                                    selected: status.trustDurationSeconds == option,
+                                    onSelected: (_) async {
+                                      await AuthRepository().setTotpTrustDuration(option);
+                                      ref.invalidate(totpStatusProvider);
+                                    },
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
               );
             },

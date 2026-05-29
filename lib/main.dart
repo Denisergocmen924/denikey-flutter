@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/generated/app_localizations.dart';
@@ -25,6 +26,37 @@ const _kSingleInstancePort = 47821;
 ServerSocket? _singleInstanceServer;
 bool _windowReady = false;
 bool _pendingShow = false;
+
+Future<void> _migrateSettingsFromLegacyPath(SharedPreferences prefs) async {
+  if (prefs.getBool('settings_v2_migrated') == true) return;
+  final home = Platform.environment['HOME'] ?? '';
+  final oldFile = File('$home/.local/share/DeniKey/shared_preferences.json');
+  if (oldFile.existsSync()) {
+    try {
+      final raw = await oldFile.readAsString();
+      final old = Map<String, dynamic>.from(json.decode(raw) as Map);
+      const stringKeys = ['theme_mode', 'app_locale'];
+      const intKeys = ['clipboard_timeout_seconds', 'auto_lock_minutes'];
+      const boolKeys = ['shortcuts_enabled'];
+      for (final k in stringKeys) {
+        if (!prefs.containsKey(k) && old.containsKey('flutter.$k')) {
+          await prefs.setString(k, old['flutter.$k'] as String);
+        }
+      }
+      for (final k in intKeys) {
+        if (!prefs.containsKey(k) && old.containsKey('flutter.$k')) {
+          await prefs.setInt(k, old['flutter.$k'] as int);
+        }
+      }
+      for (final k in boolKeys) {
+        if (!prefs.containsKey(k) && old.containsKey('flutter.$k')) {
+          await prefs.setBool(k, old['flutter.$k'] as bool);
+        }
+      }
+    } catch (_) {}
+  }
+  await prefs.setBool('settings_v2_migrated', true);
+}
 
 Future<ServerSocket?> _acquireSingleInstanceLock() async {
   try {
@@ -86,6 +118,7 @@ void main() async {
     );
 
     final prefs = await SharedPreferences.getInstance();
+    if (Platform.isLinux) await _migrateSettingsFromLegacyPath(prefs);
     final savedX = prefs.getDouble('win_x');
     final savedY = prefs.getDouble('win_y');
     final savedW = prefs.getDouble('win_w');

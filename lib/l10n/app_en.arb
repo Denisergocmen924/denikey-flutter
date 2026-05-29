@@ -813,5 +813,12 @@
   "totpDisableMasterPasswordError": "Incorrect master password",
   "totpDisabledSuccess": "Authenticator Protection disabled",
   "totpDisableConfirm": "Disable",
+  "totpTrustDurationLabel": "Verification frequency",
+  "totpTrustAlways": "Every time",
+  "totpTrust12h": "12 hours",
+  "totpTrust1d": "1 day",
+  "totpTrust7d": "7 days",
+  "totpTrust30d": "30 days",
+  "totpTrust60d": "60 days",
   "cancel": "Cancel"
 }

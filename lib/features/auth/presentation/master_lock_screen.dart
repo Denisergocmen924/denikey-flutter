@@ -4,6 +4,7 @@ import '../../../core/biometric/biometric_service.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../data/auth_repository.dart';
 
 class MasterLockScreen extends StatefulWidget {
   const MasterLockScreen({super.key});
@@ -46,6 +47,23 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
     if (mounted) context.go('/login');
   }
 
+  Future<void> _navigateAfterUnlock() async {
+    try {
+      final result = await AuthRepository().totpTrustCheck();
+      if (!mounted) return;
+      final totpEnabled = result['totp_enabled'] as bool;
+      final trustValid = result['trust_valid'] as bool;
+      if (totpEnabled && !trustValid) {
+        context.go('/totp-verify-unlock');
+      } else {
+        context.go('/vault');
+      }
+    } catch (_) {
+      // Ağ hatası — vault'a geç, TOTP sonraki açılışta kontrol edilir
+      if (mounted) context.go('/vault');
+    }
+  }
+
   Future<void> _biometricUnlock() async {
     setState(() { _loading = true; _error = null; });
     final ok = await BiometricService.instance.authenticate();
@@ -60,7 +78,7 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
         });
         return;
       }
-      context.go('/vault');
+      await _navigateAfterUnlock();
     } else {
       setState(() { _error = AppLocalizations.of(context).masterLockAuthFailed; _loading = false; });
     }
@@ -104,10 +122,10 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
         return;
       }
 
-      // Doğru şifre — master key'i güncelle, TTL'i yenile ve vault'a geç
+      // Doğru şifre — master key'i güncelle, TTL'i yenile
       await SecureStorage.instance.saveMasterKey(masterKey);
       await BiometricService.instance.saveMasterPasswordTimestamp();
-      if (mounted) context.go('/vault');
+      if (mounted) await _navigateAfterUnlock();
     } catch (_) {
       setState(() { _error = AppLocalizations.of(context).masterLockWrongPassword; _loading = false; });
     }

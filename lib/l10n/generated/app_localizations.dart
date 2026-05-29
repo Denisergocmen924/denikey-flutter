@@ -1528,12 +1528,6 @@ abstract class AppLocalizations {
   /// **'Kategori Seç'**
   String get addItemStep0;
 
-  /// No description provided for @addItemStep1.
-  ///
-  /// In tr, this message translates to:
-  /// **'Tür Seç'**
-  String get addItemStep1;
-
   /// No description provided for @addItemStep2.
   ///
   /// In tr, this message translates to:
@@ -1564,12 +1558,6 @@ abstract class AppLocalizations {
   /// **'Yeni kategori ekle'**
   String get addItemCreateCategorySubtitle;
 
-  /// No description provided for @addItemSelectType.
-  ///
-  /// In tr, this message translates to:
-  /// **'Tür Seçin'**
-  String get addItemSelectType;
-
   /// No description provided for @addItemNewCategory.
   ///
   /// In tr, this message translates to:
@@ -1582,18 +1570,6 @@ abstract class AppLocalizations {
   /// **'Kategori Adı'**
   String get addItemNewCategoryName;
 
-  /// No description provided for @addItemColorSelect.
-  ///
-  /// In tr, this message translates to:
-  /// **'Renk Seç'**
-  String get addItemColorSelect;
-
-  /// No description provided for @addItemNewItemType.
-  ///
-  /// In tr, this message translates to:
-  /// **'Yeni Tür'**
-  String get addItemNewItemType;
-
   /// No description provided for @addItemTypeNameLabel.
   ///
   /// In tr, this message translates to:
@@ -1605,12 +1581,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'İkon Seç'**
   String get addItemTypeSelectIcon;
-
-  /// No description provided for @addItemTypeSelectColor.
-  ///
-  /// In tr, this message translates to:
-  /// **'Renk Seç'**
-  String get addItemTypeSelectColor;
 
   /// No description provided for @addItemTypeFixedFields.
   ///
@@ -1677,18 +1647,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Örn: Instagram, Gmail, Netflix'**
   String get addItemTitleHint;
-
-  /// No description provided for @addItemUrlLabel.
-  ///
-  /// In tr, this message translates to:
-  /// **'Web Sitesi (URL)'**
-  String get addItemUrlLabel;
-
-  /// No description provided for @addItemUrlHint.
-  ///
-  /// In tr, this message translates to:
-  /// **'Örn: https://instagram.com'**
-  String get addItemUrlHint;
 
   /// No description provided for @addItemExtraFieldKeyLabel.
   ///
@@ -1773,12 +1731,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Şifre'**
   String get detailPasswordLabel;
-
-  /// No description provided for @detailExtraInfoSection.
-  ///
-  /// In tr, this message translates to:
-  /// **'Ek Bilgiler'**
-  String get detailExtraInfoSection;
 
   /// No description provided for @detailCategoryLabel.
   ///
@@ -1881,12 +1833,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Başlık'**
   String get detailEditTitle;
-
-  /// No description provided for @detailEditUrl.
-  ///
-  /// In tr, this message translates to:
-  /// **'Web Sitesi (URL)'**
-  String get detailEditUrl;
 
   /// No description provided for @detailEditPassword.
   ///
@@ -2014,12 +1960,6 @@ abstract class AppLocalizations {
   /// **'Şifre kopyalandı, 30 sn sonra silinecek'**
   String get passwordHistoryCopy;
 
-  /// No description provided for @passwordHistoryLoading.
-  ///
-  /// In tr, this message translates to:
-  /// **'Yükleniyor...'**
-  String get passwordHistoryLoading;
-
   /// No description provided for @passwordHistoryError.
   ///
   /// In tr, this message translates to:
@@ -2109,12 +2049,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Sistem'**
   String get librarySystemLabel;
-
-  /// No description provided for @librarySystemLock.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kilitli'**
-  String get librarySystemLock;
 
   /// No description provided for @libraryTypeFieldCount.
   ///
@@ -2284,12 +2218,6 @@ abstract class AppLocalizations {
   /// **'Kalıcı Sil'**
   String get trashDeletePermanent;
 
-  /// No description provided for @trashLoading.
-  ///
-  /// In tr, this message translates to:
-  /// **'Yükleniyor...'**
-  String get trashLoading;
-
   /// No description provided for @trashError.
   ///
   /// In tr, this message translates to:
@@ -2421,12 +2349,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{category} kategorisinde kayıt yok'**
   String auditLogEmptyCategory(String category);
-
-  /// No description provided for @auditLogLoading.
-  ///
-  /// In tr, this message translates to:
-  /// **'Yükleniyor...'**
-  String get auditLogLoading;
 
   /// No description provided for @auditLogError.
   ///
@@ -2572,12 +2494,6 @@ abstract class AppLocalizations {
   /// **'Kapalı'**
   String get supportTicketStatusClosed;
 
-  /// No description provided for @supportTicketYourMessage.
-  ///
-  /// In tr, this message translates to:
-  /// **'Mesajınız'**
-  String get supportTicketYourMessage;
-
   /// No description provided for @supportTicketAdminReply.
   ///
   /// In tr, this message translates to:
@@ -2662,12 +2578,6 @@ abstract class AppLocalizations {
   /// **'Talep silindi'**
   String get supportTicketDeleteSuccess;
 
-  /// No description provided for @supportTicketDeleteError.
-  ///
-  /// In tr, this message translates to:
-  /// **'Talep silinemedi'**
-  String get supportTicketDeleteError;
-
   /// No description provided for @forceUpdateTitle.
   ///
   /// In tr, this message translates to:
@@ -2721,12 +2631,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kurulum başlatılamadı: {error}'**
   String forceUpdateInstallError(String error);
-
-  /// No description provided for @forceUpdateInstallErrorFilePath.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kurulum başlatılamadı. Dosya: {filePath}'**
-  String forceUpdateInstallErrorFilePath(String filePath);
 
   /// No description provided for @forceUpdatePermissionTitle.
   ///
@@ -2848,12 +2752,6 @@ abstract class AppLocalizations {
   /// **'Sıfır Bilgi · Tam Güvenlik'**
   String get splashSubtitle;
 
-  /// No description provided for @splashVersionPrefix.
-  ///
-  /// In tr, this message translates to:
-  /// **'v'**
-  String get splashVersionPrefix;
-
   /// No description provided for @settingsAutoLockUnlimited.
   ///
   /// In tr, this message translates to:
@@ -2901,12 +2799,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{days} gün önce'**
   String settingsDeviceDaysAgo(int days);
-
-  /// No description provided for @onboardingSkip.
-  ///
-  /// In tr, this message translates to:
-  /// **'Atla'**
-  String get onboardingSkip;
 
   /// No description provided for @onboardingNext.
   ///
@@ -3016,71 +2908,17 @@ abstract class AppLocalizations {
   /// **'Çöp Kutusu'**
   String get onboardingChipTrash;
 
-  /// No description provided for @onboardingLibraryTitle.
-  ///
-  /// In tr, this message translates to:
-  /// **'Organize Edin'**
-  String get onboardingLibraryTitle;
-
-  /// No description provided for @onboardingLibrarySubtitle.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kategorilerle şifrelerinizi düzenleyin. Öğe türleri ile kredi kartı, kimlik belgesi ve daha fazlasını saklayın.'**
-  String get onboardingLibrarySubtitle;
-
   /// No description provided for @onboardingLibraryCategorySocialMedia.
   ///
   /// In tr, this message translates to:
   /// **'Sosyal Medya'**
   String get onboardingLibraryCategorySocialMedia;
 
-  /// No description provided for @onboardingLibraryCategoryBanking.
-  ///
-  /// In tr, this message translates to:
-  /// **'Bankacılık'**
-  String get onboardingLibraryCategoryBanking;
-
   /// No description provided for @onboardingLibraryCategoryWork.
   ///
   /// In tr, this message translates to:
   /// **'İş'**
   String get onboardingLibraryCategoryWork;
-
-  /// No description provided for @onboardingLibraryCategoryDevices.
-  ///
-  /// In tr, this message translates to:
-  /// **'Cihazlar'**
-  String get onboardingLibraryCategoryDevices;
-
-  /// No description provided for @onboardingLibraryPasswordCount.
-  ///
-  /// In tr, this message translates to:
-  /// **'{count} şifre'**
-  String onboardingLibraryPasswordCount(int count);
-
-  /// No description provided for @onboardingLibraryItemTypesHeader.
-  ///
-  /// In tr, this message translates to:
-  /// **'Öğe Türleri'**
-  String get onboardingLibraryItemTypesHeader;
-
-  /// No description provided for @onboardingLibraryItemTypesDesc.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kredi Kartı, Kimlik, SSH Anahtarı, Wi-Fi ve daha fazlası...'**
-  String get onboardingLibraryItemTypesDesc;
-
-  /// No description provided for @onboardingChipCategories.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kategoriler'**
-  String get onboardingChipCategories;
-
-  /// No description provided for @onboardingChipItemTypes.
-  ///
-  /// In tr, this message translates to:
-  /// **'Öğe Türleri'**
-  String get onboardingChipItemTypes;
 
   /// No description provided for @onboardingChipCustomize.
   ///
@@ -3268,12 +3106,6 @@ abstract class AppLocalizations {
   /// **'Kategorisizler'**
   String get categoriesUncategorized;
 
-  /// No description provided for @genericError.
-  ///
-  /// In tr, this message translates to:
-  /// **'Hata: {error}'**
-  String genericError(String error);
-
   /// No description provided for @networkError.
   ///
   /// In tr, this message translates to:
@@ -3357,18 +3189,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tip seçilince'**
   String get onboardingTypesWith;
-
-  /// No description provided for @onboardingTypesWithoutDesc.
-  ///
-  /// In tr, this message translates to:
-  /// **'Alan ekle, alan ekle, alan ekle...'**
-  String get onboardingTypesWithoutDesc;
-
-  /// No description provided for @onboardingTypesWithDesc.
-  ///
-  /// In tr, this message translates to:
-  /// **'Alanlar hazır geliyor!'**
-  String get onboardingTypesWithDesc;
 
   /// No description provided for @onboardingTypesChipTemplate.
   ///
@@ -3651,6 +3471,198 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu alanı doldurmak zorunludur'**
   String get addItemFieldNameRequired;
+
+  /// No description provided for @totpSettingsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Authenticator Koruması'**
+  String get totpSettingsTitle;
+
+  /// No description provided for @totpSettingsActiveDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Girişlerde authenticator uygulamanızdan kod istenir'**
+  String get totpSettingsActiveDesc;
+
+  /// No description provided for @totpSettingsInactiveDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Girişlerde ek doğrulama kodu istenmez'**
+  String get totpSettingsInactiveDesc;
+
+  /// No description provided for @totpSetupTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Authenticator Koruması Kurulumu'**
+  String get totpSetupTitle;
+
+  /// No description provided for @totpSetupStep1.
+  ///
+  /// In tr, this message translates to:
+  /// **'1. QR Kodu Tarayın'**
+  String get totpSetupStep1;
+
+  /// No description provided for @totpSetupStep1Desc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google Authenticator, Authy veya benzer bir uygulama ile aşağıdaki QR kodu tarayın.'**
+  String get totpSetupStep1Desc;
+
+  /// No description provided for @totpSetupStep2.
+  ///
+  /// In tr, this message translates to:
+  /// **'2. Doğrulama Kodunu Girin'**
+  String get totpSetupStep2;
+
+  /// No description provided for @totpSetupStep2Desc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulamanızın gösterdiği 6 haneli kodu girerek kurulumu tamamlayın.'**
+  String get totpSetupStep2Desc;
+
+  /// No description provided for @totpSetupManualKey.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elle Giriş için Anahtar'**
+  String get totpSetupManualKey;
+
+  /// No description provided for @totpSetupActivate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Etkinleştir'**
+  String get totpSetupActivate;
+
+  /// No description provided for @totpSetupLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kurulum bilgileri yüklenemedi'**
+  String get totpSetupLoadError;
+
+  /// No description provided for @totpSecretCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Anahtar kopyalandı'**
+  String get totpSecretCopied;
+
+  /// No description provided for @totpCodeLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'6 haneli kod'**
+  String get totpCodeLabel;
+
+  /// No description provided for @totpInvalidCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçersiz kod, tekrar deneyin'**
+  String get totpInvalidCode;
+
+  /// No description provided for @totpEnabledSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Authenticator Koruması etkinleştirildi'**
+  String get totpEnabledSuccess;
+
+  /// No description provided for @totpVerifyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Authenticator Koruması'**
+  String get totpVerifyTitle;
+
+  /// No description provided for @totpVerifyDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Authenticator uygulamanızın gösterdiği 6 haneli kodu girin.'**
+  String get totpVerifyDesc;
+
+  /// No description provided for @totpVerifyButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğrula'**
+  String get totpVerifyButton;
+
+  /// No description provided for @totpDisableTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Korumayı Devre Dışı Bırak'**
+  String get totpDisableTitle;
+
+  /// No description provided for @totpDisableDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Authenticator Korumasını devre dışı bırakmak için master password\'ünüzü girin.'**
+  String get totpDisableDesc;
+
+  /// No description provided for @totpDisableMasterPasswordLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Master Password'**
+  String get totpDisableMasterPasswordLabel;
+
+  /// No description provided for @totpDisableMasterPasswordError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Master password hatalı'**
+  String get totpDisableMasterPasswordError;
+
+  /// No description provided for @totpDisabledSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Authenticator Koruması devre dışı bırakıldı'**
+  String get totpDisabledSuccess;
+
+  /// No description provided for @totpDisableConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devre Dışı Bırak'**
+  String get totpDisableConfirm;
+
+  /// No description provided for @totpTrustDurationLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğrulama sıklığı'**
+  String get totpTrustDurationLabel;
+
+  /// No description provided for @totpTrustAlways.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her seferinde'**
+  String get totpTrustAlways;
+
+  /// No description provided for @totpTrust12h.
+  ///
+  /// In tr, this message translates to:
+  /// **'12 saat'**
+  String get totpTrust12h;
+
+  /// No description provided for @totpTrust1d.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 gün'**
+  String get totpTrust1d;
+
+  /// No description provided for @totpTrust7d.
+  ///
+  /// In tr, this message translates to:
+  /// **'7 gün'**
+  String get totpTrust7d;
+
+  /// No description provided for @totpTrust30d.
+  ///
+  /// In tr, this message translates to:
+  /// **'30 gün'**
+  String get totpTrust30d;
+
+  /// No description provided for @totpTrust60d.
+  ///
+  /// In tr, this message translates to:
+  /// **'60 gün'**
+  String get totpTrust60d;
+
+  /// No description provided for @cancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'İptal'**
+  String get cancel;
 }
 
 class _AppLocalizationsDelegate

@@ -813,5 +813,12 @@
   "totpDisableMasterPasswordError": "Неверный мастер-пароль",
   "totpDisabledSuccess": "Защита Authenticator отключена",
   "totpDisableConfirm": "Отключить",
+  "totpTrustDurationLabel": "Частота проверки",
+  "totpTrustAlways": "Каждый раз",
+  "totpTrust12h": "12 часов",
+  "totpTrust1d": "1 день",
+  "totpTrust7d": "7 дней",
+  "totpTrust30d": "30 дней",
+  "totpTrust60d": "60 дней",
   "cancel": "Отмена"
 }

@@ -783,9 +783,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get addItemStep0 => 'Kategori Seç';
 
   @override
-  String get addItemStep1 => 'Tür Seç';
-
-  @override
   String get addItemStep2 => 'Bilgileri Gir';
 
   @override
@@ -801,28 +798,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get addItemCreateCategorySubtitle => 'Yeni kategori ekle';
 
   @override
-  String get addItemSelectType => 'Tür Seçin';
-
-  @override
   String get addItemNewCategory => 'Yeni Kategori';
 
   @override
   String get addItemNewCategoryName => 'Kategori Adı';
 
   @override
-  String get addItemColorSelect => 'Renk Seç';
-
-  @override
-  String get addItemNewItemType => 'Yeni Tür';
-
-  @override
   String get addItemTypeNameLabel => 'Tip Adı';
 
   @override
   String get addItemTypeSelectIcon => 'İkon Seç';
-
-  @override
-  String get addItemTypeSelectColor => 'Renk Seç';
 
   @override
   String get addItemTypeFixedFields => 'Sabit Alanlar';
@@ -857,12 +842,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get addItemTitleHint => 'Örn: Instagram, Gmail, Netflix';
-
-  @override
-  String get addItemUrlLabel => 'Web Sitesi (URL)';
-
-  @override
-  String get addItemUrlHint => 'Örn: https://instagram.com';
 
   @override
   String get addItemExtraFieldKeyLabel => 'Alan Adı';
@@ -905,9 +884,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get detailPasswordLabel => 'Şifre';
-
-  @override
-  String get detailExtraInfoSection => 'Ek Bilgiler';
 
   @override
   String get detailCategoryLabel => 'Klasör';
@@ -962,9 +938,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get detailEditTitle => 'Başlık';
-
-  @override
-  String get detailEditUrl => 'Web Sitesi (URL)';
 
   @override
   String get detailEditPassword => 'Şifre';
@@ -1041,9 +1014,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get passwordHistoryCopy => 'Şifre kopyalandı, 30 sn sonra silinecek';
 
   @override
-  String get passwordHistoryLoading => 'Yükleniyor...';
-
-  @override
   String get passwordHistoryError => 'Yüklenemedi';
 
   @override
@@ -1088,9 +1058,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get librarySystemLabel => 'Sistem';
-
-  @override
-  String get librarySystemLock => 'Kilitli';
 
   @override
   String libraryTypeFieldCount(int count) {
@@ -1185,9 +1152,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get trashDeletePermanent => 'Kalıcı Sil';
 
   @override
-  String get trashLoading => 'Yükleniyor...';
-
-  @override
   String get trashError => 'Hata';
 
   @override
@@ -1254,9 +1218,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String auditLogEmptyCategory(String category) {
     return '$category kategorisinde kayıt yok';
   }
-
-  @override
-  String get auditLogLoading => 'Yükleniyor...';
 
   @override
   String get auditLogError => 'Hata';
@@ -1331,9 +1292,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get supportTicketStatusClosed => 'Kapalı';
 
   @override
-  String get supportTicketYourMessage => 'Mesajınız';
-
-  @override
   String get supportTicketAdminReply => 'Destek Yanıtı';
 
   @override
@@ -1377,9 +1335,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get supportTicketDeleteSuccess => 'Talep silindi';
 
   @override
-  String get supportTicketDeleteError => 'Talep silinemedi';
-
-  @override
   String get forceUpdateTitle => 'Güncelleme Gerekli';
 
   @override
@@ -1411,11 +1366,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String forceUpdateInstallError(String error) {
     return 'Kurulum başlatılamadı: $error';
-  }
-
-  @override
-  String forceUpdateInstallErrorFilePath(String filePath) {
-    return 'Kurulum başlatılamadı. Dosya: $filePath';
   }
 
   @override
@@ -1482,9 +1432,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get splashSubtitle => 'Sıfır Bilgi · Tam Güvenlik';
 
   @override
-  String get splashVersionPrefix => 'v';
-
-  @override
   String get settingsAutoLockUnlimited => 'Süresiz';
 
   @override
@@ -1517,9 +1464,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String settingsDeviceDaysAgo(int days) {
     return '$days gün önce';
   }
-
-  @override
-  String get onboardingSkip => 'Atla';
 
   @override
   String get onboardingNext => 'İleri';
@@ -1578,41 +1522,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingChipTrash => 'Çöp Kutusu';
 
   @override
-  String get onboardingLibraryTitle => 'Organize Edin';
-
-  @override
-  String get onboardingLibrarySubtitle =>
-      'Kategorilerle şifrelerinizi düzenleyin. Öğe türleri ile kredi kartı, kimlik belgesi ve daha fazlasını saklayın.';
-
-  @override
   String get onboardingLibraryCategorySocialMedia => 'Sosyal Medya';
 
   @override
-  String get onboardingLibraryCategoryBanking => 'Bankacılık';
-
-  @override
   String get onboardingLibraryCategoryWork => 'İş';
-
-  @override
-  String get onboardingLibraryCategoryDevices => 'Cihazlar';
-
-  @override
-  String onboardingLibraryPasswordCount(int count) {
-    return '$count şifre';
-  }
-
-  @override
-  String get onboardingLibraryItemTypesHeader => 'Öğe Türleri';
-
-  @override
-  String get onboardingLibraryItemTypesDesc =>
-      'Kredi Kartı, Kimlik, SSH Anahtarı, Wi-Fi ve daha fazlası...';
-
-  @override
-  String get onboardingChipCategories => 'Kategoriler';
-
-  @override
-  String get onboardingChipItemTypes => 'Öğe Türleri';
 
   @override
   String get onboardingChipCustomize => 'Özelleştir';
@@ -1718,11 +1631,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get categoriesUncategorized => 'Kategorisizler';
 
   @override
-  String genericError(String error) {
-    return 'Hata: $error';
-  }
-
-  @override
   String get networkError => 'Sunucuya bağlanılamadı';
 
   @override
@@ -1765,12 +1673,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingTypesWith => 'Tip seçilince';
-
-  @override
-  String get onboardingTypesWithoutDesc => 'Alan ekle, alan ekle, alan ekle...';
-
-  @override
-  String get onboardingTypesWithDesc => 'Alanlar hazır geliyor!';
 
   @override
   String get onboardingTypesChipTemplate => 'Şablon';
@@ -1921,4 +1823,107 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get addItemFieldNameRequired => 'Bu alanı doldurmak zorunludur';
+
+  @override
+  String get totpSettingsTitle => 'Authenticator Koruması';
+
+  @override
+  String get totpSettingsActiveDesc =>
+      'Girişlerde authenticator uygulamanızdan kod istenir';
+
+  @override
+  String get totpSettingsInactiveDesc =>
+      'Girişlerde ek doğrulama kodu istenmez';
+
+  @override
+  String get totpSetupTitle => 'Authenticator Koruması Kurulumu';
+
+  @override
+  String get totpSetupStep1 => '1. QR Kodu Tarayın';
+
+  @override
+  String get totpSetupStep1Desc =>
+      'Google Authenticator, Authy veya benzer bir uygulama ile aşağıdaki QR kodu tarayın.';
+
+  @override
+  String get totpSetupStep2 => '2. Doğrulama Kodunu Girin';
+
+  @override
+  String get totpSetupStep2Desc =>
+      'Uygulamanızın gösterdiği 6 haneli kodu girerek kurulumu tamamlayın.';
+
+  @override
+  String get totpSetupManualKey => 'Elle Giriş için Anahtar';
+
+  @override
+  String get totpSetupActivate => 'Etkinleştir';
+
+  @override
+  String get totpSetupLoadError => 'Kurulum bilgileri yüklenemedi';
+
+  @override
+  String get totpSecretCopied => 'Anahtar kopyalandı';
+
+  @override
+  String get totpCodeLabel => '6 haneli kod';
+
+  @override
+  String get totpInvalidCode => 'Geçersiz kod, tekrar deneyin';
+
+  @override
+  String get totpEnabledSuccess => 'Authenticator Koruması etkinleştirildi';
+
+  @override
+  String get totpVerifyTitle => 'Authenticator Koruması';
+
+  @override
+  String get totpVerifyDesc =>
+      'Authenticator uygulamanızın gösterdiği 6 haneli kodu girin.';
+
+  @override
+  String get totpVerifyButton => 'Doğrula';
+
+  @override
+  String get totpDisableTitle => 'Korumayı Devre Dışı Bırak';
+
+  @override
+  String get totpDisableDesc =>
+      'Authenticator Korumasını devre dışı bırakmak için master password\'ünüzü girin.';
+
+  @override
+  String get totpDisableMasterPasswordLabel => 'Master Password';
+
+  @override
+  String get totpDisableMasterPasswordError => 'Master password hatalı';
+
+  @override
+  String get totpDisabledSuccess =>
+      'Authenticator Koruması devre dışı bırakıldı';
+
+  @override
+  String get totpDisableConfirm => 'Devre Dışı Bırak';
+
+  @override
+  String get totpTrustDurationLabel => 'Doğrulama sıklığı';
+
+  @override
+  String get totpTrustAlways => 'Her seferinde';
+
+  @override
+  String get totpTrust12h => '12 saat';
+
+  @override
+  String get totpTrust1d => '1 gün';
+
+  @override
+  String get totpTrust7d => '7 gün';
+
+  @override
+  String get totpTrust30d => '30 gün';
+
+  @override
+  String get totpTrust60d => '60 gün';
+
+  @override
+  String get cancel => 'İptal';
 }

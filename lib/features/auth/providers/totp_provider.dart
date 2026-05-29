@@ -1,9 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
 
-// TOTP etkin olup olmadığı
-final totpStatusProvider = FutureProvider.autoDispose<bool>((ref) async {
-  return AuthRepository().totpStatus();
+class TotpStatus {
+  final bool enabled;
+  final int trustDurationSeconds;
+
+  const TotpStatus({required this.enabled, required this.trustDurationSeconds});
+}
+
+final totpStatusProvider = FutureProvider.autoDispose<TotpStatus>((ref) async {
+  final data = await AuthRepository().totpStatus();
+  return TotpStatus(
+    enabled: data['totp_enabled'] as bool,
+    trustDurationSeconds: data['totp_trust_duration_seconds'] as int,
+  );
 });
 
 // Kurulum için üretilen QR verisi
