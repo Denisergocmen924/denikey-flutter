@@ -30,6 +30,7 @@ class AuthRepository {
     return {
       'user_id': response.data['user']['id'],
       'email': response.data['user']['email'] ?? email,
+      'email_verify_token': response.data['email_verify_token'] as String? ?? '',
     };
   }
 
@@ -51,12 +52,22 @@ class AuthRepository {
       },
     );
 
+    if (response.data['needs_email_verification'] == true) {
+      return {
+        'needs_email_verification': true,
+        'user_id': response.data['user_id'],
+        'email': response.data['email'],
+        'email_verify_token': response.data['email_verify_token'] as String? ?? '',
+      };
+    }
+
     if (response.data['needs_device_verification'] == true) {
       return {
         'needs_device_verification': true,
         'needs_totp': false,
         'user_id': response.data['user_id'],
         'email': response.data['email'],
+        'email_verify_token': response.data['email_verify_token'] as String? ?? '',
       };
     }
 

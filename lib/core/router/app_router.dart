@@ -72,6 +72,7 @@ final router = GoRouter(
             email: extra['email'],
             purpose: extra['purpose'] ?? 'register',
             masterPassword: extra['master_password'],
+            emailVerifyToken: extra['email_verify_token'] as String?,
           );
         },
       ),

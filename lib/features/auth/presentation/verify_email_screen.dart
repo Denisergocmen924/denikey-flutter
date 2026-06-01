@@ -17,6 +17,7 @@ class VerifyEmailScreen extends ConsumerStatefulWidget {
   final String purpose;
   final String? masterPassword;
   final String? encryptionKeySalt;
+  final String? emailVerifyToken;
 
   const VerifyEmailScreen({
     super.key,
@@ -25,6 +26,7 @@ class VerifyEmailScreen extends ConsumerStatefulWidget {
     this.purpose = 'register',
     this.masterPassword,
     this.encryptionKeySalt,
+    this.emailVerifyToken,
   });
 
   @override
@@ -101,12 +103,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   Future<void> _resend() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final endpoint = widget.purpose == 'new_device'
-          ? ApiConstants.resendVerification
-          : ApiConstants.resendVerification;
       await DioClient.instance.dio.post(
-        endpoint,
-        data: {'user_id': widget.userId},
+        ApiConstants.resendVerification,
+        data: {'temp_token': widget.emailVerifyToken ?? ''},
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

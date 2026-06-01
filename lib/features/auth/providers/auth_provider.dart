@@ -4,25 +4,25 @@ import '../data/auth_repository.dart';
 import '../../../core/presentation/loading_overlay.dart';
 import '../../../core/localization/l10n.dart';
 
-enum AuthStatus { idle, loading, success, needsDeviceVerification, deviceBanned, needsTotp, error }
+enum AuthStatus { idle, loading, success, needsEmailVerification, needsDeviceVerification, deviceBanned, needsTotp, error }
 
 class AuthState {
   final AuthStatus status;
   final String? errorMessage;
   final String? userId;
   final String? email;
-  final String? masterPassword; // device verify ve totp için geçici tutar
   final String? totpTempToken;
   final String? username;
+  final String? emailVerifyToken;
 
   const AuthState({
     this.status = AuthStatus.idle,
     this.errorMessage,
     this.userId,
     this.email,
-    this.masterPassword,
     this.totpTempToken,
     this.username,
+    this.emailVerifyToken,
   });
 
   AuthState copyWith({
@@ -30,43 +30,60 @@ class AuthState {
     String? errorMessage,
     String? userId,
     String? email,
-    String? masterPassword,
     String? totpTempToken,
     String? username,
+    String? emailVerifyToken,
   }) {
     return AuthState(
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       userId: userId ?? this.userId,
       email: email ?? this.email,
-      masterPassword: masterPassword ?? this.masterPassword,
       totpTempToken: totpTempToken ?? this.totpTempToken,
       username: username ?? this.username,
+      emailVerifyToken: emailVerifyToken ?? this.emailVerifyToken,
     );
   }
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repo = AuthRepository();
+  String? _pendingMasterPassword;
+
   AuthNotifier() : super(const AuthState());
+
+  // Şifreyi bir kez okur ve hemen temizler
+  String? consumeMasterPassword() {
+    final pw = _pendingMasterPassword;
+    _pendingMasterPassword = null;
+    return pw;
+  }
 
   Future<void> login(String username, String password) async {
     state = state.copyWith(status: AuthStatus.loading);
     LoadingOverlay.showGlobal(message: L10n.s.authLoadingLogin);
     try {
       final result = await _repo.login(username: username, masterPassword: password);
-      if (result['needs_device_verification'] == true) {
+      if (result['needs_email_verification'] == true) {
+        state = state.copyWith(
+          status: AuthStatus.needsEmailVerification,
+          userId: result['user_id'],
+          email: result['email'],
+          emailVerifyToken: result['email_verify_token'] as String?,
+        );
+      } else if (result['needs_device_verification'] == true) {
+        _pendingMasterPassword = password;
         state = state.copyWith(
           status: AuthStatus.needsDeviceVerification,
           userId: result['user_id'],
           email: result['email'],
-          masterPassword: password,
+          emailVerifyToken: result['email_verify_token'] as String?,
         );
       } else if (result['needs_totp'] == true) {
+        _pendingMasterPassword = password;
         state = state.copyWith(
           status: AuthStatus.needsTotp,
           totpTempToken: result['totp_temp_token'],
-          masterPassword: password,
           username: username,
         );
       } else {
@@ -102,6 +119,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         status: AuthStatus.success,
         userId: result['user_id'],
         email: result['email'],
+        emailVerifyToken: result['email_verify_token'] as String?,
       );
     } catch (e) {
       state = state.copyWith(
@@ -122,11 +140,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    _pendingMasterPassword = null;
     await _repo.logout();
     state = const AuthState();
   }
 
-  void reset() => state = const AuthState();
+  void reset() {
+    _pendingMasterPassword = null;
+    state = const AuthState();
+  }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(

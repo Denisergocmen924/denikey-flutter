@@ -87,6 +87,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           'user_id': userId,
           'email': email,
           'master_password': _passwordCtrl.text.trim(),
+          'email_verify_token': next.emailVerifyToken,
         });
       }
       if (next.status == AuthStatus.error && mounted) {

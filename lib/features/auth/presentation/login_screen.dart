@@ -43,18 +43,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (next.status == AuthStatus.success) {
         context.go('/vault');
       }
+      if (next.status == AuthStatus.needsEmailVerification) {
+        context.push('/verify-email', extra: {
+          'user_id': next.userId,
+          'email': next.email,
+          'purpose': 'register',
+          'email_verify_token': next.emailVerifyToken,
+        });
+      }
       if (next.status == AuthStatus.needsDeviceVerification) {
+        final pw = ref.read(authProvider.notifier).consumeMasterPassword();
         context.push('/verify-email', extra: {
           'user_id': next.userId,
           'email': next.email,
           'purpose': 'new_device',
-          'master_password': next.masterPassword,
+          'master_password': pw,
+          'email_verify_token': next.emailVerifyToken,
         });
       }
       if (next.status == AuthStatus.needsTotp) {
+        final pw = ref.read(authProvider.notifier).consumeMasterPassword();
         ref.read(totpPendingProvider.notifier).set(TotpPendingState(
           tempToken: next.totpTempToken!,
-          masterPassword: next.masterPassword!,
+          masterPassword: pw ?? '',
           username: next.username!,
         ));
         context.push('/totp-verify-login');
