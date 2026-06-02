@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -180,6 +181,12 @@ class VaultNotifier extends StateNotifier<VaultState> {
     }
   }
 
+  static String _generateSamplePassword() {
+    const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#\$';
+    final rng = Random.secure();
+    return List.generate(16, (_) => chars[rng.nextInt(chars.length)]).join();
+  }
+
   Future<void> createSampleItemIfNeeded() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('sample_item_created') == true) return;
@@ -190,7 +197,7 @@ class VaultNotifier extends StateNotifier<VaultState> {
         'title': L10n.s.vaultSampleTitle,
         'username': 'ornek_kullanici',
         'email': 'ornek@denikey.website',
-        'password': 'Değiştir123!',
+        'password': _generateSamplePassword(),
         'notes': L10n.s.vaultSampleNotes,
         'url': 'https://denikey.website',
       });

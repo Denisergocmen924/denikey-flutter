@@ -247,7 +247,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerPasswordMinError.
   ///
   /// In tr, this message translates to:
-  /// **'En az 6 karakter'**
+  /// **'En az 10 karakter'**
   String get registerPasswordMinError;
 
   /// No description provided for @registerConfirmLabel.
@@ -681,6 +681,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Farklı hesapla giriş yap'**
   String get masterLockDifferentAccount;
+
+  /// No description provided for @masterLockTooManyAttempts.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla yanlış deneme. Güvenlik için oturum kapatıldı.'**
+  String get masterLockTooManyAttempts;
+
+  /// No description provided for @storageInsecureWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uyarı: Bu platformda güvenli depolama bulunamadı. Veriler şifrelenmeden saklanıyor.'**
+  String get storageInsecureWarning;
 
   /// No description provided for @lockTitle.
   ///

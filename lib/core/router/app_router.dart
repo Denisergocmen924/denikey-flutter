@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../storage/secure_storage.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/master_lock_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
@@ -28,8 +29,21 @@ import '../../features/auth/presentation/totp_setup_screen.dart';
 import '../../features/auth/presentation/totp_verify_login_screen.dart';
 import '../../features/auth/presentation/totp_verify_unlock_screen.dart';
 
+const _publicPaths = {
+  '/splash', '/login', '/register', '/verify-email',
+  '/forgot-password', '/reset-password', '/onboarding',
+  '/privacy-policy', '/device-banned', '/force-update',
+  '/totp-verify-login',
+};
+
 final router = GoRouter(
   initialLocation: '/splash',
+  redirect: (context, state) async {
+    final loc = state.matchedLocation;
+    if (_publicPaths.any((p) => loc.startsWith(p))) return null;
+    final token = await SecureStorage.instance.getToken();
+    return token == null ? '/login' : null;
+  },
   routes: [
       GoRoute(
         path: '/splash',

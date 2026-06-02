@@ -81,7 +81,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerPasswordError => 'Password is required';
 
   @override
-  String get registerPasswordMinError => 'At least 6 characters';
+  String get registerPasswordMinError => 'At least 10 characters';
 
   @override
   String get registerConfirmLabel => 'Confirm Password';
@@ -316,6 +316,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get masterLockDifferentAccount => 'Sign in with a different account';
+
+  @override
+  String get masterLockTooManyAttempts =>
+      'Too many wrong attempts. Session ended for security.';
+
+  @override
+  String get storageInsecureWarning =>
+      'Warning: Secure storage is unavailable on this platform. Data is stored without encryption.';
 
   @override
   String get lockTitle => 'DeniKey Locked';

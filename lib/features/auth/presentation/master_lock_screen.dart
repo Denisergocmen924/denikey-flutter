@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
@@ -22,11 +23,42 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
   ({IconData icon, String label})? _biometric;
   bool _biometricExpired = false;
   int _remainingDays = 0;
+  int _failedAttempts = 0;
+  bool _storageInsecure = false;
+
+  static const _attemptsKey = 'master_lock_attempts';
 
   @override
   void initState() {
     super.initState();
     _loadBiometric();
+    _loadFailedAttempts();
+    _checkStorage();
+  }
+
+  Future<void> _loadFailedAttempts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final count = prefs.getInt(_attemptsKey) ?? 0;
+    if (count >= 3) {
+      await _logout();
+      return;
+    }
+    if (mounted) setState(() => _failedAttempts = count);
+  }
+
+  Future<void> _saveFailedAttempts(int count) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_attemptsKey, count);
+  }
+
+  Future<void> _clearFailedAttempts() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_attemptsKey);
+  }
+
+  Future<void> _checkStorage() async {
+    final secure = await SecureStorage.isStorageSecure();
+    if (mounted && !secure) setState(() => _storageInsecure = true);
   }
 
   Future<void> _loadBiometric() async {
@@ -118,15 +150,40 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
       );
 
       if (plaintext != 'denikey-verify') {
+        _failedAttempts++;
+        await _saveFailedAttempts(_failedAttempts);
+        if (_failedAttempts >= 3) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(AppLocalizations.of(context).masterLockTooManyAttempts),
+              backgroundColor: Colors.red,
+            ));
+          }
+          await _logout();
+          return;
+        }
         setState(() { _error = AppLocalizations.of(context).masterLockWrongPassword; _loading = false; });
         return;
       }
 
-      // Doğru şifre — master key'i güncelle, TTL'i yenile
+      // Doğru şifre — sayacı sıfırla, master key'i güncelle, TTL'i yenile
+      await _clearFailedAttempts();
       await SecureStorage.instance.saveMasterKey(masterKey);
       await BiometricService.instance.saveMasterPasswordTimestamp();
       if (mounted) await _navigateAfterUnlock();
     } catch (_) {
+      _failedAttempts++;
+      await _saveFailedAttempts(_failedAttempts);
+      if (_failedAttempts >= 3) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context).masterLockTooManyAttempts),
+            backgroundColor: Colors.red,
+          ));
+        }
+        await _logout();
+        return;
+      }
       setState(() { _error = AppLocalizations.of(context).masterLockWrongPassword; _loading = false; });
     }
   }
@@ -146,6 +203,29 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (_storageInsecure) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withAlpha(30),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.warning_amber_outlined, color: Colors.orange, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l10n.storageInsecureWarning,
+                              style: const TextStyle(fontSize: 12, color: Colors.orange),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   const SizedBox(height: 48),
                   Center(
                     child: Container(

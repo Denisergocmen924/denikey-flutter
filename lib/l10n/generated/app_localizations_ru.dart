@@ -81,7 +81,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get registerPasswordError => 'Пароль обязателен';
 
   @override
-  String get registerPasswordMinError => 'Не менее 6 символов';
+  String get registerPasswordMinError => 'Не менее 10 символов';
 
   @override
   String get registerConfirmLabel => 'Подтверждение пароля';
@@ -314,6 +314,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get masterLockDifferentAccount => 'Войти с другим аккаунтом';
+
+  @override
+  String get masterLockTooManyAttempts =>
+      'Слишком много неверных попыток. Сессия завершена в целях безопасности.';
+
+  @override
+  String get storageInsecureWarning =>
+      'Внимание: защищённое хранилище недоступно. Данные хранятся без шифрования.';
 
   @override
   String get lockTitle => 'DeniKey заблокирован';

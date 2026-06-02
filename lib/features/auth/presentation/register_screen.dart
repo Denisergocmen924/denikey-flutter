@@ -180,7 +180,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return l10n.registerPasswordError;
-                      if (v.length < 6) return l10n.registerPasswordMinError;
+                      if (v.length < 10) return l10n.registerPasswordMinError;
                       return null;
                     },
                   ),

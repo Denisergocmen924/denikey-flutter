@@ -81,7 +81,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get registerPasswordError => 'Şifre gerekli';
 
   @override
-  String get registerPasswordMinError => 'En az 6 karakter';
+  String get registerPasswordMinError => 'En az 10 karakter';
 
   @override
   String get registerConfirmLabel => 'Şifre Tekrar';
@@ -315,6 +315,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get masterLockDifferentAccount => 'Farklı hesapla giriş yap';
+
+  @override
+  String get masterLockTooManyAttempts =>
+      'Çok fazla yanlış deneme. Güvenlik için oturum kapatıldı.';
+
+  @override
+  String get storageInsecureWarning =>
+      'Uyarı: Bu platformda güvenli depolama bulunamadı. Veriler şifrelenmeden saklanıyor.';
 
   @override
   String get lockTitle => 'DeniKey Kilitli';

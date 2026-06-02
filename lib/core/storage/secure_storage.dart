@@ -107,4 +107,18 @@ class SecureStorage {
 
   // CLEAR ALL
   Future<void> clearAll() => _storage.deleteAll();
+
+  // Linux/Windows'ta libsecret/DPAPI çalışıyor mu?
+  static Future<bool> isStorageSecure() async {
+    if (!Platform.isLinux && !Platform.isWindows) return true;
+    try {
+      const testKey = '_sec_check';
+      await _storage.write(key: testKey, value: 'ok');
+      final val = await _storage.read(key: testKey);
+      await _storage.delete(key: testKey);
+      return val == 'ok';
+    } catch (_) {
+      return false;
+    }
+  }
 }
