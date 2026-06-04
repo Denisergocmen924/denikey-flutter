@@ -552,6 +552,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDeviceActionFailed => 'Action failed';
 
   @override
+  String get settingsDeviceRemove => 'Remove Device';
+
+  @override
+  String get settingsDeviceRemoveConfirm =>
+      'This device will be permanently removed. Are you sure?';
+
+  @override
+  String get settingsDeviceRemoveSuccess => 'Device removed';
+
+  @override
+  String get settingsDeviceRename => 'Rename Device';
+
+  @override
+  String get settingsDeviceRenameHint => 'Device name';
+
+  @override
+  String get settingsDeviceRenameSuccess => 'Device name updated';
+
+  @override
   String get settingsUsernameChangeTitle => 'Change Username';
 
   @override
@@ -1019,8 +1038,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Previous versions will appear here when the password is updated';
 
   @override
-  String get passwordHistoryCopy =>
-      'Password copied, will be cleared in 30 sec';
+  String passwordHistoryCopy(int timeout) {
+    return 'Password copied, will be cleared in $timeout sec';
+  }
+
+  @override
+  String get passwordHistoryCopyNoTimeout => 'Password copied';
 
   @override
   String get passwordHistoryError => 'Failed to load';
@@ -1117,8 +1140,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordGeneratorCopy => 'Copy';
 
   @override
-  String get passwordGeneratorCopySuccess =>
-      'Password copied, will be cleared in 30 sec';
+  String passwordGeneratorCopySuccess(int timeout) {
+    return 'Password copied, will be cleared in $timeout sec';
+  }
+
+  @override
+  String get passwordGeneratorCopySuccessNoTimeout => 'Password copied';
 
   @override
   String get trashTitle => 'Trash';
@@ -1934,4 +1961,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get save => 'Save';
 }

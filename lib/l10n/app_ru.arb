@@ -231,6 +231,12 @@
   "settingsDeviceUnban": "Разблокировать устройство",
   "settingsDeviceUnbanSuccess": "Блокировка устройства снята",
   "settingsDeviceActionFailed": "Действие не выполнено",
+  "settingsDeviceRemove": "Удалить устройство",
+  "settingsDeviceRemoveConfirm": "Устройство будет удалено навсегда. Вы уверены?",
+  "settingsDeviceRemoveSuccess": "Устройство удалено",
+  "settingsDeviceRename": "Переименовать",
+  "settingsDeviceRenameHint": "Имя устройства",
+  "settingsDeviceRenameSuccess": "Имя устройства обновлено",
   "settingsUsernameChangeTitle": "Изменить имя пользователя",
   "settingsUsernameChangeHint": "Новое имя пользователя",
   "settingsUsernameChangeError": "Не может быть пустым",
@@ -447,7 +453,15 @@
   "passwordHistoryClearMessage": "Удалить всю историю паролей?",
   "passwordHistoryEmpty": "Истории паролей нет",
   "passwordHistoryEmptyHint": "Предыдущие версии появятся здесь при обновлении пароля",
-  "passwordHistoryCopy": "Пароль скопирован, будет удалён через 30 сек",
+  "passwordHistoryCopy": "Пароль скопирован, будет удалён через {timeout} сек",
+  "@passwordHistoryCopy": {
+    "placeholders": {
+      "timeout": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordHistoryCopyNoTimeout": "Пароль скопирован",
   "passwordHistoryError": "Не удалось загрузить",
   "passwordHistoryRetry": "Повторить",
   "libraryTitle": "Библиотека",
@@ -485,7 +499,15 @@
   "passwordGeneratorNumbers": "Цифры (0–9)",
   "passwordGeneratorSymbols": "Символы (!@#$...)",
   "passwordGeneratorCopy": "Копировать",
-  "passwordGeneratorCopySuccess": "Пароль скопирован, будет удалён через 30 сек",
+  "passwordGeneratorCopySuccess": "Пароль скопирован, будет удалён через {timeout} сек",
+  "@passwordGeneratorCopySuccess": {
+    "placeholders": {
+      "timeout": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordGeneratorCopySuccessNoTimeout": "Пароль скопирован",
   "trashTitle": "Корзина",
   "trashEmptyButton": "Удалить все",
   "trashEmptyTitle": "Очистить корзину",
@@ -822,5 +844,6 @@
   "totpTrust7d": "7 дней",
   "totpTrust30d": "30 дней",
   "totpTrust60d": "60 дней",
-  "cancel": "Отмена"
+  "cancel": "Отмена",
+  "save": "Сохранить"
 }

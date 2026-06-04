@@ -231,6 +231,12 @@
   "settingsDeviceUnban": "Yasağı Kaldır",
   "settingsDeviceUnbanSuccess": "Cihaz yasağı kaldırıldı",
   "settingsDeviceActionFailed": "İşlem başarısız",
+  "settingsDeviceRemove": "Cihazı Sil",
+  "settingsDeviceRemoveConfirm": "Bu cihaz kalıcı olarak silinecek. Emin misiniz?",
+  "settingsDeviceRemoveSuccess": "Cihaz silindi",
+  "settingsDeviceRename": "Adı Değiştir",
+  "settingsDeviceRenameHint": "Cihaz adı",
+  "settingsDeviceRenameSuccess": "Cihaz adı güncellendi",
   "settingsUsernameChangeTitle": "Kullanıcı Adı Değiştir",
   "settingsUsernameChangeHint": "Yeni kullanıcı adı",
   "settingsUsernameChangeError": "Boş bırakılamaz",
@@ -447,7 +453,15 @@
   "passwordHistoryClearMessage": "Tüm şifre geçmişi silinsin mi?",
   "passwordHistoryEmpty": "Şifre geçmişi yok",
   "passwordHistoryEmptyHint": "Şifre güncellendiğinde eski sürümler burada görünür",
-  "passwordHistoryCopy": "Şifre kopyalandı, 30 sn sonra silinecek",
+  "passwordHistoryCopy": "Şifre kopyalandı, {timeout} sn sonra silinecek",
+  "@passwordHistoryCopy": {
+    "placeholders": {
+      "timeout": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordHistoryCopyNoTimeout": "Şifre kopyalandı",
   "passwordHistoryError": "Yüklenemedi",
   "passwordHistoryRetry": "Tekrar Dene",
   "libraryTitle": "Kütüphane",
@@ -485,7 +499,15 @@
   "passwordGeneratorNumbers": "Rakam (0–9)",
   "passwordGeneratorSymbols": "Sembol (!@#$...)",
   "passwordGeneratorCopy": "Kopyala",
-  "passwordGeneratorCopySuccess": "Şifre kopyalandı, 30 sn sonra silinecek",
+  "passwordGeneratorCopySuccess": "Şifre kopyalandı, {timeout} sn sonra silinecek",
+  "@passwordGeneratorCopySuccess": {
+    "placeholders": {
+      "timeout": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordGeneratorCopySuccessNoTimeout": "Şifre kopyalandı",
   "trashTitle": "Çöp Kutusu",
   "trashEmptyButton": "Tümünü Sil",
   "trashEmptyTitle": "Çöp Kutusunu Boşalt",
@@ -829,5 +851,6 @@
   "totpTrust7d": "7 gün",
   "totpTrust30d": "30 gün",
   "totpTrust60d": "60 gün",
-  "cancel": "İptal"
+  "cancel": "İptal",
+  "save": "Kaydet"
 }

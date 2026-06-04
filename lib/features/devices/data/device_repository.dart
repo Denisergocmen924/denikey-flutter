@@ -62,4 +62,15 @@ class DeviceRepository {
   Future<void> unbanDevice(String deviceId) async {
     await _dio.patch(ApiConstants.deviceUnban(deviceId));
   }
+
+  Future<void> deleteDevice(String deviceId) async {
+    await _dio.delete(ApiConstants.deviceDelete(deviceId));
+  }
+
+  Future<void> renameDevice(String deviceId, String displayName) async {
+    await _dio.patch(
+      ApiConstants.deviceRename(deviceId),
+      data: {'display_name': displayName},
+    );
+  }
 }

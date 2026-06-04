@@ -231,6 +231,12 @@
   "settingsDeviceUnban": "Unban Device",
   "settingsDeviceUnbanSuccess": "Device ban lifted",
   "settingsDeviceActionFailed": "Action failed",
+  "settingsDeviceRemove": "Remove Device",
+  "settingsDeviceRemoveConfirm": "This device will be permanently removed. Are you sure?",
+  "settingsDeviceRemoveSuccess": "Device removed",
+  "settingsDeviceRename": "Rename Device",
+  "settingsDeviceRenameHint": "Device name",
+  "settingsDeviceRenameSuccess": "Device name updated",
   "settingsUsernameChangeTitle": "Change Username",
   "settingsUsernameChangeHint": "New username",
   "settingsUsernameChangeError": "Cannot be empty",
@@ -447,7 +453,15 @@
   "passwordHistoryClearMessage": "Delete all password history?",
   "passwordHistoryEmpty": "No password history",
   "passwordHistoryEmptyHint": "Previous versions will appear here when the password is updated",
-  "passwordHistoryCopy": "Password copied, will be cleared in 30 sec",
+  "passwordHistoryCopy": "Password copied, will be cleared in {timeout} sec",
+  "@passwordHistoryCopy": {
+    "placeholders": {
+      "timeout": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordHistoryCopyNoTimeout": "Password copied",
   "passwordHistoryError": "Failed to load",
   "passwordHistoryRetry": "Retry",
   "libraryTitle": "Library",
@@ -485,7 +499,15 @@
   "passwordGeneratorNumbers": "Numbers (0–9)",
   "passwordGeneratorSymbols": "Symbols (!@#$...)",
   "passwordGeneratorCopy": "Copy",
-  "passwordGeneratorCopySuccess": "Password copied, will be cleared in 30 sec",
+  "passwordGeneratorCopySuccess": "Password copied, will be cleared in {timeout} sec",
+  "@passwordGeneratorCopySuccess": {
+    "placeholders": {
+      "timeout": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordGeneratorCopySuccessNoTimeout": "Password copied",
   "trashTitle": "Trash",
   "trashEmptyButton": "Delete All",
   "trashEmptyTitle": "Empty Trash",
@@ -822,5 +844,6 @@
   "totpTrust7d": "7 days",
   "totpTrust30d": "30 days",
   "totpTrust60d": "60 days",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "save": "Save"
 }

@@ -1108,6 +1108,42 @@ abstract class AppLocalizations {
   /// **'İşlem başarısız'**
   String get settingsDeviceActionFailed;
 
+  /// No description provided for @settingsDeviceRemove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihazı Sil'**
+  String get settingsDeviceRemove;
+
+  /// No description provided for @settingsDeviceRemoveConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihaz kalıcı olarak silinecek. Emin misiniz?'**
+  String get settingsDeviceRemoveConfirm;
+
+  /// No description provided for @settingsDeviceRemoveSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihaz silindi'**
+  String get settingsDeviceRemoveSuccess;
+
+  /// No description provided for @settingsDeviceRename.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adı Değiştir'**
+  String get settingsDeviceRename;
+
+  /// No description provided for @settingsDeviceRenameHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihaz adı'**
+  String get settingsDeviceRenameHint;
+
+  /// No description provided for @settingsDeviceRenameSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihaz adı güncellendi'**
+  String get settingsDeviceRenameSuccess;
+
   /// No description provided for @settingsUsernameChangeTitle.
   ///
   /// In tr, this message translates to:
@@ -1969,8 +2005,14 @@ abstract class AppLocalizations {
   /// No description provided for @passwordHistoryCopy.
   ///
   /// In tr, this message translates to:
-  /// **'Şifre kopyalandı, 30 sn sonra silinecek'**
-  String get passwordHistoryCopy;
+  /// **'Şifre kopyalandı, {timeout} sn sonra silinecek'**
+  String passwordHistoryCopy(int timeout);
+
+  /// No description provided for @passwordHistoryCopyNoTimeout.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre kopyalandı'**
+  String get passwordHistoryCopyNoTimeout;
 
   /// No description provided for @passwordHistoryError.
   ///
@@ -2155,8 +2197,14 @@ abstract class AppLocalizations {
   /// No description provided for @passwordGeneratorCopySuccess.
   ///
   /// In tr, this message translates to:
-  /// **'Şifre kopyalandı, 30 sn sonra silinecek'**
-  String get passwordGeneratorCopySuccess;
+  /// **'Şifre kopyalandı, {timeout} sn sonra silinecek'**
+  String passwordGeneratorCopySuccess(int timeout);
+
+  /// No description provided for @passwordGeneratorCopySuccessNoTimeout.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre kopyalandı'**
+  String get passwordGeneratorCopySuccessNoTimeout;
 
   /// No description provided for @trashTitle.
   ///
@@ -3675,6 +3723,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'İptal'**
   String get cancel;
+
+  /// No description provided for @save.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydet'**
+  String get save;
 }
 
 class _AppLocalizationsDelegate

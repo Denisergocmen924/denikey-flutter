@@ -1139,42 +1139,114 @@ class _DeviceTile extends ConsumerWidget {
                 style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
         ],
       ),
-      trailing: PopupMenuButton<String>(
-        icon: const Icon(Icons.more_vert),
-        onSelected: (val) => _onAction(context, ref, val, l10n),
-        itemBuilder: (_) => [
-          if (device.status != 'revoked' && device.status != 'banned')
-            PopupMenuItem(
-              value: 'revoke',
-              child: Row(children: [
-                const Icon(Icons.logout, size: 18),
-                const SizedBox(width: 8),
-                Text(l10n.settingsDeviceRevoke),
-              ]),
-            ),
-          if (device.status != 'banned')
-            PopupMenuItem(
-              value: 'ban',
-              child: Row(children: [
-                const Icon(Icons.block, size: 18, color: Colors.red),
-                const SizedBox(width: 8),
-                Text(l10n.settingsDeviceBan,
-                    style: const TextStyle(color: Colors.red)),
-              ]),
-            ),
-          if (device.status == 'banned')
-            PopupMenuItem(
-              value: 'unban',
-              child: Row(children: [
-                const Icon(Icons.check_circle_outline, size: 18, color: Colors.green),
-                const SizedBox(width: 8),
-                Text(l10n.settingsDeviceUnban,
-                    style: const TextStyle(color: Colors.green)),
-              ]),
-            ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            iconSize: 18,
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: l10n.settingsDeviceRename,
+            onPressed: () => _showRenameDialog(context, ref, l10n),
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (val) => _onAction(context, ref, val, l10n),
+            itemBuilder: (_) => [
+              if (device.status != 'revoked' && device.status != 'banned')
+                PopupMenuItem(
+                  value: 'revoke',
+                  child: Row(children: [
+                    const Icon(Icons.logout, size: 18),
+                    const SizedBox(width: 8),
+                    Text(l10n.settingsDeviceRevoke),
+                  ]),
+                ),
+              if (device.status != 'banned')
+                PopupMenuItem(
+                  value: 'ban',
+                  child: Row(children: [
+                    const Icon(Icons.block, size: 18, color: Colors.red),
+                    const SizedBox(width: 8),
+                    Text(l10n.settingsDeviceBan,
+                        style: const TextStyle(color: Colors.red)),
+                  ]),
+                ),
+              if (device.status == 'banned')
+                PopupMenuItem(
+                  value: 'unban',
+                  child: Row(children: [
+                    const Icon(Icons.check_circle_outline, size: 18, color: Colors.green),
+                    const SizedBox(width: 8),
+                    Text(l10n.settingsDeviceUnban,
+                        style: const TextStyle(color: Colors.green)),
+                  ]),
+                ),
+              PopupMenuItem(
+                value: 'delete',
+                child: Row(children: [
+                  const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text(l10n.settingsDeviceRemove,
+                      style: const TextStyle(color: Colors.red)),
+                ]),
+              ),
+            ],
+          ),
         ],
       ),
     );
+  }
+
+  void _showRenameDialog(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+    final controller = TextEditingController(text: device.label);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.settingsDeviceRename),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: l10n.settingsDeviceRenameHint,
+            counterText: '',
+          ),
+          maxLength: 50,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+              Navigator.pop(ctx);
+              final repo = ref.read(deviceRepositoryProvider);
+              try {
+                await repo.renameDevice(device.id, name);
+                ref.invalidate(devicesProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.settingsDeviceRenameSuccess)),
+                  );
+                }
+              } catch (_) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.settingsDeviceActionFailed),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(l10n.save),
+          ),
+        ],
+      ),
+    ).then((_) => controller.dispose());
   }
 
   Future<void> _onAction(
@@ -1202,6 +1274,32 @@ class _DeviceTile extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.settingsDeviceUnbanSuccess)),
+          );
+        }
+      } else if (action == 'delete') {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.settingsDeviceRemove),
+            content: Text(l10n.settingsDeviceRemoveConfirm),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(l10n.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: Text(l10n.settingsDeviceRemove),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true) return;
+        await repo.deleteDevice(device.id);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.settingsDeviceRemoveSuccess)),
           );
         }
       }

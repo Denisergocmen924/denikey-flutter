@@ -551,6 +551,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsDeviceActionFailed => 'Действие не выполнено';
 
   @override
+  String get settingsDeviceRemove => 'Удалить устройство';
+
+  @override
+  String get settingsDeviceRemoveConfirm =>
+      'Устройство будет удалено навсегда. Вы уверены?';
+
+  @override
+  String get settingsDeviceRemoveSuccess => 'Устройство удалено';
+
+  @override
+  String get settingsDeviceRename => 'Переименовать';
+
+  @override
+  String get settingsDeviceRenameHint => 'Имя устройства';
+
+  @override
+  String get settingsDeviceRenameSuccess => 'Имя устройства обновлено';
+
+  @override
   String get settingsUsernameChangeTitle => 'Изменить имя пользователя';
 
   @override
@@ -1018,8 +1037,12 @@ class AppLocalizationsRu extends AppLocalizations {
       'Предыдущие версии появятся здесь при обновлении пароля';
 
   @override
-  String get passwordHistoryCopy =>
-      'Пароль скопирован, будет удалён через 30 сек';
+  String passwordHistoryCopy(int timeout) {
+    return 'Пароль скопирован, будет удалён через $timeout сек';
+  }
+
+  @override
+  String get passwordHistoryCopyNoTimeout => 'Пароль скопирован';
 
   @override
   String get passwordHistoryError => 'Не удалось загрузить';
@@ -1116,8 +1139,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get passwordGeneratorCopy => 'Копировать';
 
   @override
-  String get passwordGeneratorCopySuccess =>
-      'Пароль скопирован, будет удалён через 30 сек';
+  String passwordGeneratorCopySuccess(int timeout) {
+    return 'Пароль скопирован, будет удалён через $timeout сек';
+  }
+
+  @override
+  String get passwordGeneratorCopySuccessNoTimeout => 'Пароль скопирован';
 
   @override
   String get trashTitle => 'Корзина';
@@ -1937,4 +1964,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get cancel => 'Отмена';
+
+  @override
+  String get save => 'Сохранить';
 }

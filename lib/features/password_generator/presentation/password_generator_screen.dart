@@ -86,6 +86,7 @@ class _PasswordGeneratorScreenState extends ConsumerState<PasswordGeneratorScree
                       tooltip: l10n.passwordGeneratorCopy,
                       onPressed: () {
                         _copyToClipboard(state.generatedPassword!);
+                        final timeout = ref.read(clipboardTimeoutProvider);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Row(
@@ -93,7 +94,11 @@ class _PasswordGeneratorScreenState extends ConsumerState<PasswordGeneratorScree
                                 const Icon(Icons.check_circle_outline,
                                     color: Colors.white, size: 18),
                                 const SizedBox(width: 8),
-                                Text(l10n.passwordGeneratorCopySuccess),
+                                Text(
+                                  timeout != null
+                                      ? l10n.passwordGeneratorCopySuccess(timeout)
+                                      : l10n.passwordGeneratorCopySuccessNoTimeout,
+                                ),
                               ],
                             ),
                             behavior: SnackBarBehavior.floating,

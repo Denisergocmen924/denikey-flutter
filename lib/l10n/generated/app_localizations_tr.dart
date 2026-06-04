@@ -552,6 +552,25 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsDeviceActionFailed => 'İşlem başarısız';
 
   @override
+  String get settingsDeviceRemove => 'Cihazı Sil';
+
+  @override
+  String get settingsDeviceRemoveConfirm =>
+      'Bu cihaz kalıcı olarak silinecek. Emin misiniz?';
+
+  @override
+  String get settingsDeviceRemoveSuccess => 'Cihaz silindi';
+
+  @override
+  String get settingsDeviceRename => 'Adı Değiştir';
+
+  @override
+  String get settingsDeviceRenameHint => 'Cihaz adı';
+
+  @override
+  String get settingsDeviceRenameSuccess => 'Cihaz adı güncellendi';
+
+  @override
   String get settingsUsernameChangeTitle => 'Kullanıcı Adı Değiştir';
 
   @override
@@ -1019,7 +1038,12 @@ class AppLocalizationsTr extends AppLocalizations {
       'Şifre güncellendiğinde eski sürümler burada görünür';
 
   @override
-  String get passwordHistoryCopy => 'Şifre kopyalandı, 30 sn sonra silinecek';
+  String passwordHistoryCopy(int timeout) {
+    return 'Şifre kopyalandı, $timeout sn sonra silinecek';
+  }
+
+  @override
+  String get passwordHistoryCopyNoTimeout => 'Şifre kopyalandı';
 
   @override
   String get passwordHistoryError => 'Yüklenemedi';
@@ -1115,8 +1139,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get passwordGeneratorCopy => 'Kopyala';
 
   @override
-  String get passwordGeneratorCopySuccess =>
-      'Şifre kopyalandı, 30 sn sonra silinecek';
+  String passwordGeneratorCopySuccess(int timeout) {
+    return 'Şifre kopyalandı, $timeout sn sonra silinecek';
+  }
+
+  @override
+  String get passwordGeneratorCopySuccessNoTimeout => 'Şifre kopyalandı';
 
   @override
   String get trashTitle => 'Çöp Kutusu';
@@ -1934,4 +1962,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cancel => 'İptal';
+
+  @override
+  String get save => 'Kaydet';
 }

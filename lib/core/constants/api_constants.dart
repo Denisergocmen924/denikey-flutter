@@ -59,9 +59,11 @@ class ApiConstants {
 
   // Devices
   static const String devices = '/api/v1/devices';
-  static String deviceRevoke(String id) => '/api/v1/devices/$id';
-  static String deviceBan(String id)    => '/api/v1/devices/$id/ban';
-  static String deviceUnban(String id)  => '/api/v1/devices/$id/unban';
+  static String deviceRevoke(String id)    => '/api/v1/devices/$id';
+  static String deviceBan(String id)       => '/api/v1/devices/$id/ban';
+  static String deviceUnban(String id)     => '/api/v1/devices/$id/unban';
+  static String deviceDelete(String id)    => '/api/v1/devices/$id/permanent';
+  static String deviceRename(String id)    => '/api/v1/devices/$id/rename';
 
   // GitHub Releases (public repo)
   static const String releasesPage         = 'https://github.com/Denisergocmen924/denikey-releases/releases/latest';

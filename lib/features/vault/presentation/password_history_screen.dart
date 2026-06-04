@@ -96,10 +96,17 @@ class _PasswordHistoryScreenState extends ConsumerState<PasswordHistoryScreen> {
   }
 
   void _copyToClipboard(String value) {
+    final l10n = AppLocalizations.of(context);
     final timeout = ref.read(clipboardTimeoutProvider);
     Clipboard.setData(ClipboardData(text: value));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context).passwordHistoryCopy)),
+      SnackBar(
+        content: Text(
+          timeout != null
+              ? l10n.passwordHistoryCopy(timeout)
+              : l10n.passwordHistoryCopyNoTimeout,
+        ),
+      ),
     );
     _clipboardTimer?.cancel();
     if (timeout != null) {
