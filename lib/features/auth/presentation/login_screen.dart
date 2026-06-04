@@ -180,13 +180,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ],
                   ),
-                  Center(
-                    child: TextButton(
-                      onPressed: () => context.push('/forgot-password'),
-                      child: Text(l10n.loginForgotButton,
-                        style: TextStyle(color: cs.onSurfaceVariant)),
-                    ),
-                  ),
                   const SizedBox(height: 16),
                 ],
               ),

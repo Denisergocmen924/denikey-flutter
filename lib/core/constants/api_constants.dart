@@ -12,8 +12,6 @@ class ApiConstants {
   static const String verifyDevice       = '/api/v1/auth/verify-device';
   static const String resendVerification = '/api/v1/auth/resend-verification';
   static const String refreshToken       = '/api/v1/auth/refresh';
-  static const String forgotPassword     = '/api/v1/auth/forgot-password';
-  static const String resetPassword      = '/api/v1/auth/reset-password';
   static const String changeEmail        = '/api/v1/auth/change-email';
   static const String confirmEmailChange = '/api/v1/auth/confirm-email-change';
   static const String updateProfile      = '/api/v1/auth/profile';

@@ -39,9 +39,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get loginRegisterButton => 'Kayıt Ol';
 
   @override
-  String get loginForgotButton => 'Şifremi Unuttum';
-
-  @override
   String get loginError => 'Hata';
 
   @override
@@ -144,82 +141,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get verifySendError => 'Kod gönderilemedi';
-
-  @override
-  String get forgotPasswordTitle => 'Şifremi Unuttum';
-
-  @override
-  String get forgotPasswordHeading => 'Şifre Sıfırlama';
-
-  @override
-  String get forgotPasswordDescription =>
-      'Kayıtlı e-posta adresinize doğrulama kodu gönderilecek.';
-
-  @override
-  String get forgotPasswordEmailLabel => 'E-posta';
-
-  @override
-  String get forgotPasswordEmailError => 'E-posta gerekli';
-
-  @override
-  String get forgotPasswordEmailFormatError => 'Geçerli bir e-posta girin';
-
-  @override
-  String get forgotPasswordSubmitButton => 'Kod Gönder';
-
-  @override
-  String get forgotPasswordError =>
-      'Doğrulama kodu gönderilemedi, tekrar deneyin';
-
-  @override
-  String get forgotPasswordApiError => 'Bir hata oluştu';
-
-  @override
-  String get resetPasswordTitle => 'Yeni Şifre Belirle';
-
-  @override
-  String get resetPasswordHeading => 'Şifrenizi Sıfırlayın';
-
-  @override
-  String resetPasswordDescription(String email) {
-    return '$email adresine gönderilen kodu ve yeni şifrenizi girin.';
-  }
-
-  @override
-  String get resetPasswordCodeLabel => 'Doğrulama Kodu';
-
-  @override
-  String get resetPasswordCodeError => 'Kod gerekli';
-
-  @override
-  String get resetPasswordCodeMinError => '6 haneli kodu girin';
-
-  @override
-  String get resetPasswordNewLabel => 'Yeni Master Şifre';
-
-  @override
-  String get resetPasswordNewError => 'Şifre gerekli';
-
-  @override
-  String get resetPasswordNewMinError => 'En az 8 karakter';
-
-  @override
-  String get resetPasswordConfirmLabel => 'Şifre Tekrar';
-
-  @override
-  String get resetPasswordConfirmError => 'Şifre tekrarı gerekli';
-
-  @override
-  String get resetPasswordConfirmMismatch => 'Şifreler eşleşmiyor';
-
-  @override
-  String get resetPasswordSubmitButton => 'Şifremi Sıfırla';
-
-  @override
-  String get resetPasswordSuccess => 'Şifreniz başarıyla sıfırlandı';
-
-  @override
-  String get resetPasswordApiError => 'Bir hata oluştu';
 
   @override
   String get changeEmailTitle => 'E-posta Değiştir';

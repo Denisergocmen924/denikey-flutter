@@ -39,9 +39,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get loginRegisterButton => 'Зарегистрироваться';
 
   @override
-  String get loginForgotButton => 'Забыл пароль';
-
-  @override
   String get loginError => 'Ошибка';
 
   @override
@@ -144,82 +141,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get verifySendError => 'Не удалось отправить код';
-
-  @override
-  String get forgotPasswordTitle => 'Забыл пароль';
-
-  @override
-  String get forgotPasswordHeading => 'Сброс пароля';
-
-  @override
-  String get forgotPasswordDescription =>
-      'На ваш зарегистрированный email будет отправлен код подтверждения.';
-
-  @override
-  String get forgotPasswordEmailLabel => 'Email';
-
-  @override
-  String get forgotPasswordEmailError => 'Требуется email';
-
-  @override
-  String get forgotPasswordEmailFormatError => 'Введите корректный email';
-
-  @override
-  String get forgotPasswordSubmitButton => 'Отправить код';
-
-  @override
-  String get forgotPasswordError =>
-      'Не удалось отправить код подтверждения, попробуйте снова';
-
-  @override
-  String get forgotPasswordApiError => 'Произошла ошибка';
-
-  @override
-  String get resetPasswordTitle => 'Установить новый пароль';
-
-  @override
-  String get resetPasswordHeading => 'Сброс пароля';
-
-  @override
-  String resetPasswordDescription(String email) {
-    return 'Введите код, отправленный на $email, и ваш новый пароль.';
-  }
-
-  @override
-  String get resetPasswordCodeLabel => 'Код подтверждения';
-
-  @override
-  String get resetPasswordCodeError => 'Требуется код';
-
-  @override
-  String get resetPasswordCodeMinError => 'Введите 6-значный код';
-
-  @override
-  String get resetPasswordNewLabel => 'Новый мастер-пароль';
-
-  @override
-  String get resetPasswordNewError => 'Пароль обязателен';
-
-  @override
-  String get resetPasswordNewMinError => 'Не менее 8 символов';
-
-  @override
-  String get resetPasswordConfirmLabel => 'Подтверждение пароля';
-
-  @override
-  String get resetPasswordConfirmError => 'Требуется подтверждение пароля';
-
-  @override
-  String get resetPasswordConfirmMismatch => 'Пароли не совпадают';
-
-  @override
-  String get resetPasswordSubmitButton => 'Сбросить пароль';
-
-  @override
-  String get resetPasswordSuccess => 'Ваш пароль успешно сброшен';
-
-  @override
-  String get resetPasswordApiError => 'Произошла ошибка';
 
   @override
   String get changeEmailTitle => 'Изменить Email';

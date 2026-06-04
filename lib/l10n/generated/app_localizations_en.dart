@@ -39,9 +39,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginRegisterButton => 'Sign Up';
 
   @override
-  String get loginForgotButton => 'Forgot Password';
-
-  @override
   String get loginError => 'Error';
 
   @override
@@ -144,83 +141,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verifySendError => 'Failed to send code';
-
-  @override
-  String get forgotPasswordTitle => 'Forgot Password';
-
-  @override
-  String get forgotPasswordHeading => 'Password Reset';
-
-  @override
-  String get forgotPasswordDescription =>
-      'A verification code will be sent to your registered email.';
-
-  @override
-  String get forgotPasswordEmailLabel => 'Email';
-
-  @override
-  String get forgotPasswordEmailError => 'Email is required';
-
-  @override
-  String get forgotPasswordEmailFormatError => 'Enter a valid email';
-
-  @override
-  String get forgotPasswordSubmitButton => 'Send Code';
-
-  @override
-  String get forgotPasswordError =>
-      'Failed to send verification code, please try again';
-
-  @override
-  String get forgotPasswordApiError => 'An error occurred';
-
-  @override
-  String get resetPasswordTitle => 'Set New Password';
-
-  @override
-  String get resetPasswordHeading => 'Reset Your Password';
-
-  @override
-  String resetPasswordDescription(String email) {
-    return 'Enter the code sent to $email and your new password.';
-  }
-
-  @override
-  String get resetPasswordCodeLabel => 'Verification Code';
-
-  @override
-  String get resetPasswordCodeError => 'Code is required';
-
-  @override
-  String get resetPasswordCodeMinError => 'Enter the 6-digit code';
-
-  @override
-  String get resetPasswordNewLabel => 'New Master Password';
-
-  @override
-  String get resetPasswordNewError => 'Password is required';
-
-  @override
-  String get resetPasswordNewMinError => 'At least 8 characters';
-
-  @override
-  String get resetPasswordConfirmLabel => 'Confirm Password';
-
-  @override
-  String get resetPasswordConfirmError => 'Password confirmation is required';
-
-  @override
-  String get resetPasswordConfirmMismatch => 'Passwords do not match';
-
-  @override
-  String get resetPasswordSubmitButton => 'Reset Password';
-
-  @override
-  String get resetPasswordSuccess =>
-      'Your password has been reset successfully';
-
-  @override
-  String get resetPasswordApiError => 'An error occurred';
 
   @override
   String get changeEmailTitle => 'Change Email';

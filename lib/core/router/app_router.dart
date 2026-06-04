@@ -5,8 +5,6 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/master_lock_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/verify_email_screen.dart';
-import '../../features/auth/presentation/forgot_password_screen.dart';
-import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/auth/presentation/change_email_screen.dart';
 import '../../features/auth/presentation/confirm_email_change_screen.dart';
 import '../../features/auth/presentation/settings_screen.dart';
@@ -31,7 +29,7 @@ import '../../features/auth/presentation/totp_verify_unlock_screen.dart';
 
 const _publicPaths = {
   '/splash', '/login', '/register', '/verify-email',
-  '/forgot-password', '/reset-password', '/onboarding',
+  '/onboarding',
   '/privacy-policy', '/device-banned', '/force-update',
   '/totp-verify-login',
 };
@@ -123,19 +121,6 @@ final router = GoRouter(
             },
           ),
         ],
-      ),
-      GoRoute(
-        path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
-      ),
-      GoRoute(
-        path: '/reset-password',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
-          return ResetPasswordScreen(
-            email: extra['email'] as String? ?? '',
-          );
-        },
       ),
       GoRoute(
         path: '/change-email',
