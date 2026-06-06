@@ -101,7 +101,6 @@
   "masterLockBiometricTomorrow": "Пароль потребуется завтра",
   "masterLockDifferentAccount": "Войти с другим аккаунтом",
   "masterLockTooManyAttempts": "Слишком много неверных попыток. Сессия завершена в целях безопасности.",
-  "storageInsecureWarning": "Внимание: защищённое хранилище недоступно. Данные хранятся без шифрования.",
   "lockTitle": "DeniKey заблокирован",
   "lockDescription": "Подтвердите личность для продолжения",
   "lockBiometricButton": "Разблокировать биометрией",

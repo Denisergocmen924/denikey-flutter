@@ -242,10 +242,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Çok fazla yanlış deneme. Güvenlik için oturum kapatıldı.';
 
   @override
-  String get storageInsecureWarning =>
-      'Uyarı: Bu platformda güvenli depolama bulunamadı. Veriler şifrelenmeden saklanıyor.';
-
-  @override
   String get lockTitle => 'DeniKey Kilitli';
 
   @override

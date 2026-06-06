@@ -4,11 +4,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 /// Tüm platformlarda flutter_secure_storage kullanılır.
-/// Android: Android Keystore  |  Linux: libsecret (GNOME Keyring)
-/// Windows: DPAPI              |  macOS/iOS: Keychain
+/// Android: Keystore | Windows: DPAPI | Ubuntu: libsecret (GNOME Keyring)
 class SecureStorage {
   SecureStorage._();
   static final SecureStorage instance = SecureStorage._();
+
+  // Güvenli kasaya yazma başarısız olursa (edge case) bu bellek kopyası kullanılır
+  List<int>? _memoryMasterKey;
 
   static const _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
@@ -41,14 +43,32 @@ class SecureStorage {
   Future<void> deleteRefreshToken() => _delete(_keyRefreshToken);
 
   // MASTER KEY
-  Future<void> saveMasterKey(List<int> key) =>
-      _write(_keyMasterKey, base64Encode(key));
-  Future<List<int>?> getMasterKey() async {
-    final encoded = await _read(_keyMasterKey);
-    if (encoded == null) return null;
-    return base64Decode(encoded);
+  Future<void> saveMasterKey(List<int> key) async {
+    _memoryMasterKey = List.from(key);
+    try {
+      await _write(_keyMasterKey, base64Encode(key));
+    } catch (_) {
+      // Güvenli kasa erişilemezse yalnızca bellekte tutulur (oturum boyunca)
+    }
   }
-  Future<void> deleteMasterKey() => _delete(_keyMasterKey);
+
+  Future<List<int>?> getMasterKey() async {
+    if (_memoryMasterKey != null) return _memoryMasterKey;
+    try {
+      final encoded = await _read(_keyMasterKey);
+      if (encoded == null) return null;
+      final key = base64Decode(encoded);
+      _memoryMasterKey = key;
+      return key;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> deleteMasterKey() async {
+    _memoryMasterKey = null;
+    await _delete(_keyMasterKey);
+  }
 
   // EMAIL
   Future<void> saveEmail(String email) => _write(_keyEmail, email);
@@ -105,20 +125,20 @@ class SecureStorage {
     return id;
   }
 
-  // CLEAR ALL
-  Future<void> clearAll() => _storage.deleteAll();
-
-  // Linux/Windows'ta libsecret/DPAPI çalışıyor mu?
-  static Future<bool> isStorageSecure() async {
-    if (!Platform.isLinux && !Platform.isWindows) return true;
-    try {
-      const testKey = '_sec_check';
-      await _storage.write(key: testKey, value: 'ok');
-      final val = await _storage.read(key: testKey);
-      await _storage.delete(key: testKey);
-      return val == 'ok';
-    } catch (_) {
-      return false;
-    }
+  // MASTER LOCK ATTEMPTS
+  static const _keyMasterLockAttempts = 'master_lock_attempts';
+  Future<int> getMasterLockAttempts() async {
+    final val = await _read(_keyMasterLockAttempts);
+    return int.tryParse(val ?? '') ?? 0;
   }
+  Future<void> saveMasterLockAttempts(int count) =>
+      _write(_keyMasterLockAttempts, count.toString());
+  Future<void> clearMasterLockAttempts() => _delete(_keyMasterLockAttempts);
+
+  // CLEAR ALL
+  Future<void> clearAll() async {
+    _memoryMasterKey = null;
+    await _storage.deleteAll();
+  }
+
 }

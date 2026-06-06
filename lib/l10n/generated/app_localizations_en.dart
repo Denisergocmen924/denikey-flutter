@@ -242,10 +242,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too many wrong attempts. Session ended for security.';
 
   @override
-  String get storageInsecureWarning =>
-      'Warning: Secure storage is unavailable on this platform. Data is stored without encryption.';
-
-  @override
   String get lockTitle => 'DeniKey Locked';
 
   @override

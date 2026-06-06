@@ -538,12 +538,6 @@ abstract class AppLocalizations {
   /// **'Çok fazla yanlış deneme. Güvenlik için oturum kapatıldı.'**
   String get masterLockTooManyAttempts;
 
-  /// No description provided for @storageInsecureWarning.
-  ///
-  /// In tr, this message translates to:
-  /// **'Uyarı: Bu platformda güvenli depolama bulunamadı. Veriler şifrelenmeden saklanıyor.'**
-  String get storageInsecureWarning;
-
   /// No description provided for @lockTitle.
   ///
   /// In tr, this message translates to:

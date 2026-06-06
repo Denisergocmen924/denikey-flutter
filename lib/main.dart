@@ -350,6 +350,11 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
     if (autoLock.minutes != null) {
       NotificationService.instance.showAutoLockNotification();
     }
+    // Masaüstünde biometric yok; kilit ekranında master password tekrar
+    // girilip key yeniden türetilir. Residency'yi azaltmak için kasadan da sil.
+    if (Platform.isLinux || Platform.isWindows) {
+      await SecureStorage.instance.deleteMasterKey();
+    }
     ref.read(routerProvider).go('/master-lock');
   }
 

@@ -241,10 +241,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Слишком много неверных попыток. Сессия завершена в целях безопасности.';
 
   @override
-  String get storageInsecureWarning =>
-      'Внимание: защищённое хранилище недоступно. Данные хранятся без шифрования.';
-
-  @override
   String get lockTitle => 'DeniKey заблокирован';
 
   @override
