@@ -24,6 +24,30 @@ class EncryptionService {
     return secretKey.extractBytes();
   }
 
+  // master_password → auth-verifier (ham parola sunucuya gönderilmez)
+  // Sunucudaki hash_master_password_for_auth_v2 ile BİREBİR aynı:
+  //   auth_salt = sha256(base64decode(salt) + "denikey-auth-v1")
+  //   verifier  = base64(Argon2id(password, auth_salt, m=64MB, t=3, p=2, len=32))
+  Future<String> deriveAuthVerifier(String masterPassword, String salt) async {
+    final saltBytes = base64Decode(salt);
+    final authSaltInput = Uint8List.fromList(
+      saltBytes + utf8.encode('denikey-auth-v1'),
+    );
+    final authSalt = (await Sha256().hash(authSaltInput)).bytes;
+
+    final algorithm = Argon2id(
+      memory: 65536,
+      parallelism: 2,
+      iterations: 3,
+      hashLength: 32,
+    );
+    final secretKey = await algorithm.deriveKey(
+      secretKey: SecretKey(utf8.encode(masterPassword)),
+      nonce: authSalt,
+    );
+    return base64Encode(await secretKey.extractBytes());
+  }
+
   // Şifreleme: plaintext → base64(iv + ciphertext)
   Future<Map<String, String>> encrypt(String plaintext, List<int> masterKey) async {
     final algorithm = AesGcm.with256bits();

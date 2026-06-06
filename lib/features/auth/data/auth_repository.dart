@@ -17,11 +17,14 @@ class AuthRepository {
     required String masterPassword,
   }) async {
     final salt = EncryptionService.instance.generateSalt();
+    // Ham parola sunucuya gitmez; verifier istemcide türetilir
+    final authVerifier =
+        await EncryptionService.instance.deriveAuthVerifier(masterPassword, salt);
     final deviceId = await SecureStorage.instance.getDeviceId();
     final response = await _dio.post(ApiConstants.register, data: {
       'username': username,
       'email': email,
-      'master_password': masterPassword,
+      'auth_verifier': authVerifier,
       'encryption_key_salt': salt,
       'device_id': deviceId,
       'device_type': getDeviceType(),
@@ -34,6 +37,16 @@ class AuthRepository {
     };
   }
 
+  // Login'in 1. adımı: verifier türetmek için salt'ı sunucudan al.
+  // Var olmayan kullanıcıda sunucu sahte-tutarlı salt döner (enumeration engellenir).
+  Future<String> getLoginSalt(String username) async {
+    final response = await _dio.post(
+      ApiConstants.loginSalt,
+      data: {'username': username},
+    );
+    return response.data['encryption_key_salt'] as String;
+  }
+
   Future<Map<String, dynamic>> login({
     required String username,
     required String masterPassword,
@@ -41,11 +54,16 @@ class AuthRepository {
     final deviceId = await SecureStorage.instance.getDeviceId();
     final deviceName = await getDeviceName();
 
+    // 1. adım: salt'ı al (yeni cihazda lokalde yok), verifier'ı türet
+    final salt = await getLoginSalt(username);
+    final authVerifier =
+        await EncryptionService.instance.deriveAuthVerifier(masterPassword, salt);
+
     final response = await _dio.post(
       ApiConstants.login,
       data: {
         'username': username,
-        'master_password': masterPassword,
+        'auth_verifier': authVerifier,
         'device_id': deviceId,
         'device_type': getDeviceType(),
         'device_name': deviceName,
@@ -168,7 +186,10 @@ class AuthRepository {
   }
 
   Future<void> totpDisable({required String masterPassword}) async {
-    await _dio.post(ApiConstants.totpDisable, data: {'master_password': masterPassword});
+    final salt = await SecureStorage.instance.getEncryptionSalt();
+    final authVerifier =
+        await EncryptionService.instance.deriveAuthVerifier(masterPassword, salt!);
+    await _dio.post(ApiConstants.totpDisable, data: {'auth_verifier': authVerifier});
   }
 
   Future<void> verifyDevice({
@@ -241,9 +262,12 @@ class AuthRepository {
     required String username,
     required String masterPassword,
   }) async {
+    final salt = await SecureStorage.instance.getEncryptionSalt();
+    final authVerifier =
+        await EncryptionService.instance.deriveAuthVerifier(masterPassword, salt!);
     await _dio.delete(
       ApiConstants.deleteAccount,
-      data: {'username': username, 'master_password': masterPassword},
+      data: {'username': username, 'auth_verifier': authVerifier},
     );
     await SecureStorage.instance.clearAll();
     await CacheService.instance.clearCache();

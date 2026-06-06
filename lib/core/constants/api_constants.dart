@@ -7,6 +7,7 @@ class ApiConstants {
 
   // Auth
   static const String register           = '/api/v1/auth/register';
+  static const String loginSalt          = '/api/v1/auth/login-salt';
   static const String login              = '/api/v1/auth/login';
   static const String verifyEmail        = '/api/v1/auth/verify-email';
   static const String verifyDevice       = '/api/v1/auth/verify-device';
