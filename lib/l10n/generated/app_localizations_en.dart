@@ -1840,13 +1840,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get totpDisableDesc =>
-      'Enter your master password to disable Authenticator Protection.';
+      'Enter your master password and authenticator code to disable protection.';
 
   @override
   String get totpDisableMasterPasswordLabel => 'Master Password';
 
   @override
   String get totpDisableMasterPasswordError => 'Incorrect master password';
+
+  @override
+  String get totpDisableCodeLabel => 'Authenticator Code';
+
+  @override
+  String get totpDisableCodeError => 'Invalid authenticator code';
 
   @override
   String get totpDisabledSuccess => 'Authenticator Protection disabled';

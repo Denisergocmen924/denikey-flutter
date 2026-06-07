@@ -3493,7 +3493,7 @@ abstract class AppLocalizations {
   /// No description provided for @totpDisableDesc.
   ///
   /// In tr, this message translates to:
-  /// **'Authenticator Korumasını devre dışı bırakmak için master password\'ünüzü girin.'**
+  /// **'Devre dışı bırakmak için master password\'ünüzü ve authenticator kodunuzu girin.'**
   String get totpDisableDesc;
 
   /// No description provided for @totpDisableMasterPasswordLabel.
@@ -3507,6 +3507,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Master password hatalı'**
   String get totpDisableMasterPasswordError;
+
+  /// No description provided for @totpDisableCodeLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Authenticator Kodu'**
+  String get totpDisableCodeLabel;
+
+  /// No description provided for @totpDisableCodeError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçersiz authenticator kodu'**
+  String get totpDisableCodeError;
 
   /// No description provided for @totpDisabledSuccess.
   ///

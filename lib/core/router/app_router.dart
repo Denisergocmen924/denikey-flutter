@@ -38,9 +38,13 @@ final router = GoRouter(
   initialLocation: '/splash',
   redirect: (context, state) async {
     final loc = state.matchedLocation;
-    if (_publicPaths.any((p) => loc.startsWith(p))) return null;
+    if (_publicPaths.contains(loc)) return null;
     final token = await SecureStorage.instance.getToken();
-    return token == null ? '/login' : null;
+    if (token == null) return '/login';
+    if (loc == '/master-lock') return null;
+    final masterKey = await SecureStorage.instance.getMasterKey();
+    if (masterKey == null) return '/master-lock';
+    return null;
   },
   routes: [
       GoRoute(

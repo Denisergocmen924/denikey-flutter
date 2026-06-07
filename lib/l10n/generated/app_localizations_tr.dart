@@ -1841,13 +1841,19 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get totpDisableDesc =>
-      'Authenticator Korumasını devre dışı bırakmak için master password\'ünüzü girin.';
+      'Devre dışı bırakmak için master password\'ünüzü ve authenticator kodunuzu girin.';
 
   @override
   String get totpDisableMasterPasswordLabel => 'Master Password';
 
   @override
   String get totpDisableMasterPasswordError => 'Master password hatalı';
+
+  @override
+  String get totpDisableCodeLabel => 'Authenticator Kodu';
+
+  @override
+  String get totpDisableCodeError => 'Geçersiz authenticator kodu';
 
   @override
   String get totpDisabledSuccess =>

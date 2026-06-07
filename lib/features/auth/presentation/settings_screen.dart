@@ -90,8 +90,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     WidgetRef ref,
     AppLocalizations l10n,
   ) async {
-    final ctrl = TextEditingController();
-    String? err;
+    final pwCtrl = TextEditingController();
+    final codeCtrl = TextEditingController();
+    String? pwErr;
+    String? codeErr;
 
     await showDialog<void>(
       context: context,
@@ -104,12 +106,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Text(l10n.totpDisableDesc, style: const TextStyle(fontSize: 14)),
               const SizedBox(height: 16),
               TextField(
-                controller: ctrl,
+                controller: pwCtrl,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: l10n.totpDisableMasterPasswordLabel,
-                  errorText: err,
+                  errorText: pwErr,
                   border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: codeCtrl,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                decoration: InputDecoration(
+                  labelText: l10n.totpDisableCodeLabel,
+                  errorText: codeErr,
+                  border: const OutlineInputBorder(),
+                  counterText: '',
                 ),
               ),
             ],
@@ -122,7 +136,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             FilledButton(
               onPressed: () async {
                 try {
-                  await _repo.totpDisable(masterPassword: ctrl.text);
+                  await _repo.totpDisable(
+                    masterPassword: pwCtrl.text,
+                    totpCode: codeCtrl.text,
+                  );
                   ref.invalidate(totpStatusProvider);
                   if (ctx.mounted) Navigator.pop(ctx);
                   if (mounted) {
@@ -130,8 +147,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       SnackBar(content: Text(l10n.totpDisabledSuccess)),
                     );
                   }
-                } catch (_) {
-                  setS(() => err = l10n.totpDisableMasterPasswordError);
+                } catch (e) {
+                  final msg = e.toString();
+                  if (msg.contains('TOTP') || msg.contains('totp') || msg.contains('400')) {
+                    setS(() { pwErr = null; codeErr = l10n.totpDisableCodeError; });
+                  } else {
+                    setS(() { pwErr = l10n.totpDisableMasterPasswordError; codeErr = null; });
+                  }
                 }
               },
               child: Text(l10n.totpDisableConfirm),
@@ -140,7 +162,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
     );
-    ctrl.dispose();
+    pwCtrl.dispose();
+    codeCtrl.dispose();
   }
 
   Future<void> _startDeleteAccountFlow() async {

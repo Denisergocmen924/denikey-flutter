@@ -1844,13 +1844,19 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get totpDisableDesc =>
-      'Введите мастер-пароль, чтобы отключить защиту Authenticator.';
+      'Введите мастер-пароль и код аутентификатора для отключения защиты.';
 
   @override
   String get totpDisableMasterPasswordLabel => 'Мастер-пароль';
 
   @override
   String get totpDisableMasterPasswordError => 'Неверный мастер-пароль';
+
+  @override
+  String get totpDisableCodeLabel => 'Код аутентификатора';
+
+  @override
+  String get totpDisableCodeError => 'Неверный код аутентификатора';
 
   @override
   String get totpDisabledSuccess => 'Защита Authenticator отключена';

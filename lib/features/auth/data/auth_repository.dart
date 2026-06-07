@@ -185,11 +185,14 @@ class AuthRepository {
     await _dio.post(ApiConstants.totpEnable, data: {'secret': secret, 'code': code});
   }
 
-  Future<void> totpDisable({required String masterPassword}) async {
+  Future<void> totpDisable({required String masterPassword, required String totpCode}) async {
     final salt = await SecureStorage.instance.getEncryptionSalt();
     final authVerifier =
         await EncryptionService.instance.deriveAuthVerifier(masterPassword, salt!);
-    await _dio.post(ApiConstants.totpDisable, data: {'auth_verifier': authVerifier});
+    await _dio.post(ApiConstants.totpDisable, data: {
+      'auth_verifier': authVerifier,
+      'totp_code': totpCode,
+    });
   }
 
   Future<void> verifyDevice({
