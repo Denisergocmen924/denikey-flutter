@@ -340,7 +340,8 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
         .routerDelegate.currentConfiguration.uri.toString();
     if (location == '/splash' || location == '/login' ||
         location == '/register' || location == '/lock' ||
-        location == '/master-lock' || location == '/force-update') {
+        location == '/master-lock' || location == '/force-update' ||
+        location == '/totp-verify-unlock') {
       return;
     }
     if (autoLock.minutes != null && _blurTime != null) {
