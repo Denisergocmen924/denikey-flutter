@@ -176,30 +176,30 @@ jobs:
           cp -r build/linux/x64/release/bundle/. "$PKG/opt/denikey/"
           cp linux/denikey.png "$PKG/usr/share/icons/hicolor/256x256/apps/denikey.png"
 
-          cat > "$PKG/usr/share/applications/denikey.desktop" << 'DESKTOP'
-[Desktop Entry]
-Name=DeniKey
-Comment=Zero-knowledge şifre yöneticisi
-Exec=/opt/denikey/DeniKey
-Icon=denikey
-Type=Application
-Categories=Utility;Security;
-StartupWMClass=DeniKey
-Terminal=false
-Path=/opt/denikey
-DESKTOP
+          printf '%s\n' \
+            '[Desktop Entry]' \
+            'Name=DeniKey' \
+            'Comment=Zero-knowledge şifre yöneticisi' \
+            'Exec=/opt/denikey/DeniKey' \
+            'Icon=denikey' \
+            'Type=Application' \
+            'Categories=Utility;Security;' \
+            'StartupWMClass=DeniKey' \
+            'Terminal=false' \
+            'Path=/opt/denikey' \
+            > "$PKG/usr/share/applications/denikey.desktop"
 
           ln -s /opt/denikey/DeniKey "$PKG/usr/bin/denikey"
 
-          cat > "$PKG/DEBIAN/control" << CONTROL
-Package: denikey
-Version: $VERSION
-Architecture: amd64
-Maintainer: Denis Ergocmen <denisergocmen@gmail.com>
-Description: Zero-knowledge şifre yöneticisi
- DeniKey, sıfır-bilgi şifreleme ile çalışan çapraz platform bir şifre yöneticisidir.
-Depends: libgtk-3-0, libsecret-1-0, libnotify4, libayatana-appindicator3-1
-CONTROL
+          printf '%s\n' \
+            'Package: denikey' \
+            "Version: $VERSION" \
+            'Architecture: amd64' \
+            'Maintainer: Denis Ergocmen <denisergocmen@gmail.com>' \
+            'Description: Zero-knowledge şifre yöneticisi' \
+            ' DeniKey, sıfır-bilgi şifreleme ile çalışan çapraz platform bir şifre yöneticisidir.' \
+            'Depends: libgtk-3-0, libsecret-1-0, libnotify4, libayatana-appindicator3-1' \
+            > "$PKG/DEBIAN/control"
 
           dpkg-deb --build "$PKG" "DeniKey-Linux.deb"
       - name: GitHub Release'e yükle
