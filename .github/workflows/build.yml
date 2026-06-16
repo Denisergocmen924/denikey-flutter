@@ -148,13 +148,6 @@ jobs:
             'set -e' \
             'gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true' \
             'update-desktop-database /usr/share/applications || true' \
-            'for home_dir in /home/*; do' \
-            '  if [ -d "$home_dir/Desktop" ]; then' \
-            '    cp /usr/share/applications/denikey.desktop "$home_dir/Desktop/denikey.desktop"' \
-            '    chmod +x "$home_dir/Desktop/denikey.desktop"' \
-            '    chown --reference="$home_dir" "$home_dir/Desktop/denikey.desktop" 2>/dev/null || true' \
-            '  fi' \
-            'done' \
             > "$PKG/DEBIAN/postinst"
           chmod 755 "$PKG/DEBIAN/postinst"
 
