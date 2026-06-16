@@ -101,6 +101,7 @@
   "masterLockBiometricTomorrow": "Пароль потребуется завтра",
   "masterLockDifferentAccount": "Войти с другим аккаунтом",
   "masterLockTooManyAttempts": "Слишком много неверных попыток. Сессия завершена в целях безопасности.",
+  "masterLockDeriving": "Создание ключа шифрования...",
   "lockTitle": "DeniKey заблокирован",
   "lockDescription": "Подтвердите личность для продолжения",
   "lockBiometricButton": "Разблокировать биометрией",

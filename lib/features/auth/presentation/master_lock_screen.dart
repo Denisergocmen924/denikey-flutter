@@ -261,6 +261,17 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                           )
                         : Text(l10n.masterLockButton, style: const TextStyle(fontSize: 16)),
                   ),
+                  if (_loading) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      l10n.masterLockDeriving,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                   if (_biometric != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(

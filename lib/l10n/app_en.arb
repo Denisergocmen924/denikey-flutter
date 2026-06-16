@@ -101,6 +101,7 @@
   "masterLockBiometricTomorrow": "Password required tomorrow",
   "masterLockDifferentAccount": "Sign in with a different account",
   "masterLockTooManyAttempts": "Too many wrong attempts. Session ended for security.",
+  "masterLockDeriving": "Generating encryption key...",
   "lockTitle": "DeniKey Locked",
   "lockDescription": "Verify your identity to continue",
   "lockBiometricButton": "Unlock with Biometrics",

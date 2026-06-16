@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
@@ -7,45 +8,47 @@ class EncryptionService {
   static final EncryptionService instance = EncryptionService._();
   EncryptionService._();
 
-  // master_password + salt → master_key (Argon2id)
-  Future<List<int>> deriveMasterKey(String masterPassword, String salt) async {
-    final algorithm = Argon2id(
-      memory: 65536,    // 64 MB
-      parallelism: 2,
-      iterations: 3,
-      hashLength: 32,   // 256 bit
-    );
-
-    final secretKey = await algorithm.deriveKey(
-      secretKey: SecretKey(utf8.encode(masterPassword)),
-      nonce: base64Decode(salt),
-    );
-
-    return secretKey.extractBytes();
+  // master_password + salt → master_key (Argon2id, ayrı isolate'te çalışır)
+  Future<List<int>> deriveMasterKey(String masterPassword, String salt) {
+    return Isolate.run(() async {
+      final algorithm = Argon2id(
+        memory: 65536,
+        parallelism: 2,
+        iterations: 3,
+        hashLength: 32,
+      );
+      final secretKey = await algorithm.deriveKey(
+        secretKey: SecretKey(utf8.encode(masterPassword)),
+        nonce: base64Decode(salt),
+      );
+      return secretKey.extractBytes();
+    });
   }
 
-  // master_password → auth-verifier (ham parola sunucuya gönderilmez)
+  // master_password → auth-verifier (ham parola sunucuya gönderilmez, ayrı isolate'te çalışır)
   // Sunucudaki hash_master_password_for_auth_v2 ile BİREBİR aynı:
   //   auth_salt = sha256(base64decode(salt) + "denikey-auth-v1")
   //   verifier  = base64(Argon2id(password, auth_salt, m=64MB, t=3, p=2, len=32))
-  Future<String> deriveAuthVerifier(String masterPassword, String salt) async {
-    final saltBytes = base64Decode(salt);
-    final authSaltInput = Uint8List.fromList(
-      saltBytes + utf8.encode('denikey-auth-v1'),
-    );
-    final authSalt = (await Sha256().hash(authSaltInput)).bytes;
+  Future<String> deriveAuthVerifier(String masterPassword, String salt) {
+    return Isolate.run(() async {
+      final saltBytes = base64Decode(salt);
+      final authSaltInput = Uint8List.fromList(
+        saltBytes + utf8.encode('denikey-auth-v1'),
+      );
+      final authSalt = (await Sha256().hash(authSaltInput)).bytes;
 
-    final algorithm = Argon2id(
-      memory: 65536,
-      parallelism: 2,
-      iterations: 3,
-      hashLength: 32,
-    );
-    final secretKey = await algorithm.deriveKey(
-      secretKey: SecretKey(utf8.encode(masterPassword)),
-      nonce: authSalt,
-    );
-    return base64Encode(await secretKey.extractBytes());
+      final algorithm = Argon2id(
+        memory: 65536,
+        parallelism: 2,
+        iterations: 3,
+        hashLength: 32,
+      );
+      final secretKey = await algorithm.deriveKey(
+        secretKey: SecretKey(utf8.encode(masterPassword)),
+        nonce: authSalt,
+      );
+      return base64Encode(await secretKey.extractBytes());
+    });
   }
 
   // Şifreleme: plaintext → base64(iv + ciphertext)

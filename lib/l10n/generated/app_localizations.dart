@@ -538,6 +538,12 @@ abstract class AppLocalizations {
   /// **'Çok fazla yanlış deneme. Güvenlik için oturum kapatıldı.'**
   String get masterLockTooManyAttempts;
 
+  /// No description provided for @masterLockDeriving.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreleme anahtarı oluşturuluyor...'**
+  String get masterLockDeriving;
+
   /// No description provided for @lockTitle.
   ///
   /// In tr, this message translates to:

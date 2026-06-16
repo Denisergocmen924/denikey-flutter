@@ -241,6 +241,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Слишком много неверных попыток. Сессия завершена в целях безопасности.';
 
   @override
+  String get masterLockDeriving => 'Создание ключа шифрования...';
+
+  @override
   String get lockTitle => 'DeniKey заблокирован';
 
   @override

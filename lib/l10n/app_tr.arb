@@ -101,6 +101,7 @@
   "masterLockBiometricTomorrow": "Yarın şifre istenecek",
   "masterLockDifferentAccount": "Farklı hesapla giriş yap",
   "masterLockTooManyAttempts": "Çok fazla yanlış deneme. Güvenlik için oturum kapatıldı.",
+  "masterLockDeriving": "Şifreleme anahtarı oluşturuluyor...",
   "lockTitle": "DeniKey Kilitli",
   "lockDescription": "Devam etmek için kimliğinizi doğrulayın",
   "lockBiometricButton": "Biyometrik ile Aç",

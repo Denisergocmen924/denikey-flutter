@@ -242,6 +242,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'Çok fazla yanlış deneme. Güvenlik için oturum kapatıldı.';
 
   @override
+  String get masterLockDeriving => 'Şifreleme anahtarı oluşturuluyor...';
+
+  @override
   String get lockTitle => 'DeniKey Kilitli';
 
   @override

@@ -242,6 +242,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too many wrong attempts. Session ended for security.';
 
   @override
+  String get masterLockDeriving => 'Generating encryption key...';
+
+  @override
   String get lockTitle => 'DeniKey Locked';
 
   @override
