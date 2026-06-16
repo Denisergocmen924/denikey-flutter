@@ -123,7 +123,7 @@ jobs:
             'Name=DeniKey' \
             'Comment=Zero-knowledge şifre yöneticisi' \
             'Exec=/opt/denikey/DeniKey' \
-            'Icon=denikey' \
+            'Icon=/usr/share/icons/hicolor/256x256/apps/denikey.png' \
             'Type=Application' \
             'Categories=Utility;Security;' \
             'StartupWMClass=DeniKey' \
