@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">DeniKey</h1>
-<p align="center">Zero-knowledge mimarisiyle çalışan, açık kaynak bir şifre yöneticisi</p>
+<p align="center">Zero-knowledge mimarisiyle çalışan bir şifre yöneticisi</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.41.6-blue?logo=flutter" />
@@ -77,4 +77,4 @@ Ubuntu kurulumu: `.deb` dosyasını indirip çift tıklayın, Ubuntu Yazılım M
 
 ## Lisans
 
-Bu proje şu an kapalı kaynak olarak geliştirilmektedir.
+Kaynak kod inceleme amaçlı herkese açıktır. Telif hakkı saklıdır — izinsiz kullanım, dağıtım veya türev çalışma oluşturma yasaktır.
