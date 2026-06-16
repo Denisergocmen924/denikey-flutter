@@ -1,3 +1,6 @@
+# Android signing — şifreli, repoya girmesin
+android/key.properties
+
 # Windows NTFS Alternate Data Streams
 *:Zone.Identifier
 
