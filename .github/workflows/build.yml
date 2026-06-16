@@ -180,7 +180,7 @@ jobs:
             '[Desktop Entry]' \
             'Name=DeniKey' \
             'Comment=Zero-knowledge şifre yöneticisi' \
-            'Exec=/opt/denikey/DeniKey' \
+            'Exec=/opt/denikey/denikey_app' \
             'Icon=denikey' \
             'Type=Application' \
             'Categories=Utility;Security;' \
@@ -189,7 +189,7 @@ jobs:
             'Path=/opt/denikey' \
             > "$PKG/usr/share/applications/denikey.desktop"
 
-          ln -s /opt/denikey/DeniKey "$PKG/usr/bin/denikey"
+          ln -s /opt/denikey/denikey_app "$PKG/usr/bin/denikey"
 
           printf '%s\n' \
             'Package: denikey' \
@@ -200,6 +200,14 @@ jobs:
             ' DeniKey, sıfır-bilgi şifreleme ile çalışan çapraz platform bir şifre yöneticisidir.' \
             'Depends: libgtk-3-0, libsecret-1-0, libnotify4, libayatana-appindicator3-1' \
             > "$PKG/DEBIAN/control"
+
+          printf '%s\n' \
+            '#!/bin/sh' \
+            'set -e' \
+            'gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true' \
+            'update-desktop-database /usr/share/applications || true' \
+            > "$PKG/DEBIAN/postinst"
+          chmod 755 "$PKG/DEBIAN/postinst"
 
           dpkg-deb --build "$PKG" "DeniKey-Linux.deb"
       - name: GitHub Release'e yükle
