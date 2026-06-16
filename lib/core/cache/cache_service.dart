@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import '../crypto/encryption_service.dart';
 import '../storage/secure_storage.dart';
 
@@ -16,7 +18,14 @@ class CacheService {
   }
 
   Future<Database> _initDb() async {
-    final path = join(await getDatabasesPath(), 'denikey_cache.db');
+    final String dbDir;
+    if (Platform.isLinux || Platform.isWindows) {
+      final dir = await getApplicationSupportDirectory();
+      dbDir = dir.path;
+    } else {
+      dbDir = await getDatabasesPath();
+    }
+    final path = join(dbDir, 'denikey_cache.db');
     return openDatabase(
       path,
       version: 2,
