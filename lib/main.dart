@@ -16,16 +16,9 @@ import 'core/notifications/notification_service.dart';
 import 'core/presentation/loading_overlay.dart';
 import 'core/presentation/app_shortcuts.dart';
 import 'core/storage/secure_storage.dart';
-import 'core/services/tray_service.dart';
 import 'core/localization/l10n.dart';
 import 'core/providers/connectivity_provider.dart';
 import 'core/presentation/offline_screen.dart';
-
-// Tek instance kilidi için sabit port
-const _kSingleInstancePort = 47821;
-ServerSocket? _singleInstanceServer;
-bool _windowReady = false;
-bool _pendingShow = false;
 
 Future<void> _migrateSettingsFromLegacyPath(SharedPreferences prefs) async {
   if (prefs.getBool('settings_v2_migrated') == true) return;
@@ -58,54 +51,10 @@ Future<void> _migrateSettingsFromLegacyPath(SharedPreferences prefs) async {
   await prefs.setBool('settings_v2_migrated', true);
 }
 
-Future<ServerSocket?> _acquireSingleInstanceLock() async {
-  try {
-    // Bu port'u bind edebildiysek → ilk instance'ız
-    return await ServerSocket.bind(InternetAddress.loopbackIPv4, _kSingleInstancePort);
-  } on SocketException {
-    // Port zaten dolu → başka instance var, onu uyar ve çık
-    try {
-      final socket = await Socket.connect(
-        InternetAddress.loopbackIPv4,
-        _kSingleInstancePort,
-        timeout: const Duration(seconds: 2),
-      );
-      socket.write('show');
-      await socket.flush();
-      await socket.close();
-    } catch (_) {}
-    return null;
-  }
-}
-
-void _listenForSecondInstance() {
-  _singleInstanceServer?.listen((client) {
-    client.listen(
-      (_) {
-        if (_windowReady) {
-          windowManager.show();
-          windowManager.focus();
-        } else {
-          _pendingShow = true;
-        }
-        client.destroy();
-      },
-      onError: (_) => client.destroy(),
-    );
-  });
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isWindows) {
-    _singleInstanceServer = await _acquireSingleInstanceLock();
-    if (_singleInstanceServer == null) {
-      // Başka instance var, o pencereyi öne getirdi, bu process çıkıyor
-      exit(0);
-    }
-  }
 
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+  if (Platform.isLinux) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
 
@@ -140,18 +89,6 @@ void main() async {
       }
     });
 
-    if (Platform.isWindows) {
-      await windowManager.setPreventClose(true);
-      await TrayService.instance.init();
-      // windowManager hazır olduktan sonra listener'ı başlat
-      _windowReady = true;
-      if (_pendingShow) {
-        _pendingShow = false;
-        await windowManager.show();
-        await windowManager.focus();
-      }
-      _listenForSecondInstance();
-    }
   }
   await NotificationService.instance.initialize();
   runApp(const ProviderScope(child: MyApp()));
@@ -278,7 +215,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
   @override
   void initState() {
     super.initState();
-    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    if (Platform.isLinux) {
       windowManager.addListener(this);
     } else {
       WidgetsBinding.instance.addObserver(this);
@@ -288,7 +225,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
   @override
   void dispose() {
     _boundsTimer?.cancel();
-    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    if (Platform.isLinux) {
       windowManager.removeListener(this);
     } else {
       WidgetsBinding.instance.removeObserver(this);
@@ -353,17 +290,10 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
     }
     // Masaüstünde biometric yok; kilit ekranında master password tekrar
     // girilip key yeniden türetilir. Residency'yi azaltmak için kasadan da sil.
-    if (Platform.isLinux || Platform.isWindows) {
+    if (Platform.isLinux) {
       await SecureStorage.instance.deleteMasterKey();
     }
     ref.read(routerProvider).go('/master-lock');
-  }
-
-  @override
-  void onWindowClose() async {
-    if (!Platform.isWindows) return;
-    await TrayService.instance.destroy();
-    exit(0);
   }
 
   @override

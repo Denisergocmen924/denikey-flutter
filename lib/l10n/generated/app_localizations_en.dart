@@ -1375,10 +1375,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get desktopOnboardingShortcut6 => 'Go back / close';
 
   @override
-  String get desktopOnboardingWindowsNote =>
-      'The X button closes the app. You can also exit by right-clicking the system tray icon.';
-
-  @override
   String get desktopOnboardingButton => 'Got It';
 
   @override
@@ -1668,12 +1664,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get biometricReason => 'Authenticate to access DeniKey';
-
-  @override
-  String get trayOpen => 'Open DeniKey';
-
-  @override
-  String get trayExit => 'Exit';
 
   @override
   String get shortcutSupport => 'Support Ticket';

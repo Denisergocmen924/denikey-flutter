@@ -19,7 +19,7 @@ class CacheService {
 
   Future<Database> _initDb() async {
     final String dbDir;
-    if (Platform.isLinux || Platform.isWindows) {
+    if (Platform.isLinux) {
       final dir = await getApplicationSupportDirectory();
       dbDir = dir.path;
     } else {

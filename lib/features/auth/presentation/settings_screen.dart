@@ -719,7 +719,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
             },
           ),
-          if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) ...[
+          if (Platform.isLinux) ...[
             Consumer(
               builder: (context, ref, _) {
                 final l10n = AppLocalizations.of(context);

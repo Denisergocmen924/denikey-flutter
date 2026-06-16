@@ -12,7 +12,7 @@ class VaultRepository {
   final Dio _dio = DioClient.instance.dio;
 
   Future<bool> isOnline() async {
-    if (Platform.isLinux || Platform.isWindows) {
+    if (Platform.isLinux) {
       try {
         final socket = await Socket.connect(
           'denikey-backend.fly.dev',

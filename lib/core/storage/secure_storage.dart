@@ -105,9 +105,6 @@ class SecureStorage {
       } else if (Platform.isIOS) {
         final info = await deviceInfo.iosInfo;
         id = info.identifierForVendor ?? 'ios-unknown';
-      } else if (Platform.isWindows) {
-        final info = await deviceInfo.windowsInfo;
-        id = info.deviceId;
       } else if (Platform.isLinux) {
         final info = await deviceInfo.linuxInfo;
         id = info.machineId ?? 'linux-unknown';

@@ -76,19 +76,10 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen>
     if (mounted) setState(() => _hasInstallPermission = status.isGranted);
   }
 
-  String get _installPath {
-    if (Platform.isWindows) {
-      return File(Platform.resolvedExecutable).parent.path;
-    }
-    return '';
-  }
-
   String get _downloadUrl {
     final v = widget.minimumVersion;
     if (Platform.isAndroid) {
       return '${ApiConstants.releasesDownloadBase}/v$v/DeniKey-Android.apk';
-    } else if (Platform.isWindows) {
-      return '${ApiConstants.releasesDownloadBase}/v$v/DeniKey-Setup.exe';
     }
     return ApiConstants.releasesPage;
   }
@@ -122,8 +113,7 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen>
     final l10n = AppLocalizations.of(context);
     try {
       final dir      = await getTemporaryDirectory();
-      final fileName = Platform.isAndroid ? 'DeniKey-Update.apk' : 'DeniKey-Setup.exe';
-      _savePath = '${dir.path}/$fileName';
+      _savePath = '${dir.path}/DeniKey-Update.apk';
 
       if (_downloadedBytes == 0) {
         final existing = File(_savePath!);
@@ -175,8 +165,6 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen>
         } else {
           setState(() => _error = l10n.forceUpdateInstallError(result.message));
         }
-      } else if (Platform.isWindows) {
-        await Process.start(_savePath!, ['/SILENT', '/TASKS=']);
       }
     } on DioException catch (e) {
       if (CancelToken.isCancel(e)) return;
@@ -324,24 +312,6 @@ class _ForceUpdateScreenState extends State<ForceUpdateScreen>
                     ],
                   ),
                 ),
-
-                if (Platform.isWindows) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.folder_outlined, size: 12, color: _muted),
-                      const SizedBox(width: 5),
-                      Flexible(
-                        child: Text(
-                          _installPath,
-                          style: const TextStyle(fontSize: 11, color: _muted),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
 
                 const SizedBox(height: 40),
 

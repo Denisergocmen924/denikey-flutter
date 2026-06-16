@@ -1375,10 +1375,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get desktopOnboardingShortcut6 => 'Geri git / kapat';
 
   @override
-  String get desktopOnboardingWindowsNote =>
-      'X butonu uygulamayı kapatır. Sistem tepsisindeki simgeye sağ tıklayarak da çıkış yapabilirsiniz.';
-
-  @override
   String get desktopOnboardingButton => 'Anladım';
 
   @override
@@ -1669,12 +1665,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get biometricReason =>
       'DeniKey\'e erişmek için kimliğinizi doğrulayın';
-
-  @override
-  String get trayOpen => 'DeniKey\'i Aç';
-
-  @override
-  String get trayExit => 'Çıkış';
 
   @override
   String get shortcutSupport => 'Destek Talebi';

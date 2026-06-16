@@ -6,7 +6,7 @@ import 'package:denikey_app/l10n/generated/app_localizations.dart';
 const _kKey = 'desktop_onboarding_done';
 
 Future<void> showDesktopOnboardingIfNeeded(BuildContext context) async {
-  if (!Platform.isWindows && !Platform.isLinux) return;
+  if (!Platform.isLinux) return;
   final prefs = await SharedPreferences.getInstance();
   if (prefs.getBool(_kKey) == true) return;
   await prefs.setBool(_kKey, true);
@@ -25,7 +25,6 @@ class _DesktopOnboardingDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
-    final isWindows = Platform.isWindows;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -63,23 +62,6 @@ class _DesktopOnboardingDialog extends StatelessWidget {
               _shortcutRow(cs, 'Ctrl + G', l10n.desktopOnboardingShortcut4),
               _shortcutRow(cs, '← →', l10n.desktopOnboardingShortcut5),
               _shortcutRow(cs, 'Escape', l10n.desktopOnboardingShortcut6),
-              if (isWindows) ...[
-                const SizedBox(height: 16),
-                Divider(color: cs.outlineVariant),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(Icons.info_outline, size: 16, color: cs.onSurfaceVariant),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l10n.desktopOnboardingWindowsNote,
-                        style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant, height: 1.5),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
               const SizedBox(height: 24),
               Align(
                 alignment: Alignment.centerRight,

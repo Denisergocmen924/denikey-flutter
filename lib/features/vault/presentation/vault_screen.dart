@@ -264,7 +264,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                   const Icon(Icons.wifi_off, color: Colors.white, size: 18),
                   const SizedBox(width: 8),
                   Text(
-                    (Platform.isLinux || Platform.isWindows)
+                    Platform.isLinux
                         ? l10n.vaultOfflineWarning
                         : l10n.vaultOfflineWarningDesktop,
                     style: const TextStyle(color: Colors.white, fontSize: 13),

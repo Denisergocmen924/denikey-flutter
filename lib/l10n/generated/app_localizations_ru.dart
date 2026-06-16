@@ -1375,10 +1375,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get desktopOnboardingShortcut6 => 'Назад / закрыть';
 
   @override
-  String get desktopOnboardingWindowsNote =>
-      'Кнопка X закрывает приложение. Вы также можете выйти, нажав правой кнопкой на значок в системном трее.';
-
-  @override
   String get desktopOnboardingButton => 'Понятно';
 
   @override
@@ -1672,12 +1668,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get biometricReason => 'Подтвердите личность для доступа к DeniKey';
-
-  @override
-  String get trayOpen => 'Открыть DeniKey';
-
-  @override
-  String get trayExit => 'Выход';
 
   @override
   String get shortcutSupport => 'Служба поддержки';

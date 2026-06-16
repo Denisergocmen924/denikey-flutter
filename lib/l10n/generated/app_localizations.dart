@@ -2638,12 +2638,6 @@ abstract class AppLocalizations {
   /// **'Geri git / kapat'**
   String get desktopOnboardingShortcut6;
 
-  /// No description provided for @desktopOnboardingWindowsNote.
-  ///
-  /// In tr, this message translates to:
-  /// **'X butonu uygulamayı kapatır. Sistem tepsisindeki simgeye sağ tıklayarak da çıkış yapabilirsiniz.'**
-  String get desktopOnboardingWindowsNote;
-
   /// No description provided for @desktopOnboardingButton.
   ///
   /// In tr, this message translates to:
@@ -3171,18 +3165,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'DeniKey\'e erişmek için kimliğinizi doğrulayın'**
   String get biometricReason;
-
-  /// No description provided for @trayOpen.
-  ///
-  /// In tr, this message translates to:
-  /// **'DeniKey\'i Aç'**
-  String get trayOpen;
-
-  /// No description provided for @trayExit.
-  ///
-  /// In tr, this message translates to:
-  /// **'Çıkış'**
-  String get trayExit;
 
   /// No description provided for @shortcutSupport.
   ///

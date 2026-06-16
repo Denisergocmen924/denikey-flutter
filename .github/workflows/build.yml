@@ -63,72 +63,14 @@ jobs:
             | Platform | Dosya |
             |----------|-------|
             | Android | `DeniKey-Android.apk` |
-            | Windows | `DeniKey-Setup.exe` |
             | Ubuntu | `DeniKey-Linux.deb` |
 
             ### Kurulum
             - **Android:** APK'yı indir, "Bilinmeyen kaynaklardan yükle" izni ver, kur.
-            - **Windows:** `DeniKey-Setup.exe` dosyasını indir ve çalıştır.
             - **Ubuntu:** `DeniKey-Linux.deb` dosyasını indir, çift tıkla ve "Kur" de.
           files: |
             DeniKey-Android.apk
             DeniKey-Android.aab
-
-  build-windows:
-    name: Windows EXE
-    runs-on: windows-2022
-    permissions:
-      contents: write
-    steps:
-      - name: Git long path desteği
-        run: git config --global core.longpaths true
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.41.6'
-          channel: stable
-      - run: flutter pub get
-      - name: Versiyon belirle
-        id: version
-        shell: pwsh
-        run: |
-          $ref = "${{ github.ref }}"
-          if ($ref -like "refs/tags/v*") {
-            $v = "${{ github.ref_name }}".TrimStart("v")
-          } else {
-            $pubspec = Get-Content pubspec.yaml -Raw
-            $v = [regex]::Match($pubspec, '(?m)^version:\s*([^\+\r\n]+)').Groups[1].Value.Trim()
-          }
-          echo "name=$v" >> $env:GITHUB_OUTPUT
-          echo "number=${{ github.run_number }}" >> $env:GITHUB_OUTPUT
-      - run: flutter build windows --release --build-name=${{ steps.version.outputs.name }} --build-number=${{ steps.version.outputs.number }}
-      - name: Kurulum scriptini kopyala ve EXE yeniden adlandır
-        shell: pwsh
-        run: |
-          $releaseDir = "build\windows\x64\runner\Release"
-          $exePath = "$releaseDir\denikey_app.exe"
-          if (Test-Path $exePath) {
-            Rename-Item $exePath "DeniKey.exe"
-          }
-          if (Test-Path "windows_setup\install.ps1") {
-            Copy-Item "windows_setup\install.ps1" "$releaseDir\install.ps1"
-          }
-      - name: Inno Setup kur
-        run: choco install innosetup --yes
-      - name: Installer oluştur
-        shell: pwsh
-        run: |
-          $version = "${{ steps.version.outputs.name }}"
-          Write-Host "Building installer version: $version"
-          New-Item -ItemType Directory -Force -Path "windows_setup\installer_output" | Out-Null
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "windows_setup\installer.iss"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: GitHub Release'e yükle
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: true
-          files: windows_setup/installer_output/DeniKey-Setup.exe
 
   build-linux:
     name: Linux DEB
@@ -143,7 +85,7 @@ jobs:
           sudo apt-get install -y clang cmake ninja-build pkg-config \
             libgtk-3-dev liblzma-dev libstdc++-12-dev \
             libsecret-1-dev libjsoncpp-dev \
-            libnotify-dev libayatana-appindicator3-dev \
+            libnotify-dev \
             libpam0g-dev network-manager-dev
       - uses: subosito/flutter-action@v2
         with:
@@ -180,7 +122,7 @@ jobs:
             '[Desktop Entry]' \
             'Name=DeniKey' \
             'Comment=Zero-knowledge şifre yöneticisi' \
-            'Exec=/opt/denikey/denikey_app' \
+            'Exec=/opt/denikey/DeniKey' \
             'Icon=denikey' \
             'Type=Application' \
             'Categories=Utility;Security;' \
@@ -189,7 +131,7 @@ jobs:
             'Path=/opt/denikey' \
             > "$PKG/usr/share/applications/denikey.desktop"
 
-          ln -s /opt/denikey/denikey_app "$PKG/usr/bin/denikey"
+          ln -s /opt/denikey/DeniKey "$PKG/usr/bin/denikey"
 
           printf '%s\n' \
             'Package: denikey' \
@@ -198,7 +140,7 @@ jobs:
             'Maintainer: Denis Ergocmen <denisergocmen@gmail.com>' \
             'Description: Zero-knowledge şifre yöneticisi' \
             ' DeniKey, sıfır-bilgi şifreleme ile çalışan çapraz platform bir şifre yöneticisidir.' \
-            'Depends: libgtk-3-0, libsecret-1-0, libnotify4, libayatana-appindicator3-1' \
+            'Depends: libgtk-3-0, libsecret-1-0, libnotify4' \
             > "$PKG/DEBIAN/control"
 
           printf '%s\n' \
@@ -219,7 +161,7 @@ jobs:
 
   publish-release:
     name: Release Yayınla
-    needs: [build-android, build-windows, build-linux]
+    needs: [build-android, build-linux]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
@@ -241,7 +183,6 @@ jobs:
         run: |
           gh release download ${{ github.ref_name }} \
             --pattern "DeniKey-Android.apk" \
-            --pattern "DeniKey-Setup.exe" \
             --pattern "DeniKey-Linux.deb"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -253,7 +194,6 @@ jobs:
             --yes 2>/dev/null || true
           gh release create ${{ github.ref_name }} \
             DeniKey-Android.apk \
-            DeniKey-Setup.exe \
             DeniKey-Linux.deb \
             --repo Denisergocmen924/denikey-releases \
             --title "DeniKey ${{ github.ref_name }}" \

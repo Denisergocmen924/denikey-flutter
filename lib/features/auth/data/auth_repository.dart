@@ -288,8 +288,6 @@ class AuthRepository {
   String getDeviceType() {
     if (Platform.isAndroid) return 'android';
     if (Platform.isIOS) return 'ios';
-    if (Platform.isWindows) return 'windows';
-    if (Platform.isMacOS) return 'macos';
     if (Platform.isLinux) return 'linux';
     return 'unknown';
   }
@@ -303,12 +301,6 @@ class AuthRepository {
       } else if (Platform.isIOS) {
         final info = await plugin.iosInfo;
         return info.name;
-      } else if (Platform.isWindows) {
-        final info = await plugin.windowsInfo;
-        return info.computerName;
-      } else if (Platform.isMacOS) {
-        final info = await plugin.macOsInfo;
-        return info.computerName;
       } else if (Platform.isLinux) {
         final info = await plugin.linuxInfo;
         return info.prettyName;
