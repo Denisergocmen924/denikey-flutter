@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../../core/presentation/app_nav_bar.dart';
@@ -286,7 +287,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           Expanded(
             child: Builder(builder: (context) {
               if (state.status == VaultStatus.loading) {
-                return Center(child: Text(l10n.vaultLoading));
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(l10n.vaultLoading,
+                        style: TextStyle(color: cs.onSurfaceVariant)),
+                    ],
+                  ),
+                ).animate().fadeIn(duration: const Duration(milliseconds: 300));
               }
               if (state.status == VaultStatus.error) {
                 return AppErrorWidget(
@@ -300,15 +311,28 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // Nefes alan kalkan ikonu
                       Icon(Icons.shield_outlined, size: 72,
-                        color: cs.onSurfaceVariant.withAlpha(80)),
+                        color: cs.onSurfaceVariant.withAlpha(80))
+                      .animate(onPlay: (ctrl) => ctrl.repeat(reverse: true))
+                      .scale(
+                        begin: const Offset(0.93, 0.93),
+                        end: const Offset(1.07, 1.07),
+                        duration: const Duration(milliseconds: 2200),
+                        curve: Curves.easeInOut,
+                      ),
                       const SizedBox(height: 20),
                       Text(l10n.vaultEmpty,
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600,
-                          color: cs.onSurface)),
+                          color: cs.onSurface))
+                      .animate(delay: const Duration(milliseconds: 200))
+                      .fadeIn(duration: const Duration(milliseconds: 400))
+                      .slideY(begin: 0.3, curve: Curves.easeOut),
                       const SizedBox(height: 8),
                       Text(l10n.vaultEmptyHint,
-                        style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant)),
+                        style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant))
+                      .animate(delay: const Duration(milliseconds: 350))
+                      .fadeIn(duration: const Duration(milliseconds: 400)),
                     ],
                   ),
                 );
@@ -319,10 +343,15 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.folder_open_outlined, size: 64,
-                        color: cs.onSurfaceVariant.withAlpha(80)),
+                        color: cs.onSurfaceVariant.withAlpha(80))
+                      .animate()
+                      .fadeIn(duration: const Duration(milliseconds: 400))
+                      .scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack),
                       const SizedBox(height: 16),
                       Text(l10n.vaultCategoryEmpty,
-                        style: TextStyle(fontSize: 16, color: cs.onSurfaceVariant)),
+                        style: TextStyle(fontSize: 16, color: cs.onSurfaceVariant))
+                      .animate(delay: const Duration(milliseconds: 150))
+                      .fadeIn(duration: const Duration(milliseconds: 350)),
                     ],
                   ),
                 );
@@ -339,6 +368,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
                   itemCount: filtered.length + (hasFavorites ? 2 : 0),
                   itemBuilder: (context, index) {
+                    // Favoriler başlığı
                     if (hasFavorites && index == 0) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
@@ -352,8 +382,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                 color: Colors.amber.shade700)),
                           ],
                         ),
-                      );
+                      ).animate().fadeIn(duration: const Duration(milliseconds: 280));
                     }
+
+                    // Diğerleri ayracı
                     if (hasFavorites && index == favorites.length + 1) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -370,7 +402,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                             Expanded(child: Divider(color: cs.outlineVariant, height: 1)),
                           ],
                         ),
-                      );
+                      ).animate(delay: Duration(milliseconds: index.clamp(0, 10) * 50))
+                        .fadeIn(duration: const Duration(milliseconds: 280));
                     }
 
                     final itemIndex = hasFavorites
@@ -380,6 +413,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     final isFavorite = item['is_favorite'] == true;
                     final itemId = item['id']?.toString() ?? '';
                     final isSelected = _selectedIds.contains(itemId);
+
+                    // Her öğe için kademeli gecikme (ilk 10 öğe, sonrası sabit)
+                    final staggerDelay = Duration(
+                      milliseconds: index.clamp(0, 10) * 50,
+                    );
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
@@ -482,7 +520,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                         ),
                         ),
                       ),
-                    );
+                    )
+                    .animate(delay: staggerDelay)
+                    .fadeIn(duration: const Duration(milliseconds: 320), curve: Curves.easeOut)
+                    .slideY(begin: 0.10, curve: Curves.easeOut);
                   },
                 ),
               );
@@ -541,7 +582,14 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
               icon: const Icon(Icons.add),
               label: Text(l10n.vaultAddButton,
                 style: const TextStyle(fontWeight: FontWeight.w600)),
-            ),
+            )
+          .animate()
+          .scale(
+            begin: const Offset(0.5, 0.5),
+            curve: Curves.easeOutBack,
+            duration: const Duration(milliseconds: 500),
+          )
+          .fadeIn(duration: const Duration(milliseconds: 300)),
     );
   }
 }

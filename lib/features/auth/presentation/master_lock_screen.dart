@@ -1,10 +1,13 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../data/auth_repository.dart';
+import '../../../core/presentation/app_animations.dart';
 
 class MasterLockScreen extends StatefulWidget {
   const MasterLockScreen({super.key});
@@ -13,7 +16,8 @@ class MasterLockScreen extends StatefulWidget {
   State<MasterLockScreen> createState() => _MasterLockScreenState();
 }
 
-class _MasterLockScreenState extends State<MasterLockScreen> {
+class _MasterLockScreenState extends State<MasterLockScreen>
+    with SingleTickerProviderStateMixin {
   final _ctrl    = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscure  = true;
@@ -24,12 +28,26 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
   int _remainingDays = 0;
   int _failedAttempts = 0;
 
+  // Hatalı giriş sarsma animasyonu
+  late final AnimationController _shakeCtrl;
+  late final Animation<double> _shakeAnim;
+
   @override
   void initState() {
     super.initState();
     _loadBiometric();
     _loadFailedAttempts();
+
+    _shakeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    _shakeAnim = CurvedAnimation(parent: _shakeCtrl, curve: Curves.easeOut);
   }
+
+  // Sinüsoidal sarsma: 5 titreşim, azalan genlik
+  double _shakeOffset(double t) =>
+      10.0 * math.sin(t * math.pi * 6) * (1.0 - t);
 
   Future<void> _loadFailedAttempts() async {
     final count = await SecureStorage.instance.getMasterLockAttempts();
@@ -76,7 +94,6 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
         context.go('/vault');
       }
     } catch (_) {
-      // Ağ hatası — vault'a geç, TOTP sonraki açılışta kontrol edilir
       if (mounted) context.go('/vault');
     }
   }
@@ -93,17 +110,20 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
           _error = AppLocalizations.of(context).masterLockBiometricNeeded;
           _loading = false;
         });
+        _shakeCtrl.forward(from: 0);
         return;
       }
       await _navigateAfterUnlock();
     } else {
       setState(() { _error = AppLocalizations.of(context).masterLockAuthFailed; _loading = false; });
+      _shakeCtrl.forward(from: 0);
     }
   }
 
   @override
   void dispose() {
     _ctrl.dispose();
+    _shakeCtrl.dispose();
     super.dispose();
   }
 
@@ -116,7 +136,6 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
       final blobData = await SecureStorage.instance.getVerificationBlob();
 
       if (salt == null || blobData == null) {
-        // Eski oturum — doğrulama verisi yok, oturumu kapat
         await SecureStorage.instance.clearAll();
         if (mounted) context.go('/login');
         return;
@@ -127,7 +146,6 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
         salt,
       );
 
-      // Doğrulama blob'unu çözmeye çalış
       final plaintext = await EncryptionService.instance.decrypt(
         blobData['encrypted']!,
         blobData['iv']!,
@@ -148,10 +166,10 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
           return;
         }
         setState(() { _error = AppLocalizations.of(context).masterLockWrongPassword; _loading = false; });
+        _shakeCtrl.forward(from: 0);
         return;
       }
 
-      // Doğru şifre — sayacı sıfırla, master key'i güncelle, TTL'i yenile
       await _clearFailedAttempts();
       await SecureStorage.instance.saveMasterKey(masterKey);
       await BiometricService.instance.saveMasterPasswordTimestamp();
@@ -170,6 +188,7 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
         return;
       }
       setState(() { _error = AppLocalizations.of(context).masterLockWrongPassword; _loading = false; });
+      _shakeCtrl.forward(from: 0);
     }
   }
 
@@ -189,6 +208,8 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 48),
+
+                  // Logo — kilit simgesi, giriş animasyonuyla
                   Center(
                     child: Container(
                       width: 88,
@@ -196,12 +217,30 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFF090C08),
                         borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFF5900).withAlpha(50),
+                            blurRadius: 24,
+                            spreadRadius: 0,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
                       padding: const EdgeInsets.all(12),
                       child: Image.asset('assets/icon/denikey_emblem.png'),
                     ),
+                  )
+                  .animate()
+                  .fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth)
+                  .scale(
+                    begin: const Offset(0.78, 0.78),
+                    curve: AppAnim.spring,
+                    duration: AppAnim.slow,
                   ),
+
                   const SizedBox(height: 20),
+
+                  // Başlık
                   Text(
                     l10n.masterLockTitle,
                     textAlign: TextAlign.center,
@@ -210,68 +249,93 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                       fontWeight: FontWeight.w800,
                       color: cs.onSurface,
                     ),
-                  ),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(1))
+                  .fadeIn(duration: AppAnim.normal)
+                  .slideY(begin: 0.25, curve: AppAnim.smooth),
+
                   const SizedBox(height: 6),
+
+                  // Alt başlık
                   Text(
                     _biometricExpired
                         ? l10n.masterLockBiometricExpired
                         : l10n.masterLockPassword,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: cs.onSurfaceVariant,
-                    ),
-                  ),
+                    style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(2))
+                  .fadeIn(duration: AppAnim.normal),
+
                   const SizedBox(height: 40),
-                  TextFormField(
-                    controller: _ctrl,
-                    obscureText: _obscure,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      labelText: l10n.masterLockPasswordLabel,
-                      prefixIcon: const Icon(Icons.key_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscure
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined),
-                        onPressed: () => setState(() => _obscure = !_obscure),
-                      ),
-                      errorText: _error,
+
+                  // Şifre alanı + kilit açma butonu — sarsma animasyonu burada
+                  AnimatedBuilder(
+                    animation: _shakeAnim,
+                    builder: (ctx, child) => Transform.translate(
+                      offset: Offset(_shakeOffset(_shakeAnim.value), 0),
+                      child: child,
                     ),
-                    onFieldSubmitted: (_) => _loading ? null : _unlock(),
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return l10n.masterLockPasswordError;
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: _loading ? null : _unlock,
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: _loading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextFormField(
+                          controller: _ctrl,
+                          obscureText: _obscure,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            labelText: l10n.masterLockPasswordLabel,
+                            prefixIcon: const Icon(Icons.key_outlined),
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscure
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined),
+                              onPressed: () => setState(() => _obscure = !_obscure),
                             ),
-                          )
-                        : Text(l10n.masterLockButton, style: const TextStyle(fontSize: 16)),
-                  ),
+                            errorText: _error,
+                          ),
+                          onFieldSubmitted: (_) => _loading ? null : _unlock(),
+                          validator: (v) {
+                            if (v == null || v.isEmpty) return l10n.masterLockPasswordError;
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        FilledButton(
+                          onPressed: _loading ? null : _unlock,
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: _loading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(l10n.masterLockButton,
+                                  style: const TextStyle(fontSize: 16)),
+                        ),
+                      ],
+                    ),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(3))
+                  .fadeIn(duration: AppAnim.normal)
+                  .slideY(begin: 0.2, curve: AppAnim.smooth),
+
+                  // Şifre türetme mesajı
                   if (_loading) ...[
                     const SizedBox(height: 12),
                     Text(
                       l10n.masterLockDeriving,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: cs.onSurfaceVariant,
-                      ),
+                      style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
                     ),
                   ],
+
+                  // Biyometrik butonu
                   if (_biometric != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
@@ -281,28 +345,32 @@ class _MasterLockScreenState extends State<MasterLockScreen> {
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                    ),
+                    )
+                    .animate(delay: AppAnim.entranceDelay(4))
+                    .fadeIn(duration: AppAnim.normal),
                     const SizedBox(height: 8),
                     Center(
                       child: Text(
                         _remainingDays > 1
                             ? l10n.masterLockBiometricDaysRemaining(_remainingDays)
                             : l10n.masterLockBiometricTomorrow,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: cs.onSurfaceVariant,
-                        ),
+                        style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                       ),
                     ),
                   ],
+
                   const SizedBox(height: 20),
+
+                  // Farklı hesap butonu
                   TextButton(
                     onPressed: _loading ? null : _logout,
                     child: Text(
                       l10n.masterLockDifferentAccount,
                       style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13),
                     ),
-                  ),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(5))
+                  .fadeIn(duration: AppAnim.normal),
                 ],
               ),
             ),

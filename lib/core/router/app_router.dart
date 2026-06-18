@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../storage/secure_storage.dart';
@@ -34,6 +35,40 @@ const _publicPaths = {
   '/totp-verify-login',
 };
 
+// Fade + hafif yukarı kayma — ana ekranlar arası geçiş
+Page<void> _fadePage(LocalKey key, Widget child) => CustomTransitionPage(
+  key: key,
+  child: child,
+  transitionDuration: const Duration(milliseconds: 300),
+  reverseTransitionDuration: const Duration(milliseconds: 250),
+  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    final fade = CurvedAnimation(parent: animation, curve: Curves.easeOut);
+    final slide = Tween<Offset>(
+      begin: const Offset(0, 0.04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
+    return FadeTransition(
+      opacity: fade,
+      child: SlideTransition(position: slide, child: child),
+    );
+  },
+);
+
+// Aşağıdan yukarı kayma — detay / modal ekranlar
+Page<void> _slideUpPage(LocalKey key, Widget child) => CustomTransitionPage(
+  key: key,
+  child: child,
+  transitionDuration: const Duration(milliseconds: 380),
+  reverseTransitionDuration: const Duration(milliseconds: 300),
+  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    final slide = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+    return SlideTransition(position: slide, child: child);
+  },
+);
+
 final router = GoRouter(
   initialLocation: '/splash',
   redirect: (context, state) async {
@@ -63,107 +98,165 @@ final router = GoRouter(
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => OnboardingScreen(
-          isReplay: state.extra as bool? ?? false,
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          OnboardingScreen(isReplay: state.extra as bool? ?? false),
         ),
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const LoginScreen(),
+        ),
       ),
       GoRoute(
         path: '/master-lock',
-        builder: (context, state) => const MasterLockScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const MasterLockScreen(),
+        ),
       ),
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegisterScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const RegisterScreen(),
+        ),
       ),
       GoRoute(
         path: '/verify-email',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>;
-          return VerifyEmailScreen(
-            userId: extra['user_id'],
-            email: extra['email'],
-            purpose: extra['purpose'] ?? 'register',
-            masterPassword: extra['master_password'],
-            emailVerifyToken: extra['email_verify_token'] as String?,
+          return _fadePage(
+            state.pageKey,
+            VerifyEmailScreen(
+              userId: extra['user_id'],
+              email: extra['email'],
+              purpose: extra['purpose'] ?? 'register',
+              masterPassword: extra['master_password'],
+              emailVerifyToken: extra['email_verify_token'] as String?,
+            ),
           );
         },
       ),
       GoRoute(
         path: '/vault',
-        builder: (context, state) => const VaultScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const VaultScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'detail',
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final item = state.extra as Map<String, dynamic>;
-              return VaultItemDetailScreen(item: item);
+              return _slideUpPage(
+                state.pageKey,
+                VaultItemDetailScreen(item: item),
+              );
             },
           ),
           GoRoute(
             path: 'add',
-            builder: (context, state) => const AddVaultItemScreen(),
+            pageBuilder: (context, state) => _slideUpPage(
+              state.pageKey,
+              const AddVaultItemScreen(),
+            ),
           ),
         ],
       ),
       GoRoute(
         path: '/add-item',
-        builder: (context, state) => const AddVaultItemScreen(),
+        pageBuilder: (context, state) => _slideUpPage(
+          state.pageKey,
+          const AddVaultItemScreen(),
+        ),
       ),
       GoRoute(
         path: '/categories',
-        builder: (context, state) => const LibraryScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const LibraryScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'detail',
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final cat = state.extra as Map<String, dynamic>;
-              return CategoryDetailScreen(category: cat);
+              return _slideUpPage(
+                state.pageKey,
+                CategoryDetailScreen(category: cat),
+              );
             },
           ),
         ],
       ),
       GoRoute(
         path: '/change-email',
-        builder: (context, state) => const ChangeEmailScreen(),
+        pageBuilder: (context, state) => _slideUpPage(
+          state.pageKey,
+          const ChangeEmailScreen(),
+        ),
       ),
       GoRoute(
         path: '/confirm-email-change',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>;
-          return ConfirmEmailChangeScreen(newEmail: extra['new_email'] as String);
+          return _slideUpPage(
+            state.pageKey,
+            ConfirmEmailChangeScreen(newEmail: extra['new_email'] as String),
+          );
         },
       ),
       GoRoute(
         path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const SettingsScreen(),
+        ),
       ),
       GoRoute(
         path: '/password-generator',
-        builder: (context, state) => const PasswordGeneratorScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const PasswordGeneratorScreen(),
+        ),
       ),
       GoRoute(
         path: '/audit-log',
-        builder: (context, state) => const AuditLogScreen(),
+        pageBuilder: (context, state) => _slideUpPage(
+          state.pageKey,
+          const AuditLogScreen(),
+        ),
       ),
       GoRoute(
         path: '/support-ticket',
-        builder: (context, state) => const SupportTicketScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const SupportTicketScreen(),
+        ),
       ),
       GoRoute(
         path: '/lock',
-        builder: (context, state) => const MasterLockScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const MasterLockScreen(),
+        ),
       ),
       GoRoute(
         path: '/trash',
-        builder: (context, state) => const TrashScreen(),
+        pageBuilder: (context, state) => _slideUpPage(
+          state.pageKey,
+          const TrashScreen(),
+        ),
       ),
       GoRoute(
         path: '/search',
-        builder: (context, state) => const SearchScreen(),
+        pageBuilder: (context, state) => _slideUpPage(
+          state.pageKey,
+          const SearchScreen(),
+        ),
       ),
       GoRoute(
         path: '/privacy-policy',
@@ -175,18 +268,26 @@ final router = GoRouter(
       ),
       GoRoute(
         path: '/totp-setup',
-        builder: (context, state) => const TotpSetupScreen(),
+        pageBuilder: (context, state) => _slideUpPage(
+          state.pageKey,
+          const TotpSetupScreen(),
+        ),
       ),
       GoRoute(
         path: '/totp-verify-login',
-        builder: (context, state) => const TotpVerifyLoginScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const TotpVerifyLoginScreen(),
+        ),
       ),
       GoRoute(
         path: '/totp-verify-unlock',
-        builder: (context, state) => const TotpVerifyUnlockScreen(),
+        pageBuilder: (context, state) => _fadePage(
+          state.pageKey,
+          const TotpVerifyUnlockScreen(),
+        ),
       ),
     ],
 );
 
 final routerProvider = Provider<GoRouter>((ref) => router);
-

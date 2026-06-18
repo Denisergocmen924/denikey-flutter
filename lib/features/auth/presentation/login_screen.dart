@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../providers/totp_provider.dart';
+import '../../../core/presentation/app_animations.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -93,6 +95,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 48),
+
+                  // Logo
                   Center(
                     child: Container(
                       width: 120,
@@ -100,12 +104,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFF090C08),
                         borderRadius: BorderRadius.circular(28),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFF5900).withAlpha(60),
+                            blurRadius: 32,
+                            spreadRadius: 0,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                       ),
                       padding: const EdgeInsets.all(16),
                       child: Image.asset('assets/icon/denikey_emblem.png'),
                     ),
+                  )
+                  .animate()
+                  .fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth)
+                  .scale(
+                    begin: const Offset(0.80, 0.80),
+                    curve: AppAnim.spring,
+                    duration: AppAnim.slow,
                   ),
+
                   const SizedBox(height: 20),
+
+                  // Başlık
                   Text(
                     'DeniKey',
                     textAlign: TextAlign.center,
@@ -115,15 +137,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       color: cs.onSurface,
                       letterSpacing: -0.5,
                     ),
-                  ),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(1))
+                  .fadeIn(duration: AppAnim.normal)
+                  .slideY(begin: 0.25, curve: AppAnim.smooth),
+
                   const SizedBox(height: 6),
+
+                  // Alt başlık
                   Text(
                     l10n.loginTagline,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14,
-                      color: cs.onSurfaceVariant),
-                  ),
+                    style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(2))
+                  .fadeIn(duration: AppAnim.normal),
+
                   const SizedBox(height: 48),
+
+                  // Kullanıcı adı
                   TextFormField(
                     controller: _usernameCtrl,
                     decoration: InputDecoration(
@@ -135,8 +167,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       if (v.length < 3) return l10n.loginUsernameMinError;
                       return null;
                     },
-                  ),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(3))
+                  .fadeIn(duration: AppAnim.normal)
+                  .slideY(begin: 0.2, curve: AppAnim.smooth),
+
                   const SizedBox(height: 14),
+
+                  // Şifre
                   TextFormField(
                     controller: _passwordCtrl,
                     obscureText: _obscure,
@@ -155,8 +193,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       if (v.length < 6) return l10n.loginPasswordMinError;
                       return null;
                     },
-                  ),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(4))
+                  .fadeIn(duration: AppAnim.normal)
+                  .slideY(begin: 0.2, curve: AppAnim.smooth),
+
                   const SizedBox(height: 28),
+
+                  // Giriş butonu
                   FilledButton(
                     onPressed: isLoading ? null : _submit,
                     child: isLoading
@@ -164,8 +208,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.white))
                         : Text(l10n.loginSubmitButton),
-                  ),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(5))
+                  .fadeIn(duration: AppAnim.normal)
+                  .slideY(begin: 0.15, curve: AppAnim.smooth),
+
                   const SizedBox(height: 20),
+
+                  // Kayıt ol satırı
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -179,7 +229,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         child: Text(l10n.loginRegisterButton),
                       ),
                     ],
-                  ),
+                  )
+                  .animate(delay: AppAnim.entranceDelay(6))
+                  .fadeIn(duration: AppAnim.normal),
+
                   const SizedBox(height: 16),
                 ],
               ),
