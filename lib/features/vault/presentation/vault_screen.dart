@@ -174,6 +174,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     }
   }
 
+  // Öğe tipine göre duotone aksan rengi — ikon kümelerini ayırt eder
+  Color _accentForType(String? type) {
+    switch (type) {
+      case 'login':    return const Color(0xFFFF5900); // blaze
+      case 'card':     return const Color(0xFF24C9B5); // teal
+      case 'identity': return const Color(0xFF8B7CF6); // violet
+      case 'note':     return const Color(0xFFFFB020); // amber
+      default:         return const Color(0xFFFF5900);
+    }
+  }
+
   Color _parseColor(String? hex) {
     if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
     try {
@@ -201,6 +212,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     final state = ref.watch(vaultProvider);
     final catState = ref.watch(categoryProvider);
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final filtered = _filteredItems(state.items);
     final allSelectedFav = _selectedIds.isNotEmpty &&
         _selectedIds.every((id) {
@@ -297,7 +309,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                         style: TextStyle(color: cs.onSurfaceVariant)),
                     ],
                   ),
-                ).animate().fadeIn(duration: const Duration(milliseconds: 300));
+                ).animate().fadeIn(duration: const Duration(milliseconds: 200));
               }
               if (state.status == VaultStatus.error) {
                 return AppErrorWidget(
@@ -325,14 +337,14 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                       Text(l10n.vaultEmpty,
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600,
                           color: cs.onSurface))
-                      .animate(delay: const Duration(milliseconds: 200))
-                      .fadeIn(duration: const Duration(milliseconds: 400))
+                      .animate(delay: const Duration(milliseconds: 150))
+                      .fadeIn(duration: const Duration(milliseconds: 260))
                       .slideY(begin: 0.3, curve: Curves.easeOut),
                       const SizedBox(height: 8),
                       Text(l10n.vaultEmptyHint,
                         style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant))
-                      .animate(delay: const Duration(milliseconds: 350))
-                      .fadeIn(duration: const Duration(milliseconds: 400)),
+                      .animate(delay: const Duration(milliseconds: 250))
+                      .fadeIn(duration: const Duration(milliseconds: 260)),
                     ],
                   ),
                 );
@@ -345,13 +357,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                       Icon(Icons.folder_open_outlined, size: 64,
                         color: cs.onSurfaceVariant.withAlpha(80))
                       .animate()
-                      .fadeIn(duration: const Duration(milliseconds: 400))
+                      .fadeIn(duration: const Duration(milliseconds: 260))
                       .scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack),
                       const SizedBox(height: 16),
                       Text(l10n.vaultCategoryEmpty,
                         style: TextStyle(fontSize: 16, color: cs.onSurfaceVariant))
-                      .animate(delay: const Duration(milliseconds: 150))
-                      .fadeIn(duration: const Duration(milliseconds: 350)),
+                      .animate(delay: const Duration(milliseconds: 100))
+                      .fadeIn(duration: const Duration(milliseconds: 240)),
                     ],
                   ),
                 );
@@ -382,7 +394,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                 color: Colors.amber.shade700)),
                           ],
                         ),
-                      ).animate().fadeIn(duration: const Duration(milliseconds: 280));
+                      ).animate().fadeIn(duration: const Duration(milliseconds: 200));
                     }
 
                     // Diğerleri ayracı
@@ -402,8 +414,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                             Expanded(child: Divider(color: cs.outlineVariant, height: 1)),
                           ],
                         ),
-                      ).animate(delay: Duration(milliseconds: index.clamp(0, 10) * 50))
-                        .fadeIn(duration: const Duration(milliseconds: 280));
+                      ).animate(delay: Duration(milliseconds: index.clamp(0, 8) * 35))
+                        .fadeIn(duration: const Duration(milliseconds: 200));
                     }
 
                     final itemIndex = hasFavorites
@@ -414,73 +426,98 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     final itemId = item['id']?.toString() ?? '';
                     final isSelected = _selectedIds.contains(itemId);
 
-                    // Her öğe için kademeli gecikme (ilk 10 öğe, sonrası sabit)
+                    // Her öğe için kademeli gecikme (ilk 8 öğe, sonrası sabit)
                     final staggerDelay = Duration(
-                      milliseconds: index.clamp(0, 10) * 50,
+                      milliseconds: index.clamp(0, 8) * 35,
                     );
 
+                    final accent = _accentForType(item['item_type'] as String?);
+
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 10),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 180),
+                        curve: Curves.easeOut,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: isSelected
-                              ? Border.all(color: cs.primary, width: 2)
-                              : Border.all(color: cs.outlineVariant),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: isSelected ? cs.primary : cs.outlineVariant,
+                            width: isSelected ? 2 : 1,
+                          ),
                           color: isSelected
-                              ? cs.primaryContainer.withAlpha(60)
-                              : cs.surface,
+                              ? cs.primaryContainer.withAlpha(50)
+                              : cs.surfaceContainer,
+                          boxShadow: isSelected
+                              ? null
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(isDark ? 45 : 12),
+                                    blurRadius: 8,
+                                    spreadRadius: -2,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                         ),
                         child: Material(
                           color: Colors.transparent,
                           child: ListTile(
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(18)),
                           contentPadding: const EdgeInsets.only(
-                            left: 12, right: 4, top: 6, bottom: 6),
+                            left: 12, right: 4, top: 8, bottom: 8),
                           leading: _selectionMode
                               ? AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 180),
                                   child: isSelected
                                       ? Container(
                                           key: const ValueKey('checked'),
-                                          width: 44, height: 44,
+                                          width: 46, height: 46,
                                           decoration: BoxDecoration(
                                             color: cs.primary,
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(13),
                                           ),
                                           child: const Icon(Icons.check,
                                             color: Colors.white, size: 22),
                                         )
                                       : Container(
                                           key: const ValueKey('unchecked'),
-                                          width: 44, height: 44,
+                                          width: 46, height: 46,
                                           decoration: BoxDecoration(
                                             color: cs.surfaceContainerHigh,
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(13),
                                             border: Border.all(
                                               color: cs.outlineVariant, width: 2),
                                           ),
                                         ),
                                 )
                               : Container(
-                                  width: 44, height: 44,
+                                  width: 46, height: 46,
                                   decoration: BoxDecoration(
-                                    color: cs.primaryContainer,
-                                    borderRadius: BorderRadius.circular(8),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        accent.withAlpha(55),
+                                        accent.withAlpha(22),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(13),
+                                    border: Border.all(color: accent.withAlpha(60)),
                                   ),
                                   child: Icon(_iconForType(item['item_type']),
-                                    color: cs.onPrimaryContainer, size: 22),
+                                    color: accent, size: 22),
                                 ),
                           title: Text(item['title'] ?? l10n.vaultItemUntitled,
                             style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 15)),
+                              fontWeight: FontWeight.w600, fontSize: 15.5)),
                           subtitle: item['username'] != null || item['url'] != null
-                              ? Text(
-                                  item['username'] ?? item['url'] ?? '',
-                                  style: TextStyle(
-                                    color: cs.onSurfaceVariant, fontSize: 13),
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: Text(
+                                    item['username'] ?? item['url'] ?? '',
+                                    style: TextStyle(
+                                      color: cs.onSurfaceVariant, fontSize: 13),
+                                  ),
                                 )
                               : null,
                           trailing: _selectionMode
@@ -504,7 +541,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                           .toggleFavorite(itemId, !isFavorite),
                                     ),
                                     Icon(Icons.chevron_right,
-                                      color: cs.onSurfaceVariant),
+                                      color: cs.onSurfaceVariant.withAlpha(120)),
                                     const SizedBox(width: 4),
                                   ],
                                 ),
@@ -522,7 +559,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                       ),
                     )
                     .animate(delay: staggerDelay)
-                    .fadeIn(duration: const Duration(milliseconds: 320), curve: Curves.easeOut)
+                    .fadeIn(duration: const Duration(milliseconds: 220), curve: Curves.easeOut)
                     .slideY(begin: 0.10, curve: Curves.easeOut);
                   },
                 ),
@@ -587,9 +624,9 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           .scale(
             begin: const Offset(0.5, 0.5),
             curve: Curves.easeOutBack,
-            duration: const Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 320),
           )
-          .fadeIn(duration: const Duration(milliseconds: 300)),
+          .fadeIn(duration: const Duration(milliseconds: 220)),
     );
   }
 }

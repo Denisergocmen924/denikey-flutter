@@ -39,8 +39,8 @@ const _publicPaths = {
 Page<void> _fadePage(LocalKey key, Widget child) => CustomTransitionPage(
   key: key,
   child: child,
-  transitionDuration: const Duration(milliseconds: 300),
-  reverseTransitionDuration: const Duration(milliseconds: 250),
+  transitionDuration: const Duration(milliseconds: 220),
+  reverseTransitionDuration: const Duration(milliseconds: 180),
   transitionsBuilder: (context, animation, secondaryAnimation, child) {
     final fade = CurvedAnimation(parent: animation, curve: Curves.easeOut);
     final slide = Tween<Offset>(
@@ -58,8 +58,8 @@ Page<void> _fadePage(LocalKey key, Widget child) => CustomTransitionPage(
 Page<void> _slideUpPage(LocalKey key, Widget child) => CustomTransitionPage(
   key: key,
   child: child,
-  transitionDuration: const Duration(milliseconds: 380),
-  reverseTransitionDuration: const Duration(milliseconds: 300),
+  transitionDuration: const Duration(milliseconds: 280),
+  reverseTransitionDuration: const Duration(milliseconds: 220),
   transitionsBuilder: (context, animation, secondaryAnimation, child) {
     final slide = Tween<Offset>(
       begin: const Offset(0, 1),

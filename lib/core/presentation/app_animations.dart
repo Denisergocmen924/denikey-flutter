@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppAnim {
   // Süreler
-  static const Duration fast   = Duration(milliseconds: 240);
-  static const Duration normal = Duration(milliseconds: 380);
-  static const Duration slow   = Duration(milliseconds: 540);
-  static const Duration stagger = Duration(milliseconds: 55);
+  static const Duration fast   = Duration(milliseconds: 180);
+  static const Duration normal = Duration(milliseconds: 260);
+  static const Duration slow   = Duration(milliseconds: 380);
+  static const Duration stagger = Duration(milliseconds: 40);
 
   // Eğriler
   static const Curve smooth  = Curves.easeOut;
@@ -14,5 +14,5 @@ class AppAnim {
 
   // Giriş animasyonu gecikmeleri (ekran öğeleri için)
   static Duration entranceDelay(int index) =>
-      Duration(milliseconds: index * 110);
+      Duration(milliseconds: index * 75);
 }

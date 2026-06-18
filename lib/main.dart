@@ -97,6 +97,8 @@ void main() async {
 const _onyxBlack  = Color(0xFF090C08);
 const _jetBlack   = Color(0xFF223841);
 const _blazeOrange = Color(0xFFFF5900);
+// Turuncuya karşıt soğuk vurgu — duotone glow ve ikincil aksanlar için
+const _emberTeal  = Color(0xFF24C9B5);
 
 ThemeData _buildTheme(Brightness brightness) {
   final seed = ColorScheme.fromSeed(
@@ -104,95 +106,234 @@ ThemeData _buildTheme(Brightness brightness) {
     brightness: brightness,
   );
 
+  final bool isDark = brightness == Brightness.dark;
+
   final ColorScheme cs;
-  if (brightness == Brightness.dark) {
+  if (isDark) {
     cs = seed.copyWith(
       surface:                   _onyxBlack,
       surfaceContainerLowest:    const Color(0xFF050705),
-      surfaceContainerLow:       const Color(0xFF111410),
-      surfaceContainer:          const Color(0xFF181C1A),
-      surfaceContainerHigh:      const Color(0xFF1E2830),
+      surfaceContainerLow:       const Color(0xFF101512),
+      surfaceContainer:          const Color(0xFF161D1A),
+      surfaceContainerHigh:      const Color(0xFF1D2A2C),
       surfaceContainerHighest:   _jetBlack,
-      onSurface:                 const Color(0xFFE8EDE9),
-      onSurfaceVariant:          const Color(0xFF9BABA4),
-      outline:                   const Color(0xFF455550),
-      outlineVariant:            const Color(0xFF2A3530),
+      onSurface:                 const Color(0xFFEDF2EE),
+      onSurfaceVariant:          const Color(0xFF9DAEA7),
+      outline:                   const Color(0xFF3C4B47),
+      outlineVariant:            const Color(0xFF27322E),
       primary:                   _blazeOrange,
       onPrimary:                 Colors.white,
       primaryContainer:          const Color(0xFF6B2800),
       onPrimaryContainer:        const Color(0xFFFFDBCC),
-      secondary:                 _jetBlack,
-      onSecondary:               const Color(0xFFE8EDE9),
-      secondaryContainer:        const Color(0xFF2E4550),
-      onSecondaryContainer:      const Color(0xFFD0E4EC),
+      secondary:                 _emberTeal,
+      onSecondary:               const Color(0xFF00201C),
+      secondaryContainer:        const Color(0xFF1F3A3C),
+      onSecondaryContainer:      const Color(0xFFB6F0E6),
+      tertiary:                  const Color(0xFFFFB59C),
       error:                     const Color(0xFFFF6B4A),
       onError:                   Colors.white,
     );
   } else {
     cs = seed.copyWith(
-      surface:     const Color(0xFFF5F5F2),
-      onSurface:   _onyxBlack,
-      primary:     _blazeOrange,
-      onPrimary:   Colors.white,
-      primaryContainer: const Color(0xFFFFDDD0),
-      onPrimaryContainer: const Color(0xFF4A1800),
+      surface:                   const Color(0xFFF7F6F3),
+      surfaceContainerLowest:    Colors.white,
+      surfaceContainerLow:       const Color(0xFFFFFFFF),
+      surfaceContainer:          const Color(0xFFF1F0EC),
+      surfaceContainerHigh:      const Color(0xFFEAE9E4),
+      surfaceContainerHighest:   const Color(0xFFE4E3DD),
+      onSurface:                 _onyxBlack,
+      onSurfaceVariant:          const Color(0xFF5A645F),
+      outline:                   const Color(0xFFC3C8C3),
+      outlineVariant:            const Color(0xFFDEE2DD),
+      primary:                   _blazeOrange,
+      onPrimary:                 Colors.white,
+      primaryContainer:          const Color(0xFFFFDDD0),
+      onPrimaryContainer:        const Color(0xFF4A1800),
+      secondary:                 const Color(0xFF0E8377),
+      secondaryContainer:        const Color(0xFFB6F0E6),
+      onSecondaryContainer:      const Color(0xFF00201C),
     );
   }
+
+  // Tipografi hiyerarşisi — başlıklarda sıkı harf aralığı, gövdede ferah
+  final base = ThemeData(brightness: brightness);
+  final textTheme = base.textTheme.apply(
+    bodyColor: cs.onSurface,
+    displayColor: cs.onSurface,
+  ).copyWith(
+    displaySmall: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1.0, color: cs.onSurface),
+    headlineMedium: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.6, color: cs.onSurface),
+    headlineSmall: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, letterSpacing: -0.4, color: cs.onSurface),
+    titleLarge: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, letterSpacing: -0.2, color: cs.onSurface),
+    titleMedium: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: cs.onSurface),
+    bodyLarge: TextStyle(fontSize: 15.5, height: 1.45, color: cs.onSurface),
+    bodyMedium: TextStyle(fontSize: 14, height: 1.45, color: cs.onSurface),
+    labelLarge: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 0.1),
+  );
 
   return ThemeData(
     colorScheme: cs,
     useMaterial3: true,
+    textTheme: textTheme,
     scaffoldBackgroundColor: cs.surface,
+    // InkRipple: shader derleme takılması yok, InkSparkle'dan hafif
+    splashFactory: InkRipple.splashFactory,
     cardTheme: CardThemeData(
       elevation: 0,
+      color: cs.surfaceContainer,
+      shadowColor: Colors.black.withAlpha(isDark ? 120 : 40),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(18),
         side: BorderSide(color: cs.outlineVariant),
       ),
       margin: EdgeInsets.zero,
     ),
     filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
+      style: ButtonStyle(
+        minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 54)),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        ),
+        textStyle: const WidgetStatePropertyAll(
+          TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.2),
+        ),
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return _blazeOrange.withAlpha(90);
+          }
+          return _blazeOrange;
+        }),
+        foregroundColor: const WidgetStatePropertyAll(Colors.white),
+        overlayColor: WidgetStatePropertyAll(Colors.white.withAlpha(30)),
+        elevation: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed)) return 0;
+          return isDark ? 0 : 2;
+        }),
+        shadowColor: WidgetStatePropertyAll(_blazeOrange.withAlpha(110)),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 52),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        backgroundColor: _blazeOrange,
-        foregroundColor: Colors.white,
+        foregroundColor: cs.onSurface,
+        side: BorderSide(color: cs.outline),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: _blazeOrange,
+        textStyle: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      filled: true,
+      fillColor: isDark ? cs.surfaceContainer : Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      prefixIconColor: WidgetStateColor.resolveWith((states) =>
+          states.contains(WidgetState.focused) ? _blazeOrange : cs.onSurfaceVariant),
+      floatingLabelStyle: WidgetStateTextStyle.resolveWith((states) => TextStyle(
+        color: states.contains(WidgetState.error)
+            ? cs.error
+            : states.contains(WidgetState.focused) ? _blazeOrange : cs.onSurfaceVariant,
+        fontWeight: FontWeight.w600,
+      )),
+      labelStyle: TextStyle(color: cs.onSurfaceVariant),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: cs.outlineVariant),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: cs.outlineVariant),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: _blazeOrange, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: cs.error, width: 1.5),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: cs.error, width: 2),
+      ),
     ),
     appBarTheme: AppBarTheme(
       centerTitle: false,
       elevation: 0,
-      scrolledUnderElevation: 1,
+      scrolledUnderElevation: 0,
       backgroundColor: cs.surface,
+      surfaceTintColor: Colors.transparent,
       foregroundColor: cs.onSurface,
       titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+        fontSize: 22,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -0.4,
         color: cs.onSurface,
       ),
     ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: cs.surfaceContainer,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      titleTextStyle: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: cs.onSurface),
+      contentTextStyle: TextStyle(fontSize: 14.5, height: 1.45, color: cs.onSurfaceVariant),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: cs.surfaceContainer,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+    ),
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: isDark ? const Color(0xFF1D2A2C) : _jetBlack,
+      contentTextStyle: const TextStyle(color: Color(0xFFEDF2EE), fontSize: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      insetPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: cs.surfaceContainerHigh,
+      side: BorderSide(color: cs.outlineVariant),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: cs.onSurface),
+    ),
+    dividerTheme: DividerThemeData(color: cs.outlineVariant, thickness: 1, space: 1),
+    listTileTheme: ListTileThemeData(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      iconColor: cs.onSurfaceVariant,
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: _blazeOrange,
+      foregroundColor: Colors.white,
+      elevation: 4,
+      highlightElevation: 2,
+      extendedTextStyle: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+    ),
     navigationBarTheme: NavigationBarThemeData(
-      height: 64,
-      backgroundColor: brightness == Brightness.dark
-          ? _jetBlack
-          : cs.surfaceContainerHighest,
+      height: 68,
+      elevation: 0,
+      backgroundColor: isDark ? const Color(0xFF11181A) : cs.surfaceContainerLowest,
+      surfaceTintColor: Colors.transparent,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-      indicatorColor: _blazeOrange.withAlpha(40),
+      indicatorColor: _blazeOrange.withAlpha(38),
+      indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return const IconThemeData(color: _blazeOrange);
+          return const IconThemeData(color: _blazeOrange, size: 26);
         }
-        return IconThemeData(color: cs.onSurfaceVariant);
+        return IconThemeData(color: cs.onSurfaceVariant, size: 24);
       }),
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           return const TextStyle(
-            color: _blazeOrange, fontSize: 12, fontWeight: FontWeight.w600);
+            color: _blazeOrange, fontSize: 12, fontWeight: FontWeight.w700);
         }
         return TextStyle(color: cs.onSurfaceVariant, fontSize: 12);
       }),
