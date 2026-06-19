@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../data/auth_repository.dart';
 import '../providers/profile_provider.dart';
 import '../../../core/storage/secure_storage.dart';
@@ -15,6 +16,7 @@ import '../../../core/providers/locale_provider.dart';
 import '../../../core/biometric/biometric_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
 import '../../../core/presentation/app_shortcuts.dart';
+import '../../../core/presentation/app_animations.dart';
 import '../../devices/data/device_repository.dart';
 import '../../devices/providers/device_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
@@ -28,6 +30,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 const _kTotpTrustOptions = [0, 43200, 86400, 604800, 2592000, 5184000];
+const _danger = Color(0xFFFF5247);
 
 String _totpTrustLabel(AppLocalizations l10n, int seconds) {
   switch (seconds) {
@@ -394,6 +397,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final profile = ref.watch(profileProvider);
     final displayName = profile.username ?? _email ?? '';
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentLocale = ref.watch(localeProvider);
 
     return Scaffold(
@@ -401,26 +405,52 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       bottomNavigationBar: const AppNavBar(currentIndex: 4),
       body: ListView(
         children: [
-          // Kullanıcı bilgisi
+          // Kullanıcı bilgisi — premium başlık kartı
           Container(
             margin: const EdgeInsets.fromLTRB(16, 20, 16, 4),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: cs.primaryContainer.withAlpha(60),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: cs.outlineVariant),
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [const Color(0xFF1B2420), const Color(0xFF11160F)]
+                    : [Colors.white, const Color(0xFFF3F2EE)],
+              ),
+              border: Border.all(color: const Color(0xFFFF5900).withAlpha(55)),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFF5900).withAlpha(isDark ? 42 : 26),
+                  blurRadius: 28,
+                  spreadRadius: -10,
+                  offset: const Offset(0, 12),
+                ),
+              ],
             ),
             child: Row(
               children: [
+                // Gradyan dolgulu, ışıltılı avatar
                 Container(
-                  width: 56,
-                  height: 56,
+                  width: 58,
+                  height: 58,
                   decoration: BoxDecoration(
-                    color: cs.primaryContainer,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFFF7A33), Color(0xFFFF5900)],
+                    ),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF5900).withAlpha(95),
+                        blurRadius: 18,
+                        spreadRadius: -4,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
-                  child: Icon(Icons.person_outline, size: 28,
-                    color: cs.onPrimaryContainer),
+                  child: const Icon(Icons.person, size: 30, color: Colors.white),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -430,26 +460,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Text(
                         displayName,
                         style: const TextStyle(
-                          fontSize: 17, fontWeight: FontWeight.bold),
+                          fontSize: 18, fontWeight: FontWeight.w800,
+                          letterSpacing: -0.3),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (profile.email != null)
+                      if (profile.email != null) ...[
+                        const SizedBox(height: 2),
                         Text(
                           profile.email!,
                           style: TextStyle(fontSize: 13,
                             color: cs.onSurfaceVariant),
                           overflow: TextOverflow.ellipsis,
                         ),
+                      ],
+                      const SizedBox(height: 9),
+                      // Zero-knowledge güven rozeti
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF24C9B5).withAlpha(28),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFF24C9B5).withAlpha(80)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.shield_outlined,
+                              size: 12, color: Color(0xFF24C9B5)),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                l10n.settingsHelpZeroKnowledge,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 10.5, fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.3, color: Color(0xFF24C9B5)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
+          )
+          .animate()
+          .fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth)
+          .slideY(begin: 0.15, curve: AppAnim.smooth),
 
           _sectionHeader(l10n.settingsAccountSection),
           ListTile(
-            leading: const Icon(Icons.person_outline),
+            leading: const _LeadingIcon(Icons.person_outline),
             title: Text(l10n.settingsUsernameChange),
             subtitle: profile.username != null
                 ? Text(profile.username!, style: const TextStyle(fontSize: 12))
@@ -458,13 +521,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onTap: _showUsernameDialog,
           ),
           ListTile(
-            leading: const Icon(Icons.email_outlined),
+            leading: const _LeadingIcon(Icons.email_outlined),
             title: Text(l10n.settingsEmailChange),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/change-email'),
           ),
           ListTile(
-            leading: const Icon(Icons.devices_outlined),
+            leading: const _LeadingIcon(Icons.devices_outlined),
             title: Text(l10n.settingsMyDevices),
             trailing: const Icon(Icons.chevron_right),
             onTap: _showDevicesSheet,
@@ -474,25 +537,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           _sectionHeader(l10n.settingsAppSection),
           ListTile(
-            leading: const Icon(Icons.password_outlined),
+            leading: const _LeadingIcon(Icons.password_outlined, color: Color(0xFF24C9B5)),
             title: Text(l10n.settingsPasswordGenerator),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/password-generator'),
           ),
           ListTile(
-            leading: const Icon(Icons.history_outlined),
+            leading: const _LeadingIcon(Icons.history_outlined, color: Color(0xFF24C9B5)),
             title: Text(l10n.settingsAuditLog),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/audit-log'),
           ),
           ListTile(
-            leading: const Icon(Icons.support_agent_outlined),
+            leading: const _LeadingIcon(Icons.support_agent_outlined, color: Color(0xFF24C9B5)),
             title: Text(l10n.settingsSupportTicket),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/support-ticket'),
           ),
           ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined),
+            leading: const _LeadingIcon(Icons.privacy_tip_outlined, color: Color(0xFF24C9B5)),
             title: Text(l10n.settingsPrivacyPolicy),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/privacy-policy'),
@@ -500,7 +563,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           // Dil seçici
           ListTile(
-            leading: const Icon(Icons.language_outlined),
+            leading: const _LeadingIcon(Icons.language_outlined, color: Color(0xFF24C9B5)),
             title: Text(l10n.settingsLanguage),
             subtitle: Text(
               localeDisplayNames[currentLocale.languageCode] ?? currentLocale.languageCode,
@@ -770,16 +833,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           _sectionHeader(l10n.settingsHowToUse),
           ListTile(
-            leading: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: const Color(0xFFFF5900).withAlpha(25),
-              ),
-              child: const Icon(Icons.play_circle_outline_rounded,
-                  color: Color(0xFFFF5900), size: 20),
-            ),
+            leading: const _LeadingIcon(Icons.play_circle_outline_rounded),
             title: Text(l10n.settingsDiscoverApp,
                 style: const TextStyle(fontWeight: FontWeight.w600)),
             subtitle: Text(l10n.settingsDiscoverAppDescription),
@@ -818,22 +872,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: _loggingOut
                 ? const SizedBox(
-                    width: 24, height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.logout, color: Colors.red),
-            title: Text(l10n.settingsLogout, style: const TextStyle(color: Colors.red)),
+                    width: 38, height: 38,
+                    child: Center(
+                      child: SizedBox(width: 22, height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: _danger))))
+                : const _LeadingIcon(Icons.logout, color: _danger),
+            title: Text(l10n.settingsLogout,
+                style: const TextStyle(color: _danger, fontWeight: FontWeight.w600)),
             onTap: _loggingOut ? null : _logout,
           ),
           ListTile(
             leading: _deletingAccount
                 ? const SizedBox(
-                    width: 24, height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red))
-                : const Icon(Icons.delete_forever, color: Colors.red),
+                    width: 38, height: 38,
+                    child: Center(
+                      child: SizedBox(width: 22, height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: _danger))))
+                : const _LeadingIcon(Icons.delete_forever, color: _danger),
             title: Text(l10n.settingsDeleteAccount,
-                style: const TextStyle(color: Colors.red)),
+                style: const TextStyle(color: _danger, fontWeight: FontWeight.w600)),
             subtitle: Text(l10n.settingsDeleteAccountWarning,
-                style: const TextStyle(fontSize: 12, color: Colors.red)),
+                style: TextStyle(fontSize: 12, color: _danger.withAlpha(200))),
             onTap: _deletingAccount ? null : _startDeleteAccountFlow,
           ),
 
@@ -1017,6 +1076,31 @@ class _HelpTileState extends State<_HelpTile> {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Navigasyon satırları için duotone (gradyan dolgulu) leading ikon kümesi.
+class _LeadingIcon extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  const _LeadingIcon(this.icon, {this.color = const Color(0xFFFF5900)});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [color.withAlpha(55), color.withAlpha(20)],
+        ),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: color.withAlpha(55)),
+      ),
+      child: Icon(icon, color: color, size: 20),
     );
   }
 }

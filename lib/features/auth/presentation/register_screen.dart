@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../providers/auth_provider.dart';
+import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/aurora_background.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -100,137 +103,232 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final isLoading = state.status == AuthStatus.loading;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(l10n.registerAppBarTitle),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/login'),
         ),
       ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 24),
-                  Icon(Icons.shield_outlined, size: 52,
-                    color: cs.primary),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n.registerHeading,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: cs.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.registerSubheading,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13,
-                      color: cs.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 36),
-                  TextFormField(
-                    controller: _usernameCtrl,
-                    decoration: InputDecoration(
-                      labelText: l10n.registerUsernameLabel,
-                      prefixIcon: const Icon(Icons.person_outline),
-                    ),
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return l10n.registerUsernameError;
-                      if (v.trim().length < 3) return l10n.registerUsernameMinError;
-                      if (v.trim().length > 50) return l10n.registerUsernameMaxError;
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: _emailCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: l10n.registerEmailLabel,
-                      prefixIcon: const Icon(Icons.email_outlined),
-                    ),
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return l10n.registerEmailError;
-                      if (!v.contains('@')) return l10n.registerEmailFormatError;
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: _passwordCtrl,
-                    obscureText: _obscure,
-                    decoration: InputDecoration(
-                      labelText: l10n.registerPasswordLabel,
-                      prefixIcon: const Icon(Icons.key_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscure
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined),
-                        onPressed: () => setState(() => _obscure = !_obscure),
-                      ),
-                    ),
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return l10n.registerPasswordError;
-                      if (v.length < 10) return l10n.registerPasswordMinError;
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 14),
-                  TextFormField(
-                    controller: _confirmCtrl,
-                    obscureText: _obscure,
-                    decoration: InputDecoration(
-                      labelText: l10n.registerConfirmLabel,
-                      prefixIcon: const Icon(Icons.key_outlined),
-                    ),
-                    validator: (v) {
-                      if (v != _passwordCtrl.text) return l10n.registerConfirmError;
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 14),
-                  GestureDetector(
-                    onTap: _pickBirthDate,
-                    child: InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: l10n.registerBirthdateLabel,
-                        prefixIcon: const Icon(Icons.cake_outlined),
-                      ),
-                      child: Text(
-                        _birthDate == null
-                            ? l10n.registerBirthdateSelect
-                            : '${_birthDate!.day.toString().padLeft(2, '0')}.'
-                              '${_birthDate!.month.toString().padLeft(2, '0')}.'
-                              '${_birthDate!.year}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: _birthDate == null
-                              ? Theme.of(context).colorScheme.onSurfaceVariant
-                              : Theme.of(context).colorScheme.onSurface,
+      body: AuroraBackground(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Kalkan rozeti — turuncu halka ışıltısı
+                      Center(
+                        child: Container(
+                          width: 92,
+                          height: 92,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFF161D1A), Color(0xFF090C08)],
+                            ),
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(
+                              color: const Color(0xFFFF5900).withAlpha(70),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFF5900).withAlpha(85),
+                                blurRadius: 40,
+                                spreadRadius: -6,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(Icons.shield_outlined,
+                            size: 44, color: Color(0xFFFF5900)),
                         ),
+                      )
+                      .animate()
+                      .fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth)
+                      .scale(
+                        begin: const Offset(0.80, 0.80),
+                        curve: AppAnim.spring,
+                        duration: AppAnim.slow,
                       ),
-                    ),
+
+                      const SizedBox(height: 20),
+
+                      // Başlık
+                      Text(
+                        l10n.registerHeading,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.6,
+                          color: cs.onSurface,
+                        ),
+                      )
+                      .animate(delay: AppAnim.entranceDelay(1))
+                      .fadeIn(duration: AppAnim.normal)
+                      .slideY(begin: 0.25, curve: AppAnim.smooth),
+
+                      const SizedBox(height: 6),
+
+                      // Alt başlık
+                      Text(
+                        l10n.registerSubheading,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
+                      )
+                      .animate(delay: AppAnim.entranceDelay(2))
+                      .fadeIn(duration: AppAnim.normal),
+
+                      const SizedBox(height: 28),
+
+                      // Form — buzlu cam kart
+                      GlassCard(
+                        padding: const EdgeInsets.fromLTRB(22, 26, 22, 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            TextFormField(
+                              controller: _usernameCtrl,
+                              decoration: InputDecoration(
+                                labelText: l10n.registerUsernameLabel,
+                                prefixIcon: const Icon(Icons.person_outline),
+                              ),
+                              validator: (v) {
+                                if (v == null || v.isEmpty) return l10n.registerUsernameError;
+                                if (v.trim().length < 3) return l10n.registerUsernameMinError;
+                                if (v.trim().length > 50) return l10n.registerUsernameMaxError;
+                                return null;
+                              },
+                            )
+                            .animate(delay: AppAnim.entranceDelay(3))
+                            .fadeIn(duration: AppAnim.normal)
+                            .slideY(begin: 0.2, curve: AppAnim.smooth),
+
+                            const SizedBox(height: 14),
+
+                            TextFormField(
+                              controller: _emailCtrl,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                labelText: l10n.registerEmailLabel,
+                                prefixIcon: const Icon(Icons.email_outlined),
+                              ),
+                              validator: (v) {
+                                if (v == null || v.isEmpty) return l10n.registerEmailError;
+                                if (!v.contains('@')) return l10n.registerEmailFormatError;
+                                return null;
+                              },
+                            )
+                            .animate(delay: AppAnim.entranceDelay(4))
+                            .fadeIn(duration: AppAnim.normal)
+                            .slideY(begin: 0.2, curve: AppAnim.smooth),
+
+                            const SizedBox(height: 14),
+
+                            TextFormField(
+                              controller: _passwordCtrl,
+                              obscureText: _obscure,
+                              decoration: InputDecoration(
+                                labelText: l10n.registerPasswordLabel,
+                                prefixIcon: const Icon(Icons.key_outlined),
+                                suffixIcon: IconButton(
+                                  icon: Icon(_obscure
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                                  onPressed: () => setState(() => _obscure = !_obscure),
+                                ),
+                              ),
+                              validator: (v) {
+                                if (v == null || v.isEmpty) return l10n.registerPasswordError;
+                                if (v.length < 10) return l10n.registerPasswordMinError;
+                                return null;
+                              },
+                            )
+                            .animate(delay: AppAnim.entranceDelay(5))
+                            .fadeIn(duration: AppAnim.normal)
+                            .slideY(begin: 0.2, curve: AppAnim.smooth),
+
+                            const SizedBox(height: 14),
+
+                            TextFormField(
+                              controller: _confirmCtrl,
+                              obscureText: _obscure,
+                              decoration: InputDecoration(
+                                labelText: l10n.registerConfirmLabel,
+                                prefixIcon: const Icon(Icons.key_outlined),
+                              ),
+                              validator: (v) {
+                                if (v != _passwordCtrl.text) return l10n.registerConfirmError;
+                                return null;
+                              },
+                            )
+                            .animate(delay: AppAnim.entranceDelay(6))
+                            .fadeIn(duration: AppAnim.normal)
+                            .slideY(begin: 0.2, curve: AppAnim.smooth),
+
+                            const SizedBox(height: 14),
+
+                            GestureDetector(
+                              onTap: _pickBirthDate,
+                              child: InputDecorator(
+                                decoration: InputDecoration(
+                                  labelText: l10n.registerBirthdateLabel,
+                                  prefixIcon: const Icon(Icons.cake_outlined),
+                                ),
+                                child: Text(
+                                  _birthDate == null
+                                      ? l10n.registerBirthdateSelect
+                                      : '${_birthDate!.day.toString().padLeft(2, '0')}.'
+                                        '${_birthDate!.month.toString().padLeft(2, '0')}.'
+                                        '${_birthDate!.year}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: _birthDate == null
+                                        ? cs.onSurfaceVariant
+                                        : cs.onSurface,
+                                  ),
+                                ),
+                              ),
+                            )
+                            .animate(delay: AppAnim.entranceDelay(7))
+                            .fadeIn(duration: AppAnim.normal)
+                            .slideY(begin: 0.2, curve: AppAnim.smooth),
+
+                            const SizedBox(height: 26),
+
+                            FilledButton(
+                              onPressed: isLoading ? null : _submit,
+                              child: isLoading
+                                  ? const SizedBox(height: 22, width: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white))
+                                  : Text(l10n.registerSubmitButton),
+                            )
+                            .animate(delay: AppAnim.entranceDelay(8))
+                            .fadeIn(duration: AppAnim.normal)
+                            .slideY(begin: 0.15, curve: AppAnim.smooth),
+                          ],
+                        ),
+                      )
+                      .animate(delay: AppAnim.entranceDelay(3))
+                      .fadeIn(duration: AppAnim.slow)
+                      .slideY(begin: 0.10, curve: AppAnim.smooth),
+
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                  const SizedBox(height: 28),
-                  FilledButton(
-                    onPressed: isLoading ? null : _submit,
-                    child: isLoading
-                        ? const SizedBox(height: 22, width: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
-                        : Text(l10n.registerSubmitButton),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
             ),
           ),
