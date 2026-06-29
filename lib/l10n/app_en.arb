@@ -121,6 +121,22 @@
   "settingsAuditLog": "Activity History",
   "settingsSupportTicket": "Support Ticket",
   "settingsPrivacyPolicy": "Privacy Policy",
+  "settingsExportVault": "Export Data",
+  "settingsExportVaultSubtitle": "Create encrypted JSON backup file",
+  "settingsExportDialogTitle": "Export Data",
+  "settingsExportDialogContent": "Your entire vault will be exported to a JSON file encrypted with your master password. You will need your master password to open the file.",
+  "settingsExportDialogButton": "Export",
+  "settingsExportSuccess": "Backup created",
+  "settingsExportSavedTo": "File saved:\n{path}",
+  "@settingsExportSavedTo": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsExportError": "Export failed",
+  "settingsExportNoItems": "No items found in your vault",
   "settingsBiometricLock": "Biometric Lock",
   "settingsBiometricActive": "Active  ·  Password required in {days} days",
   "@settingsBiometricActive": {

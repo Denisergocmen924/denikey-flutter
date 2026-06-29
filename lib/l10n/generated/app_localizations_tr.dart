@@ -303,6 +303,37 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsPrivacyPolicy => 'Gizlilik Politikası';
 
   @override
+  String get settingsExportVault => 'Verileri Dışa Aktar';
+
+  @override
+  String get settingsExportVaultSubtitle =>
+      'Şifreli JSON yedek dosyası oluştur';
+
+  @override
+  String get settingsExportDialogTitle => 'Verileri Dışa Aktar';
+
+  @override
+  String get settingsExportDialogContent =>
+      'Tüm kasanız master şifrenizle şifrelenmiş bir JSON dosyasına aktarılacak. Dosyayı açmak için master şifreniz gereklidir.';
+
+  @override
+  String get settingsExportDialogButton => 'Dışa Aktar';
+
+  @override
+  String get settingsExportSuccess => 'Yedek oluşturuldu';
+
+  @override
+  String settingsExportSavedTo(String path) {
+    return 'Dosya kaydedildi:\n$path';
+  }
+
+  @override
+  String get settingsExportError => 'Dışa aktarma başarısız';
+
+  @override
+  String get settingsExportNoItems => 'Kasanızda henüz öğe bulunmuyor';
+
+  @override
   String get settingsBiometricLock => 'Biyometrik Kilit';
 
   @override

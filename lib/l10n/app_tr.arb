@@ -121,6 +121,22 @@
   "settingsAuditLog": "Aktivite Geçmişi",
   "settingsSupportTicket": "Destek Talebi",
   "settingsPrivacyPolicy": "Gizlilik Politikası",
+  "settingsExportVault": "Verileri Dışa Aktar",
+  "settingsExportVaultSubtitle": "Şifreli JSON yedek dosyası oluştur",
+  "settingsExportDialogTitle": "Verileri Dışa Aktar",
+  "settingsExportDialogContent": "Tüm kasanız master şifrenizle şifrelenmiş bir JSON dosyasına aktarılacak. Dosyayı açmak için master şifreniz gereklidir.",
+  "settingsExportDialogButton": "Dışa Aktar",
+  "settingsExportSuccess": "Yedek oluşturuldu",
+  "settingsExportSavedTo": "Dosya kaydedildi:\n{path}",
+  "@settingsExportSavedTo": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsExportError": "Dışa aktarma başarısız",
+  "settingsExportNoItems": "Kasanızda henüz öğe bulunmuyor",
   "settingsBiometricLock": "Biyometrik Kilit",
   "settingsBiometricActive": "Aktif  ·  {days} gün sonra şifre istenecek",
   "@settingsBiometricActive": {

@@ -302,6 +302,37 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsPrivacyPolicy => 'Политика конфиденциальности';
 
   @override
+  String get settingsExportVault => 'Экспорт данных';
+
+  @override
+  String get settingsExportVaultSubtitle =>
+      'Создать зашифрованный файл резервной копии';
+
+  @override
+  String get settingsExportDialogTitle => 'Экспорт данных';
+
+  @override
+  String get settingsExportDialogContent =>
+      'Все данные хранилища будут экспортированы в JSON-файл, зашифрованный вашим мастер-паролем. Для открытия файла потребуется мастер-пароль.';
+
+  @override
+  String get settingsExportDialogButton => 'Экспорт';
+
+  @override
+  String get settingsExportSuccess => 'Резервная копия создана';
+
+  @override
+  String settingsExportSavedTo(String path) {
+    return 'Файл сохранён:\n$path';
+  }
+
+  @override
+  String get settingsExportError => 'Не удалось экспортировать';
+
+  @override
+  String get settingsExportNoItems => 'В хранилище нет записей';
+
+  @override
   String get settingsBiometricLock => 'Биометрическая блокировка';
 
   @override

@@ -303,6 +303,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPrivacyPolicy => 'Privacy Policy';
 
   @override
+  String get settingsExportVault => 'Export Data';
+
+  @override
+  String get settingsExportVaultSubtitle => 'Create encrypted JSON backup file';
+
+  @override
+  String get settingsExportDialogTitle => 'Export Data';
+
+  @override
+  String get settingsExportDialogContent =>
+      'Your entire vault will be exported to a JSON file encrypted with your master password. You will need your master password to open the file.';
+
+  @override
+  String get settingsExportDialogButton => 'Export';
+
+  @override
+  String get settingsExportSuccess => 'Backup created';
+
+  @override
+  String settingsExportSavedTo(String path) {
+    return 'File saved:\n$path';
+  }
+
+  @override
+  String get settingsExportError => 'Export failed';
+
+  @override
+  String get settingsExportNoItems => 'No items found in your vault';
+
+  @override
   String get settingsBiometricLock => 'Biometric Lock';
 
   @override

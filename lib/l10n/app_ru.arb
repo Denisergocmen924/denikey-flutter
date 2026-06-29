@@ -121,6 +121,22 @@
   "settingsAuditLog": "История активности",
   "settingsSupportTicket": "Служба поддержки",
   "settingsPrivacyPolicy": "Политика конфиденциальности",
+  "settingsExportVault": "Экспорт данных",
+  "settingsExportVaultSubtitle": "Создать зашифрованный файл резервной копии",
+  "settingsExportDialogTitle": "Экспорт данных",
+  "settingsExportDialogContent": "Все данные хранилища будут экспортированы в JSON-файл, зашифрованный вашим мастер-паролем. Для открытия файла потребуется мастер-пароль.",
+  "settingsExportDialogButton": "Экспорт",
+  "settingsExportSuccess": "Резервная копия создана",
+  "settingsExportSavedTo": "Файл сохранён:\n{path}",
+  "@settingsExportSavedTo": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsExportError": "Не удалось экспортировать",
+  "settingsExportNoItems": "В хранилище нет записей",
   "settingsBiometricLock": "Биометрическая блокировка",
   "settingsBiometricActive": "Активно  ·  Пароль через {days} дн.",
   "@settingsBiometricActive": {

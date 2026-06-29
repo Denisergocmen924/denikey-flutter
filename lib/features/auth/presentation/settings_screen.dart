@@ -21,6 +21,7 @@ import '../../devices/data/device_repository.dart';
 import '../../devices/providers/device_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../providers/totp_provider.dart';
+import '../../../core/services/export_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -49,6 +50,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String? _email;
   bool _loggingOut = false;
   bool _deletingAccount = false;
+  bool _exporting = false;
   bool _biometricAvailable = false;
   bool _biometricEnabled = false;
   int _biometricRemainingDays = 0;
@@ -316,6 +318,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  Future<void> _exportVault(AppLocalizations l10n) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.settingsExportDialogTitle),
+        content: Text(l10n.settingsExportDialogContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.settingsExportDialogButton),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _exporting = true);
+    try {
+      final path = await ExportService.instance.exportVault();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.settingsExportSavedTo(path)),
+          duration: const Duration(seconds: 6),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l10n.settingsExportError}: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
   Future<void> _logout() async {
     setState(() => _loggingOut = true);
     try {
@@ -559,6 +601,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: Text(l10n.settingsPrivacyPolicy),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/privacy-policy'),
+          ),
+          ListTile(
+            leading: const _LeadingIcon(Icons.download_outlined, color: Color(0xFF24C9B5)),
+            title: Text(l10n.settingsExportVault,
+                style: const TextStyle(fontWeight: FontWeight.w600)),
+            subtitle: Text(l10n.settingsExportVaultSubtitle),
+            trailing: _exporting
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.chevron_right),
+            onTap: _exporting ? null : () => _exportVault(l10n),
           ),
 
           // Dil seçici

@@ -658,6 +658,60 @@ abstract class AppLocalizations {
   /// **'Gizlilik Politikası'**
   String get settingsPrivacyPolicy;
 
+  /// No description provided for @settingsExportVault.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verileri Dışa Aktar'**
+  String get settingsExportVault;
+
+  /// No description provided for @settingsExportVaultSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreli JSON yedek dosyası oluştur'**
+  String get settingsExportVaultSubtitle;
+
+  /// No description provided for @settingsExportDialogTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verileri Dışa Aktar'**
+  String get settingsExportDialogTitle;
+
+  /// No description provided for @settingsExportDialogContent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm kasanız master şifrenizle şifrelenmiş bir JSON dosyasına aktarılacak. Dosyayı açmak için master şifreniz gereklidir.'**
+  String get settingsExportDialogContent;
+
+  /// No description provided for @settingsExportDialogButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dışa Aktar'**
+  String get settingsExportDialogButton;
+
+  /// No description provided for @settingsExportSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek oluşturuldu'**
+  String get settingsExportSuccess;
+
+  /// No description provided for @settingsExportSavedTo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dosya kaydedildi:\n{path}'**
+  String settingsExportSavedTo(String path);
+
+  /// No description provided for @settingsExportError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dışa aktarma başarısız'**
+  String get settingsExportError;
+
+  /// No description provided for @settingsExportNoItems.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kasanızda henüz öğe bulunmuyor'**
+  String get settingsExportNoItems;
+
   /// No description provided for @settingsBiometricLock.
   ///
   /// In tr, this message translates to:
