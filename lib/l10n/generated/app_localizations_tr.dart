@@ -334,6 +334,29 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsExportNoItems => 'Kasanızda henüz öğe bulunmuyor';
 
   @override
+  String get settingsExportDoneTitle => 'Yedek oluşturuldu';
+
+  @override
+  String get settingsExportResultInfo =>
+      'Kasanız şifreli olarak kaydedildi. Açmak için aynı klasördeki “denikey_decryptor.html” dosyasını çift tıklayın (ya da denikey.website/decrypt adresine gidin) ve master parolanızı girin.';
+
+  @override
+  String get settingsExportLocationLabel => 'Konum';
+
+  @override
+  String get settingsExportPlaintextWarn =>
+      'Not: Yedeği düz metne çevirip kaydederseniz o dosya şifresiz olur — güvenli bir yerde tutun.';
+
+  @override
+  String get settingsExportCopyPath => 'Yolu kopyala';
+
+  @override
+  String get settingsExportPathCopied => 'Yol panoya kopyalandı';
+
+  @override
+  String get settingsExportOk => 'Tamam';
+
+  @override
   String get settingsBiometricLock => 'Biyometrik Kilit';
 
   @override

@@ -137,6 +137,13 @@
   },
   "settingsExportError": "Не удалось экспортировать",
   "settingsExportNoItems": "В хранилище нет записей",
+  "settingsExportDoneTitle": "Резервная копия создана",
+  "settingsExportResultInfo": "Ваше хранилище сохранено в зашифрованном виде. Чтобы открыть его, дважды щёлкните файл «denikey_decryptor.html» в той же папке (или перейдите на denikey.website/decrypt) и введите мастер-пароль.",
+  "settingsExportLocationLabel": "Расположение",
+  "settingsExportPlaintextWarn": "Примечание: если вы преобразуете копию в открытый текст и сохраните её, этот файл будет незашифрованным — храните его в надёжном месте.",
+  "settingsExportCopyPath": "Копировать путь",
+  "settingsExportPathCopied": "Путь скопирован в буфер обмена",
+  "settingsExportOk": "ОК",
   "settingsBiometricLock": "Биометрическая блокировка",
   "settingsBiometricActive": "Активно  ·  Пароль через {days} дн.",
   "@settingsBiometricActive": {

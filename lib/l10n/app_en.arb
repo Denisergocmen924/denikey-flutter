@@ -137,6 +137,13 @@
   },
   "settingsExportError": "Export failed",
   "settingsExportNoItems": "No items found in your vault",
+  "settingsExportDoneTitle": "Backup created",
+  "settingsExportResultInfo": "Your vault was saved encrypted. To open it, double-click the “denikey_decryptor.html” file in the same folder (or go to denikey.website/decrypt) and enter your master password.",
+  "settingsExportLocationLabel": "Location",
+  "settingsExportPlaintextWarn": "Note: If you convert a backup to plain text and save it, that file is unencrypted — keep it somewhere safe.",
+  "settingsExportCopyPath": "Copy path",
+  "settingsExportPathCopied": "Path copied to clipboard",
+  "settingsExportOk": "OK",
   "settingsBiometricLock": "Biometric Lock",
   "settingsBiometricActive": "Active  ·  Password required in {days} days",
   "@settingsBiometricActive": {

@@ -1,0 +1,68 @@
+========================================
+  DeniKey — Yedeğini Nasıl Açarsın?
+========================================
+
+Bu klasördeki "denikey_export_*.json" dosyası ŞİFRELİDİR.
+İçindeki şifreleri okumak için master parolan gerekir.
+
+NASIL AÇILIR:
+  1. Bu klasördeki "denikey_decryptor.html" dosyasına çift tıkla
+     (herhangi bir tarayıcıda açılır — internet gerekmez).
+     Alternatif: https://denikey.website/decrypt adresine git.
+  2. "denikey_export_*.json" dosyasını pencereye sürükle.
+  3. Master parolanı gir ve "Çöz" butonuna bas.
+  4. Şifrelerin okunabilir şekilde görünür. İstersen "Düz metin indir" ile
+     .txt olarak kaydedebilirsin.
+
+GÜVENLİK:
+  - Çözme işlemi tamamen kendi cihazında olur; master parolan hiçbir yere
+    gönderilmez.
+  - "Düz metin indir" ile kaydettiğin dosya ŞİFRESİZDİR — herkes okuyabilir.
+    Güvenli bir yerde tut veya işin bitince sil.
+
+
+========================================
+  DeniKey — How to Open Your Backup
+========================================
+
+The "denikey_export_*.json" file in this folder is ENCRYPTED.
+You need your master password to read the passwords inside.
+
+HOW TO OPEN:
+  1. Double-click "denikey_decryptor.html" in this folder
+     (opens in any browser — no internet required).
+     Alternative: go to https://denikey.website/decrypt
+  2. Drag the "denikey_export_*.json" file onto the window.
+  3. Enter your master password and press "Decrypt".
+  4. Your passwords appear in readable form. You can save them as .txt
+     with "Download plain text" if you want.
+
+SECURITY:
+  - Decryption happens entirely on your own device; your master password
+    is never sent anywhere.
+  - The file saved via "Download plain text" is UNENCRYPTED — anyone can
+    read it. Keep it safe or delete it when done.
+
+
+========================================
+  DeniKey — Как открыть резервную копию
+========================================
+
+Файл "denikey_export_*.json" в этой папке ЗАШИФРОВАН.
+Чтобы прочитать пароли внутри, нужен ваш мастер-пароль.
+
+КАК ОТКРЫТЬ:
+  1. Дважды щёлкните "denikey_decryptor.html" в этой папке
+     (откроется в любом браузере — интернет не нужен).
+     Альтернатива: перейдите на https://denikey.website/decrypt
+  2. Перетащите файл "denikey_export_*.json" в окно.
+  3. Введите мастер-пароль и нажмите «Расшифровать».
+  4. Ваши пароли отобразятся в читаемом виде. При желании их можно
+     сохранить в .txt кнопкой «Скачать открытый текст».
+
+БЕЗОПАСНОСТЬ:
+  - Расшифровка происходит полностью на вашем устройстве; мастер-пароль
+    никуда не отправляется.
+  - Файл, сохранённый через «Скачать открытый текст», НЕ ЗАШИФРОВАН —
+    его может прочитать кто угодно. Храните его в надёжном месте или
+    удалите после использования.

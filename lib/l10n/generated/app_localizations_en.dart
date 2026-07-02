@@ -333,6 +333,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExportNoItems => 'No items found in your vault';
 
   @override
+  String get settingsExportDoneTitle => 'Backup created';
+
+  @override
+  String get settingsExportResultInfo =>
+      'Your vault was saved encrypted. To open it, double-click the “denikey_decryptor.html” file in the same folder (or go to denikey.website/decrypt) and enter your master password.';
+
+  @override
+  String get settingsExportLocationLabel => 'Location';
+
+  @override
+  String get settingsExportPlaintextWarn =>
+      'Note: If you convert a backup to plain text and save it, that file is unencrypted — keep it somewhere safe.';
+
+  @override
+  String get settingsExportCopyPath => 'Copy path';
+
+  @override
+  String get settingsExportPathCopied => 'Path copied to clipboard';
+
+  @override
+  String get settingsExportOk => 'OK';
+
+  @override
   String get settingsBiometricLock => 'Biometric Lock';
 
   @override

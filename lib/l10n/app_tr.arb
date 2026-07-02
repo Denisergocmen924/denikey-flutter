@@ -137,6 +137,13 @@
   },
   "settingsExportError": "Dışa aktarma başarısız",
   "settingsExportNoItems": "Kasanızda henüz öğe bulunmuyor",
+  "settingsExportDoneTitle": "Yedek oluşturuldu",
+  "settingsExportResultInfo": "Kasanız şifreli olarak kaydedildi. Açmak için aynı klasördeki “denikey_decryptor.html” dosyasını çift tıklayın (ya da denikey.website/decrypt adresine gidin) ve master parolanızı girin.",
+  "settingsExportLocationLabel": "Konum",
+  "settingsExportPlaintextWarn": "Not: Yedeği düz metne çevirip kaydederseniz o dosya şifresiz olur — güvenli bir yerde tutun.",
+  "settingsExportCopyPath": "Yolu kopyala",
+  "settingsExportPathCopied": "Yol panoya kopyalandı",
+  "settingsExportOk": "Tamam",
   "settingsBiometricLock": "Biyometrik Kilit",
   "settingsBiometricActive": "Aktif  ·  {days} gün sonra şifre istenecek",
   "@settingsBiometricActive": {

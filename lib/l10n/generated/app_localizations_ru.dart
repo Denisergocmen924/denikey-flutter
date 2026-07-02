@@ -333,6 +333,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsExportNoItems => 'В хранилище нет записей';
 
   @override
+  String get settingsExportDoneTitle => 'Резервная копия создана';
+
+  @override
+  String get settingsExportResultInfo =>
+      'Ваше хранилище сохранено в зашифрованном виде. Чтобы открыть его, дважды щёлкните файл «denikey_decryptor.html» в той же папке (или перейдите на denikey.website/decrypt) и введите мастер-пароль.';
+
+  @override
+  String get settingsExportLocationLabel => 'Расположение';
+
+  @override
+  String get settingsExportPlaintextWarn =>
+      'Примечание: если вы преобразуете копию в открытый текст и сохраните её, этот файл будет незашифрованным — храните его в надёжном месте.';
+
+  @override
+  String get settingsExportCopyPath => 'Копировать путь';
+
+  @override
+  String get settingsExportPathCopied => 'Путь скопирован в буфер обмена';
+
+  @override
+  String get settingsExportOk => 'ОК';
+
+  @override
   String get settingsBiometricLock => 'Биометрическая блокировка';
 
   @override

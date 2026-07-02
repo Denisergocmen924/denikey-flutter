@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -340,14 +341,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     setState(() => _exporting = true);
     try {
-      final path = await ExportService.instance.exportVault();
+      final result = await ExportService.instance.exportVault();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.settingsExportSavedTo(path)),
-          duration: const Duration(seconds: 6),
-        ),
-      );
+      final folder = File(result.jsonPath).parent.path;
+      await _showExportResultDialog(l10n, folder);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -356,6 +353,56 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } finally {
       if (mounted) setState(() => _exporting = false);
     }
+  }
+
+  Future<void> _showExportResultDialog(AppLocalizations l10n, String folder) {
+    final cs = Theme.of(context).colorScheme;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.settingsExportDoneTitle),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.settingsExportResultInfo),
+              const SizedBox(height: 16),
+              Text(
+                l10n.settingsExportLocationLabel,
+                style: TextStyle(fontWeight: FontWeight.w600, color: cs.onSurfaceVariant),
+              ),
+              const SizedBox(height: 4),
+              SelectableText(
+                folder,
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.settingsExportPlaintextWarn,
+                style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: folder));
+              if (!ctx.mounted) return;
+              ScaffoldMessenger.of(ctx).showSnackBar(
+                SnackBar(content: Text(l10n.settingsExportPathCopied)),
+              );
+            },
+            child: Text(l10n.settingsExportCopyPath),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.settingsExportOk),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _logout() async {

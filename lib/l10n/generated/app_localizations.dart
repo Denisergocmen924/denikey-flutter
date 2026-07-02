@@ -712,6 +712,48 @@ abstract class AppLocalizations {
   /// **'Kasanızda henüz öğe bulunmuyor'**
   String get settingsExportNoItems;
 
+  /// No description provided for @settingsExportDoneTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yedek oluşturuldu'**
+  String get settingsExportDoneTitle;
+
+  /// No description provided for @settingsExportResultInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kasanız şifreli olarak kaydedildi. Açmak için aynı klasördeki “denikey_decryptor.html” dosyasını çift tıklayın (ya da denikey.website/decrypt adresine gidin) ve master parolanızı girin.'**
+  String get settingsExportResultInfo;
+
+  /// No description provided for @settingsExportLocationLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konum'**
+  String get settingsExportLocationLabel;
+
+  /// No description provided for @settingsExportPlaintextWarn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Not: Yedeği düz metne çevirip kaydederseniz o dosya şifresiz olur — güvenli bir yerde tutun.'**
+  String get settingsExportPlaintextWarn;
+
+  /// No description provided for @settingsExportCopyPath.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yolu kopyala'**
+  String get settingsExportCopyPath;
+
+  /// No description provided for @settingsExportPathCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yol panoya kopyalandı'**
+  String get settingsExportPathCopied;
+
+  /// No description provided for @settingsExportOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get settingsExportOk;
+
   /// No description provided for @settingsBiometricLock.
   ///
   /// In tr, this message translates to:
