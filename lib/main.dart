@@ -470,7 +470,7 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener, WidgetsBindi
         L10n.update(AppLocalizations.of(context));
         return Consumer(
           builder: (context, ref, _) {
-            final isOffline = ref.watch(connectivityProvider).valueOrNull ?? false;
+            final isOffline = ref.watch(connectivityProvider).value ?? false;
             if (isOffline) return const OfflineScreen();
             return LoadingOverlay(
               key: loadingOverlayKey,

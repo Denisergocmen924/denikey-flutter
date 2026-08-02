@@ -23,7 +23,7 @@ class NotificationService {
     );
 
     await _plugin.initialize(
-      const InitializationSettings(
+      settings: const InitializationSettings(
           android: androidSettings, iOS: iosSettings),
     );
 
@@ -72,6 +72,7 @@ class NotificationService {
     const iosDetails = DarwinNotificationDetails();
     final details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
-    await _plugin.show(id, title, body, details);
+    await _plugin.show(
+        id: id, title: title, body: body, notificationDetails: details);
   }
 }

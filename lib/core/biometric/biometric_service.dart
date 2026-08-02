@@ -86,10 +86,9 @@ class BiometricService {
     try {
       return await _auth.authenticate(
         localizedReason: L10n.s.biometricReason,
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: false,
-        ),
+        // biometricOnly: false → cihaz PIN/desen fallback'ine izin verir
+        biometricOnly: false,
+        persistAcrossBackgrounding: true,
       );
     } catch (_) {
       return false;

@@ -12,8 +12,14 @@ class SecureStorage {
   // Güvenli kasaya yazma başarısız olursa (edge case) bu bellek kopyası kullanılır
   List<int>? _memoryMasterKey;
 
+  // Android v10: Jetpack Security (EncryptedSharedPreferences) deprecated edildi;
+  // varsayılan cipher RSA-OAEP + AES-GCM. Master key/token deposu olduğumuz için
+  // migrasyon çökme-dayanıklı (yedekli) yapılır.
   static const _storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    aOptions: AndroidOptions(
+      migrateOnAlgorithmChange: true,
+      migrateWithBackup: true,
+    ),
     lOptions: LinuxOptions(),
   );
 
