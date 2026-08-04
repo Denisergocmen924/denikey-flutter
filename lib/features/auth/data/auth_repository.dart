@@ -7,6 +7,7 @@ import '../../../core/cache/cache_service.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/biometric/biometric_service.dart';
+import '../../../core/providers/locale_provider.dart';
 
 class AuthRepository {
   final Dio _dio = DioClient.instance.dio;
@@ -147,6 +148,8 @@ class AuthRepository {
     await BiometricService.instance.saveMasterPasswordTimestamp();
     final blob = await EncryptionService.instance.encrypt('denikey-verify', masterKey);
     await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
+    // Dil tercihi giriş öncesi seçilmiş olabilir; oturum açılınca sunucuya taşınır
+    await syncPreferredLanguageToServer();
   }
 
   Future<Map<String, dynamic>> totpStatus() async {
@@ -230,6 +233,8 @@ class AuthRepository {
     await SecureStorage.instance.saveEncryptionSalt(salt);
     final blob = await EncryptionService.instance.encrypt('denikey-verify', masterKey);
     await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
+    // Dil tercihi giriş öncesi seçilmiş olabilir; oturum açılınca sunucuya taşınır
+    await syncPreferredLanguageToServer();
   }
 
   Future<void> changeEmail({required String newEmail}) async {

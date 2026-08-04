@@ -8,6 +8,7 @@ import '../../../core/network/dio_client.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/crypto/encryption_service.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../data/auth_repository.dart';
 
 // purpose: 'register' | 'new_device'
@@ -87,6 +88,8 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           final blob = await EncryptionService.instance.encrypt('denikey-verify', masterKey);
           await SecureStorage.instance.saveVerificationBlob(blob['encrypted']!, blob['iv']!);
         }
+        // Yeni hesap sunucuda "tr" ile açılır; kullanıcının seçtiği dile çekilir
+        await syncPreferredLanguageToServer();
       }
 
       if (mounted) context.go('/vault');

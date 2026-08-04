@@ -529,6 +529,39 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     );
   }
 
+  Widget _buildDeleteButton(_FieldEntry entry, ColorScheme cs) => IconButton(
+        icon: Icon(Icons.remove_circle_outline, color: cs.error, size: 18),
+        onPressed: () => _removeField(entry.uid),
+      );
+
+  Widget _buildValueField(_FieldEntry entry, bool isTypeField) {
+    // Gizlenen metin Flutter'da tek satır olmak zorunda; açık metin yazdıkça
+    // 5 satıra kadar büyür, böylece uzun içerik telefonda da tümüyle görünür
+    final multiline = !entry.obscure;
+    return TextField(
+      controller: entry.valueCtr,
+      obscureText: entry.obscure,
+      minLines: 1,
+      maxLines: multiline ? 5 : 1,
+      keyboardType: multiline ? TextInputType.multiline : null,
+      decoration: InputDecoration(
+        labelText: isTypeField
+            ? entry.nameCtr.text
+            : AppLocalizations.of(context).addItemExtraFieldValueLabel,
+        isDense: true,
+        suffixIcon: IconButton(
+          iconSize: 18,
+          icon: Icon(entry.obscure ? Icons.visibility_off : Icons.visibility),
+          onPressed: () => setState(() => entry.obscure = !entry.obscure),
+        ),
+      ),
+      style: TextStyle(
+        fontSize: 14,
+        fontFamily: entry.isSecret || entry.obscure ? 'monospace' : null,
+      ),
+    );
+  }
+
   Widget _buildFieldRow(_FieldEntry entry) {
     final isTypeField = entry.backendFieldId != null;
     final cs = Theme.of(context).colorScheme;
@@ -547,13 +580,22 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Tip alanı değilse alan adı düzenlenebilir; tip alanıysa isim label olarak gösterilir
-              if (!isTypeField) ...[
-                SizedBox(
-                  width: 110,
+          if (isTypeField)
+            // Alan adı sabit label olduğu için değer tüm satırı kullanabilir
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _buildValueField(entry, isTypeField)),
+                _buildDeleteButton(entry, cs),
+              ],
+            )
+          else ...[
+            // Alan adı ve değer ALT ALTA: yan yana dizilince telefonda değer
+            // kutusuna ~100px kalıyor ve yazılan metin görünmüyordu
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
                   child: TextField(
                     controller: entry.nameCtr,
                     onChanged: (_) {
@@ -567,43 +609,15 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
-                const SizedBox(width: 8),
+                _buildDeleteButton(entry, cs),
               ],
-              // Değer
-              Expanded(
-                child: TextField(
-                  controller: entry.valueCtr,
-                  obscureText: entry.obscure,
-                  decoration: InputDecoration(
-                    labelText: isTypeField
-                        ? entry.nameCtr.text
-                        : AppLocalizations.of(context).addItemExtraFieldValueLabel,
-                    isDense: true,
-                    suffixIcon: IconButton(
-                        iconSize: 18,
-                        icon: Icon(entry.obscure
-                            ? Icons.visibility_off
-                            : Icons.visibility),
-                        onPressed: () =>
-                            setState(() => entry.obscure = !entry.obscure),
-                      ),
-                  ),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontFamily: entry.isSecret || entry.obscure
-                        ? 'monospace'
-                        : null,
-                  ),
-                ),
-              ),
-              // Sil
-              IconButton(
-                icon: Icon(Icons.remove_circle_outline,
-                    color: cs.error, size: 18),
-                onPressed: () => _removeField(entry.uid),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: _buildValueField(entry, isTypeField),
+            ),
+          ],
           // Şifre güç göstergesi
           if (entry.isSecret)
             Padding(

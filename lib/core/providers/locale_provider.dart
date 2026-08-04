@@ -2,13 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../constants/api_constants.dart';
+import '../network/dio_client.dart';
+import '../storage/secure_storage.dart';
+
+const _localeKey = 'app_locale';
+
+// Kullanıcı hiç dil seçmediyse arayüzün açıldığı dil; sunucuya da bu yazılır ki
+// mailler ile ekranda görülen dil ayrışmasın (sunucu varsayılanı "tr").
+const _defaultLanguage = 'en';
+
+/// Sunucu, destek yanıtı gibi bilgilendirme maillerini `users.preferred_language`
+/// alanına bakarak gönderir; bu yüzden yerel dil tercihi sunucuya da yazılır.
+///
+/// Oturum yokken istek atılmaz: 401 dönerse DioClient interceptor'ı oturumu
+/// temizleyip `/login`'e atıyor — giriş ekranında dil değiştirmek bunu tetiklememeli.
+Future<void> syncPreferredLanguageToServer([String? languageCode]) async {
+  try {
+    if (await SecureStorage.instance.getToken() == null) return;
+    final lang = languageCode ??
+        (await SharedPreferences.getInstance()).getString(_localeKey) ??
+        _defaultLanguage;
+    await DioClient.instance.dio.put(
+      ApiConstants.updateProfile,
+      data: {'preferred_language': lang},
+    );
+  } catch (_) {
+    // Dil tercihi kritik değil; sunucuya yazılamazsa arayüz dili yine değişir
+  }
+}
+
 class LocaleNotifier extends Notifier<Locale> {
-  static const _key = 'app_locale';
+  static const _key = _localeKey;
 
   @override
   Locale build() {
     _load();
-    return const Locale('en');
+    return const Locale(_defaultLanguage);
   }
 
   Future<void> _load() async {
@@ -21,6 +51,7 @@ class LocaleNotifier extends Notifier<Locale> {
     state = locale;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, locale.languageCode);
+    await syncPreferredLanguageToServer(locale.languageCode);
   }
 }
 
