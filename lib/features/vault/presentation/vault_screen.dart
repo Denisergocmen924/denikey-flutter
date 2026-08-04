@@ -77,7 +77,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.addItemCancel)),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(ctx).colorScheme.error),
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(l10n.vaultBulkDeleteButton),
           ),

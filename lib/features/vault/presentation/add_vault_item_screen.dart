@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import '../../item_types/providers/item_type_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/app_tiles.dart';
 
 // ─── Alan modeli ─────────────────────────────────────────────────────────────
 
@@ -167,7 +170,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.addItemErrorSave),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -189,7 +192,10 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: const Color(0xFF0E1610),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => _CreateCategorySheet(
         onCreated: (id, name) {
           setState(() {
@@ -218,7 +224,10 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: const Color(0xFF0E1610),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => _CreateTypeSheet(
         onCreate: (name, fields) async {
           await ref.read(itemTypeProvider.notifier).createItemType(
@@ -265,12 +274,14 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     final state = ref.watch(categoryProvider);
     final categories = state.categories;
 
+    final cs = Theme.of(context).colorScheme;
+
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
       children: [
         _selectionTile(
           icon: Icons.inbox_outlined,
-          color: Colors.grey,
+          color: kTeal,
           title: l10n.addItemUncategorized,
           subtitle: l10n.addItemUncategorizedSubtitle,
           onTap: () {
@@ -284,29 +295,37 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
               _step = 1;
             });
           },
-        ),
-        const SizedBox(height: 8),
+        )
+            .animate()
+            .fadeIn(duration: AppAnim.normal)
+            .slideY(begin: 0.12, curve: AppAnim.smooth),
+        const SizedBox(height: 10),
         _selectionTile(
           icon: Icons.add_circle_outline,
-          color: const Color(0xFFFF5900),
+          color: kBlaze,
           title: l10n.addItemCreateCategory,
           subtitle: l10n.addItemCreateCategorySubtitle,
           onTap: _showCreateCategorySheet,
-        ),
-        const SizedBox(height: 16),
+        )
+            .animate(delay: AppAnim.listDelay(1))
+            .fadeIn(duration: AppAnim.normal)
+            .slideY(begin: 0.12, curve: AppAnim.smooth),
+        const SizedBox(height: 22),
         if (state.status == CategoryStatus.loading)
           const Center(child: CircularProgressIndicator())
         else ...[
-          Text(l10n.libraryCategoriesTab,
-              style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey.shade600)),
-          const SizedBox(height: 8),
-          ...categories.where((c) => c['is_system'] != true).map((cat) {
+          AppSectionTitle(l10n.libraryCategoriesTab),
+          const SizedBox(height: 10),
+          ...categories
+              .where((c) => c['is_system'] != true)
+              .toList()
+              .asMap()
+              .entries
+              .map((entry) {
+            final cat = entry.value;
             final color = _parseColor(cat['color']);
             return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.only(bottom: 10),
               child: _selectionTile(
                 icon: Icons.folder_outlined,
                 color: color,
@@ -318,8 +337,19 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                   _step = 1;
                 }),
               ),
-            );
+            )
+                .animate(delay: AppAnim.listDelay(entry.key + 2))
+                .fadeIn(duration: AppAnim.normal)
+                .slideY(begin: 0.12, curve: AppAnim.smooth);
           }),
+          if (categories.where((c) => c['is_system'] != true).isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                l10n.addItemCreateCategorySubtitle,
+                style: TextStyle(fontSize: 12.5, color: cs.onSurfaceVariant),
+              ),
+            ),
         ],
       ],
     );
@@ -328,33 +358,35 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
   // ─── Adım 1: Form + Sol Tip Paneli ───────────────────────────────────────
 
   Widget _buildForm() {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTypePanel(),
-        const VerticalDivider(width: 1, thickness: 1),
+        VerticalDivider(width: 1, thickness: 1, color: cs.outlineVariant),
         Expanded(child: _buildFormArea()),
       ],
     );
   }
 
   Widget _buildTypePanel() {
+    final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
     final state = ref.watch(itemTypeProvider);
     final types = state.itemTypes;
 
     return SizedBox(
-      width: 80,
+      width: 84,
       child: Column(
         children: [
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               children: [
-                ...types.map((type) {
+                ...types.asMap().entries.map((entry) {
+                  final type = entry.value;
                   final isSelected = _selectedItemType?['id'] == type['id'];
-                  final color = isSelected
-                      ? const Color(0xFFFF5900)
-                      : const Color(0xFF9BABA4);
+                  final color = isSelected ? kBlaze : cs.onSurfaceVariant;
                   final icon = _materialIcon(type['icon'] as String?);
                   return GestureDetector(
                     onTap: () {
@@ -365,42 +397,57 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                       }
                     },
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                      duration: AppAnim.fast,
+                      curve: AppAnim.smooth,
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 4),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: isSelected
-                            ? const Color(0xFFFF5900).withAlpha(20)
-                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(13),
+                        gradient: isSelected
+                            ? LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  kBlaze.withAlpha(45),
+                                  kBlaze.withAlpha(16),
+                                ],
+                              )
+                            : null,
+                        color: isSelected ? null : cs.surfaceContainer,
                         border: Border.all(
                           color: isSelected
-                              ? const Color(0xFFFF5900).withAlpha(100)
-                              : Colors.transparent,
+                              ? kBlaze.withAlpha(110)
+                              : cs.outlineVariant,
+                          width: isSelected ? 1.5 : 1,
                         ),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(icon, size: 22, color: color),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 5),
                           Text(
                             (type['name_tr'] as String? ?? ''),
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 9,
+                              fontSize: 9.5,
                               color: color,
                               fontWeight: isSelected
                                   ? FontWeight.w700
-                                  : FontWeight.w400,
+                                  : FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  );
+                  )
+                      .animate(delay: AppAnim.listDelay(entry.key))
+                      .fadeIn(duration: AppAnim.normal)
+                      .slideX(begin: -0.15, curve: AppAnim.smooth);
                 }),
               ],
             ),
@@ -410,8 +457,8 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
             child: IconButton(
               onPressed: _showCreateTypeSheet,
               icon: const Icon(Icons.add_circle_outline,
-                  color: Color(0xFFFF5900), size: 26),
-              tooltip: 'Yeni Tip',
+                  color: kBlaze, size: 26),
+              tooltip: l10n.addItemTypeCreateTitle,
             ),
           ),
         ],
@@ -429,7 +476,7 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
         children: [
           // Seçim özeti
           _buildSelectionSummary(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           // Başlık
           TextField(
@@ -441,23 +488,31 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
               labelText: l10n.addItemTitleLabel,
               hintText: l10n.addItemTitleHint,
               errorText: _titleError,
-              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.title_outlined),
             ),
-          ),
-          const SizedBox(height: 12),
+          ).animate().fadeIn(duration: AppAnim.normal).slideY(
+              begin: 0.1, curve: AppAnim.smooth),
+          const SizedBox(height: 18),
 
           // Alanlar
-          ..._fields.asMap().entries.map((e) => _buildFieldRow(e.value)),
+          if (_fields.isNotEmpty) ...[
+            AppSectionTitle(l10n.addItemTypeFieldsLabel),
+            const SizedBox(height: 10),
+          ],
+          ..._fields.asMap().entries.map(
+                (e) => _buildFieldRow(e.value)
+                    .animate(delay: AppAnim.listDelay(e.key))
+                    .fadeIn(duration: AppAnim.normal)
+                    .slideY(begin: 0.1, curve: AppAnim.smooth),
+              ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
 
           OutlinedButton.icon(
             onPressed: _addField,
             icon: const Icon(Icons.add),
             label: Text(l10n.addItemAddFieldButton),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFFFF5900),
-            ),
+            style: OutlinedButton.styleFrom(foregroundColor: kBlaze),
           ),
           const SizedBox(height: 24),
 
@@ -476,8 +531,19 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
 
   Widget _buildFieldRow(_FieldEntry entry) {
     final isTypeField = entry.backendFieldId != null;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+    final cs = Theme.of(context).colorScheme;
+    final accent = entry.isSecret ? kBlaze : kTeal;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isTypeField ? accent.withAlpha(60) : cs.outlineVariant,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -496,13 +562,12 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context).addItemExtraFieldKeyLabel,
                       errorText: entry.error,
-                      border: const OutlineInputBorder(),
                       isDense: true,
                     ),
                     style: const TextStyle(fontSize: 13),
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
               ],
               // Değer
               Expanded(
@@ -513,7 +578,6 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                     labelText: isTypeField
                         ? entry.nameCtr.text
                         : AppLocalizations.of(context).addItemExtraFieldValueLabel,
-                    border: const OutlineInputBorder(),
                     isDense: true,
                     suffixIcon: IconButton(
                         iconSize: 18,
@@ -524,23 +588,31 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
                             setState(() => entry.obscure = !entry.obscure),
                       ),
                   ),
-                  style: const TextStyle(fontSize: 13),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontFamily: entry.isSecret || entry.obscure
+                        ? 'monospace'
+                        : null,
+                  ),
                 ),
               ),
               // Sil
               IconButton(
-                icon: const Icon(Icons.remove_circle_outline,
-                    color: Colors.red, size: 18),
+                icon: Icon(Icons.remove_circle_outline,
+                    color: cs.error, size: 18),
                 onPressed: () => _removeField(entry.uid),
               ),
             ],
           ),
           // Şifre güç göstergesi
           if (entry.isSecret)
-            ValueListenableBuilder<TextEditingValue>(
-              valueListenable: entry.valueCtr,
-              builder: (ctx2, v, child) =>
-                  _PasswordStrengthIndicator(password: v.text),
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: entry.valueCtr,
+                builder: (ctx2, v, child) =>
+                    _PasswordStrengthIndicator(password: v.text),
+              ),
             ),
         ],
       ),
@@ -553,26 +625,37 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     }
     final typeColor = _parseColor(_selectedItemType?['color'] as String?);
     final typeIcon = _materialIcon(_selectedItemType?['icon'] as String?);
-    return Row(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
       children: [
-        if (_selectedCategoryName != null) ...[
-          const Icon(Icons.folder_outlined,
-              size: 13, color: Color(0xFFFF5900)),
-          const SizedBox(width: 4),
-          Text(_selectedCategoryName!,
-              style: const TextStyle(
-                  color: Color(0xFFFF5900), fontSize: 11)),
-          const SizedBox(width: 10),
-        ],
-        if (_selectedItemType != null) ...[
-          Icon(typeIcon, size: 13, color: typeColor),
-          const SizedBox(width: 4),
-          Text(
-            _selectedItemType!['name_tr'] as String? ?? '',
-            style: TextStyle(color: typeColor, fontSize: 11),
-          ),
-        ],
+        if (_selectedCategoryName != null)
+          _summaryChip(Icons.folder_outlined, _selectedCategoryName!, kBlaze),
+        if (_selectedItemType != null)
+          _summaryChip(typeIcon,
+              _selectedItemType!['name_tr'] as String? ?? '', typeColor),
       ],
+    );
+  }
+
+  Widget _summaryChip(IconData icon, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withAlpha(24),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withAlpha(70)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: color),
+          const SizedBox(width: 5),
+          Text(label,
+              style: TextStyle(
+                  color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+        ],
+      ),
     );
   }
 
@@ -585,36 +668,42 @@ class _AddVaultItemScreenState extends ConsumerState<AddVaultItemScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withAlpha(30),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        title:
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: subtitle.isNotEmpty
-            ? Text(subtitle, style: const TextStyle(fontSize: 12))
-            : null,
-        trailing:
-            const Icon(Icons.chevron_right, color: Colors.grey),
-        onTap: onTap,
+    final cs = Theme.of(context).colorScheme;
+    return AppListCard(
+      onTap: onTap,
+      child: Row(
+        children: [
+          DuotoneIcon(icon, color: color),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600)),
+                if (subtitle.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(subtitle,
+                      style: TextStyle(
+                          fontSize: 12.5, color: cs.onSurfaceVariant)),
+                ],
+              ],
+            ),
+          ),
+          Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant),
+        ],
       ),
     );
   }
 
   Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
+    if (hex == null || hex.isEmpty) return kBlaze;
     try {
       return Color(
           int.parse('FF${hex.replaceAll('#', '')}', radix: 16));
     } catch (_) {
-      return const Color(0xFFFF5900);
+      return kBlaze;
     }
   }
 
@@ -688,9 +777,8 @@ class _CreateCategorySheetState extends State<_CreateCategorySheet> {
         children: [
           Row(
             children: [
-              const Icon(Icons.create_new_folder_outlined,
-                  color: Color(0xFFFF5900)),
-              const SizedBox(width: 10),
+              const DuotoneIcon(Icons.create_new_folder_outlined),
+              const SizedBox(width: 12),
               Text(
                 AppLocalizations.of(context).addItemNewCategory,
                 style: const TextStyle(
@@ -706,7 +794,7 @@ class _CreateCategorySheetState extends State<_CreateCategorySheet> {
             onSubmitted: (_) => _save(),
             decoration: InputDecoration(
               labelText: AppLocalizations.of(context).addItemNewCategoryName,
-              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.folder_outlined),
             ),
           ),
           const SizedBox(height: 16),
@@ -789,6 +877,7 @@ class _CreateTypeSheetState extends State<_CreateTypeSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.4,
@@ -802,11 +891,11 @@ class _CreateTypeSheetState extends State<_CreateTypeSheet> {
           children: [
             // Handle
             Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              margin: const EdgeInsets.only(top: 12, bottom: 10),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade600,
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(70),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -814,13 +903,14 @@ class _CreateTypeSheetState extends State<_CreateTypeSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
-                  const Icon(Icons.extension_outlined,
-                      color: Color(0xFFFF5900)),
-                  const SizedBox(width: 10),
-                  Text(
-                    l10n.addItemTypeCreateTitle,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w700),
+                  const DuotoneIcon(Icons.extension_outlined),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      l10n.addItemTypeCreateTitle,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ],
               ),
@@ -836,22 +926,27 @@ class _CreateTypeSheetState extends State<_CreateTypeSheet> {
                     autofocus: true,
                     decoration: InputDecoration(
                       labelText: l10n.addItemTypeNameLabel,
-                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.label_outline),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.addItemTypeFieldsLabel,
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade500),
-                  ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 20),
+                  AppSectionTitle(l10n.addItemTypeFieldsLabel),
+                  const SizedBox(height: 10),
                   ..._fieldRows.asMap().entries.map((e) {
                     final i = e.key;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                    final secret = _fieldSecrets[i];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+                      decoration: BoxDecoration(
+                        color: cs.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: secret
+                              ? kBlaze.withAlpha(60)
+                              : cs.outlineVariant,
+                        ),
+                      ),
                       child: Row(
                         children: [
                           Expanded(
@@ -859,7 +954,6 @@ class _CreateTypeSheetState extends State<_CreateTypeSheet> {
                               controller: e.value['name'],
                               decoration: InputDecoration(
                                 labelText: '${l10n.addItemExtraFieldKeyLabel} ${i + 1}',
-                                border: const OutlineInputBorder(),
                                 isDense: true,
                               ),
                               style: const TextStyle(fontSize: 13),
@@ -867,36 +961,36 @@ class _CreateTypeSheetState extends State<_CreateTypeSheet> {
                           ),
                           const SizedBox(width: 8),
                           IconButton(
-                            tooltip: _fieldSecrets[i]
-                                ? 'Gizli alan'
-                                : 'Normal alan',
+                            tooltip: secret
+                                ? l10n.addItemTypeFieldTypeSecret
+                                : l10n.addItemTypeFieldTypeText,
                             icon: Icon(
-                              _fieldSecrets[i]
+                              secret
                                   ? Icons.lock_outline
                                   : Icons.lock_open_outlined,
                               size: 18,
-                              color: _fieldSecrets[i]
-                                  ? const Color(0xFFFF5900)
-                                  : Colors.grey,
+                              color: secret ? kBlaze : cs.onSurfaceVariant,
                             ),
                             onPressed: () => setState(
                                 () => _fieldSecrets[i] = !_fieldSecrets[i]),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.remove_circle_outline,
-                                color: Colors.red, size: 18),
+                            icon: Icon(Icons.remove_circle_outline,
+                                color: cs.error, size: 18),
                             onPressed: () => _removeFieldRow(i),
                           ),
                         ],
                       ),
-                    );
+                    )
+                        .animate(delay: AppAnim.listDelay(i))
+                        .fadeIn(duration: AppAnim.normal)
+                        .slideY(begin: 0.1, curve: AppAnim.smooth);
                   }),
                   OutlinedButton.icon(
                     onPressed: _addFieldRow,
                     icon: const Icon(Icons.add, size: 16),
                     label: Text(l10n.addItemAddFieldButton),
-                    style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFFF5900)),
+                    style: OutlinedButton.styleFrom(foregroundColor: kBlaze),
                   ),
                   const SizedBox(height: 24),
                   FilledButton(
@@ -927,12 +1021,13 @@ class _PasswordStrengthIndicator extends StatelessWidget {
   final String password;
   const _PasswordStrengthIndicator({required this.password});
 
+  // Güç renkleri "Onyx & Ember" paletiyle uyumlu: kırmızı → amber → teal
   static const _colors = [
-    Color(0xFFE53935),
+    Color(0xFFE5484D),
     Color(0xFFFF7043),
-    Color(0xFFFFB300),
-    Color(0xFF7CB342),
-    Color(0xFF43A047),
+    Color(0xFFFFB020),
+    Color(0xFF7CC47F),
+    kTeal,
   ];
 
   int _level() {

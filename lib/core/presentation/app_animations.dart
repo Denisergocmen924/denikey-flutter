@@ -15,4 +15,9 @@ class AppAnim {
   // Giriş animasyonu gecikmeleri (ekran öğeleri için)
   static Duration entranceDelay(int index) =>
       Duration(milliseconds: index * 75);
+
+  // Liste satırları için kademeli gecikme. İlk 8 satırdan sonrası sabit kalır —
+  // aksi halde uzun listede alt satırlar görünür şekilde geç açılır.
+  static Duration listDelay(int index) =>
+      Duration(milliseconds: (index > 7 ? 7 : index) * 35);
 }

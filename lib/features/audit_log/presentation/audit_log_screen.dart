@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/audit_log_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/app_tiles.dart';
 
 class AuditLogScreen extends ConsumerStatefulWidget {
   const AuditLogScreen({super.key});
@@ -79,9 +82,9 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
   }
 
   Color _colorForStatus(String? status) {
-    if (status == 'success') return Colors.green;
-    if (status == 'failure' || status == 'failed') return Colors.red;
-    return Colors.orange;
+    if (status == 'success') return kTeal;
+    if (status == 'failure' || status == 'failed') return const Color(0xFFE5484D);
+    return const Color(0xFFFFB020);
   }
 
   String _formatDate(String? dateStr) {
@@ -100,36 +103,64 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(auditLogProvider);
 
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: Text(l10n.auditLogTitle)),
       body: Column(
         children: [
-          // Filter chips
+          // ── Kategori filtresi — segment görünümlü kaydırmalı çipler ──
           SizedBox(
-            height: 52,
+            height: 60,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
               children: _filterKeys.map((key) {
                 final selected = _selectedCategory == key;
+                final index = _filterKeys.indexOf(key);
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(_filterLabel(key, l10n)),
-                    selected: selected,
-                    onSelected: (_) => setState(() => _selectedCategory = key),
-                    selectedColor: Theme.of(context).colorScheme.primaryContainer,
-                    checkmarkColor: Theme.of(context).colorScheme.primary,
-                    labelStyle: TextStyle(
-                      color: selected ? Theme.of(context).colorScheme.primary : null,
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () => setState(() => _selectedCategory = key),
+                      child: AnimatedContainer(
+                        duration: AppAnim.fast,
+                        curve: AppAnim.smooth,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          color: selected
+                              ? kBlaze.withAlpha(28)
+                              : cs.surfaceContainer,
+                          border: Border.all(
+                            color: selected
+                                ? kBlaze.withAlpha(120)
+                                : cs.outlineVariant,
+                            width: selected ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Text(
+                          _filterLabel(key, l10n),
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight:
+                                selected ? FontWeight.w700 : FontWeight.w500,
+                            color: selected ? kBlaze : cs.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                );
+                )
+                    .animate(delay: AppAnim.listDelay(index))
+                    .fadeIn(duration: AppAnim.normal)
+                    .slideX(begin: 0.15, curve: AppAnim.smooth);
               }).toList(),
             ),
           ),
-          const Divider(height: 1),
           // İçerik
           Expanded(child: _buildBody(state, l10n)),
         ],
@@ -142,107 +173,86 @@ class _AuditLogScreenState extends ConsumerState<AuditLogScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.status == AuditLogStatus.error) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
-            const SizedBox(height: 12),
-            Text(state.errorMessage ?? l10n.auditLogError),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => ref.read(auditLogProvider.notifier).loadLogs(),
-              child: Text(l10n.auditLogRetry),
-            ),
-          ],
-        ),
+      return AppErrorState(
+        message: state.errorMessage ?? l10n.auditLogError,
+        retryLabel: l10n.auditLogRetry,
+        onRetry: () => ref.read(auditLogProvider.notifier).loadLogs(),
       );
     }
 
     final filtered = _filteredLogs(state.logs);
 
     if (filtered.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.history_outlined, size: 64, color: Colors.grey.shade400),
-            const SizedBox(height: 16),
-            Text(
-              state.logs.isEmpty
-                  ? l10n.auditLogEmpty
-                  : l10n.auditLogEmptyCategory(_filterLabel(_selectedCategory, l10n)),
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          ],
-        ),
-      );
+      return AppEmptyState(
+        icon: Icons.history_outlined,
+        title: state.logs.isEmpty
+            ? l10n.auditLogEmpty
+            : l10n.auditLogEmptyCategory(_filterLabel(_selectedCategory, l10n)),
+        accent: kTeal,
+      ).animate().fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth);
     }
+
+    final cs = Theme.of(context).colorScheme;
 
     return RefreshIndicator(
       onRefresh: () => ref.read(auditLogProvider.notifier).loadLogs(),
       child: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
         itemCount: filtered.length,
-        separatorBuilder: (context, idx) => const SizedBox(height: 8),
+        separatorBuilder: (context, idx) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
           final log = filtered[index];
           final action = log['action'] as String?;
           final status = log['status'] as String?;
           final extraData = log['extra_data'] as Map<String, dynamic>?;
           final itemTitle = extraData?['title'] as String?;
+          final accent = _colorForStatus(status);
 
-          return Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Colors.grey.shade200),
-            ),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: _colorForStatus(status).withAlpha(25),
-                child: Icon(
-                  _iconForAction(action),
-                  color: _colorForStatus(status),
-                  size: 20,
-                ),
-              ),
-              title: Text(
-                _getActionLabel(action, l10n),
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (itemTitle != null)
-                    Text(
-                      itemTitle,
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-                    ),
-                  Text(
-                    _formatDate(log['created_at'] as String?),
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                  ),
-                ],
-              ),
-              isThreeLine: itemTitle != null,
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _colorForStatus(status).withAlpha(25),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  status ?? '',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: _colorForStatus(status),
-                    fontWeight: FontWeight.w600,
+          return AppListCard(
+            child: Row(
+              children: [
+                DuotoneIcon(_iconForAction(action), color: accent),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getActionLabel(action, l10n),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 14.5),
+                      ),
+                      if (itemTitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          itemTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: 12.5, color: cs.onSurfaceVariant),
+                        ),
+                      ],
+                      const SizedBox(height: 3),
+                      Text(
+                        _formatDate(log['created_at'] as String?),
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                          color: cs.onSurfaceVariant.withAlpha(180),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                if (status != null && status.isNotEmpty)
+                  AppStatusBadge(label: status, color: accent),
+              ],
             ),
-          );
+          )
+              .animate(delay: AppAnim.listDelay(index))
+              .fadeIn(duration: AppAnim.normal)
+              .slideY(begin: 0.12, curve: AppAnim.smooth);
         },
       ),
     );

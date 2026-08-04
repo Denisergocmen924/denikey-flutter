@@ -2,12 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../providers/vault_provider.dart';
 import '../data/vault_repository.dart';
 import '../../../core/network/dio_client.dart';
+import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/app_tiles.dart';
 import '../../../core/providers/clipboard_timeout_provider.dart';
 import '../../categories/providers/category_provider.dart';
 import 'password_history_screen.dart';
@@ -269,7 +272,8 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
               await ref.read(vaultProvider.notifier).deleteItem(widget.item['id'].toString());
               if (mounted) Navigator.pop(context);
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(ctx).colorScheme.error),
             child: Text(l10n.detailDeleteButton),
           ),
         ],
@@ -294,54 +298,98 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-              child: Text(l10n.detailCategoryMove, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            ),
-            ListTile(
-              leading: CircleAvatar(
-                radius: 18,
-                backgroundColor: Colors.grey.shade200,
-                child: const Icon(Icons.folder_off_outlined, size: 18, color: Colors.grey),
-              ),
-              title: Text(l10n.detailCategoryUncategorized),
-              trailing: currentCategoryId == null ? const Icon(Icons.check, color: Color(0xFFFF5900)) : null,
-              onTap: () async {
-                Navigator.pop(ctx);
-                await ref.read(vaultProvider.notifier).updateItem(
-                  _fullItem['id'].toString(),
-                  {'category_id': null},
-                );
-                setState(() => _fullItem['category_id'] = null);
-              },
-            ),
-            ...categories.map((cat) {
-              final catId = cat['id'] as String?;
-              final name = cat['name_tr'] as String? ?? cat['name_en'] ?? '';
-              final isSelected = catId == currentCategoryId;
-              return ListTile(
-                leading: CircleAvatar(
-                  radius: 18,
-                  backgroundColor: const Color(0xFFFF5900).withAlpha(25),
-                  child: const Icon(Icons.folder_outlined, size: 18, color: Color(0xFFFF5900)),
+      builder: (ctx) {
+        final cs = Theme.of(ctx).colorScheme;
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 16),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: cs.onSurfaceVariant.withAlpha(70),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-                title: Text(name),
-                trailing: isSelected ? const Icon(Icons.check, color: Color(0xFFFF5900)) : null,
-                onTap: () async {
-                  Navigator.pop(ctx);
-                  await ref.read(vaultProvider.notifier).updateItem(
-                    _fullItem['id'].toString(),
-                    {'category_id': catId},
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: AppSectionTitle(l10n.detailCategoryMove),
+                ),
+                _categoryOption(
+                  ctx: ctx,
+                  icon: Icons.folder_off_outlined,
+                  accent: cs.onSurfaceVariant,
+                  label: l10n.detailCategoryUncategorized,
+                  selected: currentCategoryId == null,
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await ref.read(vaultProvider.notifier).updateItem(
+                      _fullItem['id'].toString(),
+                      {'category_id': null},
+                    );
+                    setState(() => _fullItem['category_id'] = null);
+                  },
+                ),
+                ...categories.map((cat) {
+                  final catId = cat['id'] as String?;
+                  final name = cat['name_tr'] as String? ?? cat['name_en'] ?? '';
+                  return _categoryOption(
+                    ctx: ctx,
+                    icon: Icons.folder_outlined,
+                    accent: kBlaze,
+                    label: name,
+                    selected: catId == currentCategoryId,
+                    onTap: () async {
+                      Navigator.pop(ctx);
+                      await ref.read(vaultProvider.notifier).updateItem(
+                        _fullItem['id'].toString(),
+                        {'category_id': catId},
+                      );
+                      setState(() => _fullItem['category_id'] = catId);
+                    },
                   );
-                  setState(() => _fullItem['category_id'] = catId);
-                },
-              );
-            }),
-            const SizedBox(height: 8),
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _categoryOption({
+    required BuildContext ctx,
+    required IconData icon,
+    required Color accent,
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: AppListCard(
+        onTap: onTap,
+        accent: selected ? accent : null,
+        child: Row(
+          children: [
+            DuotoneIcon(icon, color: accent, size: 34),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ),
+            if (selected) Icon(Icons.check, size: 20, color: accent),
           ],
         ),
       ),
@@ -352,55 +400,88 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
     bool isSecret = false,
     bool showSecret = false,
     VoidCallback? onToggleSecret,
+    int index = 0,
   }) {
     if (value == null || value.isEmpty) return const SizedBox.shrink();
     final cs = Theme.of(context).colorScheme;
+    final isLink = !isSecret && _isUrl(value);
+    final accent = isSecret ? kBlaze : (isLink ? const Color(0xFF4FC3F7) : kTeal);
+    final hidden = isSecret && !showSecret;
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: cs.outlineVariant),
-        ),
-        child: ListTile(
-          title: Text(label,
-            style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
-          subtitle: Text(
-            isSecret && !showSecret ? '••••••••' : value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: (!isSecret && _isUrl(value))
-                  ? const Color(0xFF4FC3F7)
-                  : cs.onSurface,
-              decoration: (!isSecret && _isUrl(value))
-                  ? TextDecoration.underline
-                  : null,
+      padding: const EdgeInsets.only(bottom: 10),
+      child: AppListCard(
+        accent: isSecret && showSecret ? kBlaze : null,
+        padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+        child: Row(
+          children: [
+            DuotoneIcon(
+              isSecret
+                  ? Icons.key_outlined
+                  : (isLink ? Icons.link : Icons.short_text),
+              color: accent,
             ),
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isSecret)
-                IconButton(
-                  icon: Icon(showSecret ? Icons.visibility_off : Icons.visibility),
-                  onPressed: onToggleSecret,
-                ),
-              if (!isSecret && _isUrl(value))
-                IconButton(
-                  icon: const Icon(Icons.open_in_new, size: 20),
-                  tooltip: AppLocalizations.of(context).detailLinkOpen,
-                  onPressed: () => _openLink(value),
-                ),
-              IconButton(
-                icon: const Icon(Icons.copy, size: 20),
-                onPressed: () => _copyToClipboard(value, label),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.9,
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    hidden ? '••••••••••' : value,
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w600,
+                      // Gizli/açık sır ve linkler dar aralıklı monospace ile
+                      // daha okunur (karakter karışması azalır)
+                      fontFamily: isSecret ? 'monospace' : null,
+                      letterSpacing: isSecret && !hidden ? 0.6 : null,
+                      color: isLink ? const Color(0xFF4FC3F7) : cs.onSurface,
+                      decoration: isLink ? TextDecoration.underline : null,
+                      decorationColor: const Color(0xFF4FC3F7),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            if (isSecret)
+              IconButton(
+                iconSize: 20,
+                color: cs.onSurfaceVariant,
+                icon: Icon(showSecret ? Icons.visibility_off : Icons.visibility),
+                onPressed: onToggleSecret,
+              ),
+            if (isLink)
+              IconButton(
+                iconSize: 20,
+                color: cs.onSurfaceVariant,
+                icon: const Icon(Icons.open_in_new),
+                tooltip: AppLocalizations.of(context).detailLinkOpen,
+                onPressed: () => _openLink(value),
+              ),
+            IconButton(
+              iconSize: 20,
+              color: cs.onSurfaceVariant,
+              icon: const Icon(Icons.copy),
+              onPressed: () => _copyToClipboard(value, label),
+            ),
+          ],
         ),
-      ),
+      )
+          .animate(delay: AppAnim.listDelay(index))
+          .fadeIn(duration: AppAnim.normal)
+          .slideY(begin: 0.1, curve: AppAnim.smooth),
     );
   }
 
@@ -416,7 +497,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             ? [
                 TextButton(
                   onPressed: _saving ? null : _cancelEdit,
-                  child: Text(l10n.detailCancelEdit, style: const TextStyle(color: Colors.white)),
+                  child: Text(l10n.detailCancelEdit),
                 ),
               ]
             : [
@@ -478,26 +559,13 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
   Widget _buildViewMode() {
     final l10n = AppLocalizations.of(context);
     if (_saveError != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(_saveError!, textAlign: TextAlign.center),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () {
-                  setState(() => _saveError = null);
-                  _loadItem();
-                },
-                child: Text(l10n.detailRetry),
-              ),
-            ],
-          ),
-        ),
+      return AppErrorState(
+        message: _saveError!,
+        retryLabel: l10n.detailRetry,
+        onRetry: () {
+          setState(() => _saveError = null);
+          _loadItem();
+        },
       );
     }
 
@@ -513,50 +581,68 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
         ? (currentCategory['name_tr'] as String? ?? currentCategory['name_en'] ?? '')
         : null;
 
+    final cs = Theme.of(context).colorScheme;
+
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
       children: [
-        const SizedBox(height: 8),
         // Klasör satırı
         Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-            ),
-            child: Builder(builder: (context) {
-              final cs = Theme.of(context).colorScheme;
-              return ListTile(
-                leading: Icon(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: AppListCard(
+            onTap: _showCategoryPicker,
+            child: Row(
+              children: [
+                DuotoneIcon(
                   Icons.folder_outlined,
-                  color: categoryName != null ? const Color(0xFFFF5900) : cs.onSurfaceVariant,
+                  color: categoryName != null ? kBlaze : cs.onSurfaceVariant,
                 ),
-                title: Text(l10n.detailCategoryLabel, style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
-                subtitle: Text(
-                  categoryName ?? l10n.detailCategoryUncategorized,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: categoryName != null ? cs.onSurface : cs.onSurfaceVariant,
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.detailCategoryLabel.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.9,
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        categoryName ?? l10n.detailCategoryUncategorized,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w600,
+                          color: categoryName != null
+                              ? cs.onSurface
+                              : cs.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                trailing: Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant),
-                onTap: _showCategoryPicker,
-              );
-            }),
-          ),
+                Icon(Icons.chevron_right, size: 20, color: cs.onSurfaceVariant),
+              ],
+            ),
+          )
+              .animate()
+              .fadeIn(duration: AppAnim.normal)
+              .slideY(begin: 0.1, curve: AppAnim.smooth),
         ),
         _infoTile(l10n.detailPasswordLabel, _decryptedPassword,
           isSecret: true,
           showSecret: _showPassword,
           onToggleSecret: () => setState(() => _showPassword = !_showPassword),
+          index: 1,
         ),
         if (_customFields.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Divider(color: Theme.of(context).colorScheme.outlineVariant),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           ..._customFields.asMap().entries.map((entry) {
             final i = entry.key;
             final field = entry.value;
@@ -568,6 +654,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
               showSecret: _showCustomField[i] ?? !isSecret,
               onToggleSecret: () => setState(() =>
                 _showCustomField[i] = !(_showCustomField[i] ?? !isSecret)),
+              index: i + 2,
             );
           }),
         ],
@@ -577,37 +664,44 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
 
   Widget _buildEditForm() {
     final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 8),
-
           // Başlık
           TextField(
             controller: _titleCtrl,
             decoration: InputDecoration(
               labelText: l10n.detailEditTitle,
-              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.title, size: 20),
             ),
-          ),
+          )
+              .animate()
+              .fadeIn(duration: AppAnim.normal)
+              .slideY(begin: 0.1, curve: AppAnim.smooth),
           const SizedBox(height: 12),
 
           // Şifre
           TextField(
             controller: _passwordCtrl,
             obscureText: !_showPassword,
+            style: const TextStyle(fontFamily: 'monospace', letterSpacing: 0.6),
             decoration: InputDecoration(
               labelText: l10n.detailEditPassword,
-              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.key_outlined, size: 20),
               suffixIcon: IconButton(
                 icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
                 onPressed: () => setState(() => _showPassword = !_showPassword),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
+          )
+              .animate(delay: AppAnim.entranceDelay(1))
+              .fadeIn(duration: AppAnim.normal)
+              .slideY(begin: 0.1, curve: AppAnim.smooth),
+          const SizedBox(height: 18),
 
           // Mevcut + yeni custom fields
           ..._editCustomFields.asMap().entries.map((entry) {
@@ -618,50 +712,62 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             final showFieldValue = _showCustomField[i] ?? false;
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: f['key'],
-                          decoration: InputDecoration(
-                            labelText: l10n.detailEditCustomFieldKeyLabel,
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: f['value'],
-                          obscureText: isFieldSecret && !showFieldValue,
-                          decoration: InputDecoration(
-                            labelText: l10n.detailEditCustomFieldValueLabel,
-                            border: const OutlineInputBorder(),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                isFieldSecret ? Icons.visibility_off : Icons.visibility,
-                              ),
-                              onPressed: () => setState(() {
-                                final nowSecret = !isFieldSecret;
-                                if (i < _editFieldTypes.length) {
-                                  _editFieldTypes[i] = nowSecret ? 'secret' : 'text';
-                                }
-                                _showCustomField[i] = !nowSecret;
-                              }),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: cs.surfaceContainerLow,
+                  border: Border.all(color: cs.outlineVariant),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: f['key'],
+                            decoration: InputDecoration(
+                              labelText: l10n.detailEditCustomFieldKeyLabel,
+                              isDense: true,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: f['value'],
+                            obscureText: isFieldSecret && !showFieldValue,
+                            decoration: InputDecoration(
+                              labelText: l10n.detailEditCustomFieldValueLabel,
+                              isDense: true,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  isFieldSecret ? Icons.visibility_off : Icons.visibility,
+                                ),
+                                onPressed: () => setState(() {
+                                  final nowSecret = !isFieldSecret;
+                                  if (i < _editFieldTypes.length) {
+                                    _editFieldTypes[i] = nowSecret ? 'secret' : 'text';
+                                  }
+                                  _showCustomField[i] = !nowSecret;
+                                }),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                    onPressed: () => _removeEditCustomField(i),
-                  ),
-                ],
+                    IconButton(
+                      icon: const Icon(Icons.remove_circle_outline),
+                      color: cs.error,
+                      onPressed: () => _removeEditCustomField(i),
+                    ),
+                  ],
+                ),
               ),
-            );
+            )
+                .animate(delay: AppAnim.listDelay(i))
+                .fadeIn(duration: AppAnim.normal)
+                .slideY(begin: 0.1, curve: AppAnim.smooth);
           }),
 
           // Alan ekle butonu
@@ -669,7 +775,11 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             onPressed: _addEditCustomField,
             icon: const Icon(Icons.add),
             label: Text(l10n.addItemAddFieldButton),
-            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFFF5900)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: kBlaze,
+              side: BorderSide(color: kBlaze.withAlpha(90)),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -677,7 +787,7 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(_saveError!,
-                style: const TextStyle(color: Colors.red, fontSize: 13)),
+                style: TextStyle(color: cs.error, fontSize: 13)),
             ),
 
           // Kaydet
@@ -685,14 +795,12 @@ class _VaultItemDetailScreenState extends ConsumerState<VaultItemDetailScreen> {
             onPressed: _saving ? null : _saveEdit,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: _saving
                 ? const SizedBox(height: 20, width: 20,
                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : Text(l10n.detailEditSaveButton, style: const TextStyle(fontSize: 16)),
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );

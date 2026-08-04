@@ -2,11 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/crypto/encryption_service.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/providers/clipboard_timeout_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/app_tiles.dart';
 
 class PasswordHistoryScreen extends ConsumerStatefulWidget {
   final String itemId;
@@ -74,7 +77,8 @@ class _PasswordHistoryScreenState extends ConsumerState<PasswordHistoryScreen> {
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.addItemCancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(ctx).colorScheme.error),
             child: Text(l10n.passwordHistoryClear),
           ),
         ],
@@ -140,90 +144,109 @@ class _PasswordHistoryScreenState extends ConsumerState<PasswordHistoryScreen> {
     if (_loading) return const Center(child: CircularProgressIndicator());
 
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
-            const SizedBox(height: 12),
-            Text(_error!),
-            const SizedBox(height: 12),
-            FilledButton(onPressed: _load, child: Text(l10n.passwordHistoryRetry)),
-          ],
-        ),
+      return AppErrorState(
+        message: _error!,
+        retryLabel: l10n.passwordHistoryRetry,
+        onRetry: _load,
       );
     }
 
     if (_history.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.history, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            Text(l10n.passwordHistoryEmpty,
-                style: const TextStyle(fontSize: 16, color: Colors.grey)),
-            const SizedBox(height: 8),
-            Text(l10n.passwordHistoryEmptyHint,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
-                textAlign: TextAlign.center),
-          ],
-        ),
-      );
+      return AppEmptyState(
+        icon: Icons.history,
+        title: l10n.passwordHistoryEmpty,
+        subtitle: l10n.passwordHistoryEmptyHint,
+        accent: kTeal,
+      ).animate().fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth);
     }
 
+    final cs = Theme.of(context).colorScheme;
+
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
       itemCount: _history.length,
-      separatorBuilder: (context, idx) => const SizedBox(height: 8),
+      separatorBuilder: (context, idx) => const SizedBox(height: 10),
       itemBuilder: (context, i) {
         final h = _history[i];
         final decrypted = h['decrypted'] as String? ?? '';
         final changedAt = h['changed_at'] as String?;
         final isRevealed = _revealed.contains(i);
 
-        return Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.grey.shade200),
-          ),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: const Color(0xFFFF5900).withAlpha(25),
-              child: Text(
-                '${_history.length - i}',
-                style: const TextStyle(
-                    color: Color(0xFFFF5900), fontWeight: FontWeight.bold),
+        return AppListCard(
+          padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
+          child: Row(
+            children: [
+              // Sürüm numarası — en yeni kayıt en üstte, en büyük numarayı alır
+              Container(
+                width: 38,
+                height: 38,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [kBlaze.withAlpha(55), kBlaze.withAlpha(20)],
+                  ),
+                  borderRadius: BorderRadius.circular(11),
+                  border: Border.all(color: kBlaze.withAlpha(55)),
+                ),
+                child: Text(
+                  '${_history.length - i}',
+                  style: const TextStyle(
+                      color: kBlaze,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700),
+                ),
               ),
-            ),
-            title: Text(
-              isRevealed ? decrypted : '••••••••',
-              style: const TextStyle(
-                  fontFamily: 'monospace', fontWeight: FontWeight.w500),
-            ),
-            subtitle: changedAt != null
-                ? Text(_formatDate(changedAt),
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600))
-                : null,
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(isRevealed ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() {
-                    if (isRevealed) { _revealed.remove(i); }
-                    else { _revealed.add(i); }
-                  }),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isRevealed ? decrypted : '••••••••••',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    if (changedAt != null) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        _formatDate(changedAt),
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.copy, size: 20),
-                  onPressed: () => _copyToClipboard(decrypted),
-                ),
-              ],
-            ),
+              ),
+              IconButton(
+                iconSize: 20,
+                icon: Icon(
+                    isRevealed ? Icons.visibility_off : Icons.visibility),
+                onPressed: () => setState(() {
+                  if (isRevealed) { _revealed.remove(i); }
+                  else { _revealed.add(i); }
+                }),
+              ),
+              IconButton(
+                iconSize: 20,
+                icon: const Icon(Icons.copy),
+                color: kTeal,
+                onPressed: () => _copyToClipboard(decrypted),
+              ),
+            ],
           ),
-        );
+        )
+            .animate(delay: AppAnim.listDelay(i))
+            .fadeIn(duration: AppAnim.normal)
+            .slideY(begin: 0.12, curve: AppAnim.smooth);
       },
     );
   }

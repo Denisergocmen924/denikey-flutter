@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../vault/providers/vault_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/app_tiles.dart';
 
 class CategoryDetailScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> category;
@@ -20,12 +23,12 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
   }
 
   Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
+    if (hex == null || hex.isEmpty) return kBlaze;
     try {
       final h = hex.replaceAll('#', '');
       return Color(int.parse('FF$h', radix: 16));
     } catch (_) {
-      return const Color(0xFFFF5900);
+      return kBlaze;
     }
   }
 
@@ -40,57 +43,75 @@ class _CategoryDetailScreenState extends ConsumerState<CategoryDetailScreen> {
     // Bu kategoriye ait item'ları filtrele
     final items = vaultState.items.where((item) => item['category_id'] == categoryId).toList();
 
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(categoryName),
-        backgroundColor: color,
-        foregroundColor: Colors.white,
+        // Kategori rengi zemine değil alttaki ince şeride uygulanır —
+        // dolu renkli app bar koyu temanın dengesini bozuyordu.
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3),
+          child: Container(height: 3, color: color),
+        ),
       ),
       body: vaultState.status == VaultStatus.loading
           ? const Center(child: CircularProgressIndicator())
           : items.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.lock_open_outlined, size: 64, color: Colors.grey.shade300),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.categoryDetailEmpty,
-                        style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
-                      ),
-                    ],
-                  ),
-                )
+              ? AppEmptyState(
+                  icon: Icons.lock_open_outlined,
+                  title: l10n.categoryDetailEmpty,
+                  accent: color,
+                ).animate().fadeIn(
+                    duration: AppAnim.slow, curve: AppAnim.smooth)
               : ListView.separated(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
                   itemCount: items.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    return Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade200),
+                    final subtitle = item['username'] ?? item['url'] ?? '';
+
+                    return AppListCard(
+                      onTap: () => context.push('/vault/detail', extra: item),
+                      child: Row(
+                        children: [
+                          DuotoneIcon(Icons.lock_outline, color: color),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item['title'] ?? l10n.categoryDetailItem,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                if (subtitle.toString().isNotEmpty) ...[
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    subtitle,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 12.5,
+                                        color: cs.onSurfaceVariant),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.chevron_right,
+                              size: 20, color: cs.onSurfaceVariant),
+                        ],
                       ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: color.withAlpha(38),
-                          child: Icon(Icons.lock_outline, color: color, size: 20),
-                        ),
-                        title: Text(
-                          item['title'] ?? l10n.categoryDetailItem,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        subtitle: Text(
-                          item['username'] ?? item['url'] ?? '',
-                          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                        ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                        onTap: () => context.push('/vault/detail', extra: item),
-                      ),
-                    );
+                    )
+                        .animate(delay: AppAnim.listDelay(index))
+                        .fadeIn(duration: AppAnim.normal)
+                        .slideY(begin: 0.12, curve: AppAnim.smooth);
                   },
                 ),
     );

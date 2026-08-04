@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/category_provider.dart';
 import '../../item_types/providers/item_type_provider.dart';
+import '../../../core/presentation/app_animations.dart';
 import '../../../core/presentation/app_nav_bar.dart';
+import '../../../core/presentation/app_tiles.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 
 class LibraryScreen extends ConsumerStatefulWidget {
@@ -18,7 +21,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
   late final TabController _tabController;
 
   final List<Color> _colorPalette = [
-    const Color(0xFFFF5900),
+    kBlaze,
     const Color(0xFF185FA5),
     const Color(0xFF0F6E56),
     const Color(0xFF993C1D),
@@ -46,7 +49,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     MapEntry('email', Icons.email_outlined),
   ];
 
-  Color _selectedColor = const Color(0xFFFF5900);
+  Color _selectedColor = kBlaze;
   String _selectedIcon = 'category';
 
   @override
@@ -71,12 +74,12 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
       '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
 
   Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return const Color(0xFFFF5900);
+    if (hex == null || hex.isEmpty) return kBlaze;
     try {
       final h = hex.replaceAll('#', '');
       return Color(int.parse('FF$h', radix: 16));
     } catch (_) {
-      return const Color(0xFFFF5900);
+      return kBlaze;
     }
   }
 
@@ -111,31 +114,16 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                   controller: nameCtrl,
                   decoration: InputDecoration(
                     labelText: l10n.libraryCategoryName,
-                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.folder_outlined, size: 20),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(l10n.libraryCategoryColorSelect, style: const TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _colorPalette.map((c) {
-                    final sel = _selectedColor == c;
-                    return GestureDetector(
-                      onTap: () => setS(() => _selectedColor = c),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: c,
-                          shape: BoxShape.circle,
-                          border: sel ? Border.all(color: Colors.black, width: 3) : null,
-                        ),
-                        child: sel ? const Icon(Icons.check, color: Colors.white, size: 18) : null,
-                      ),
-                    );
-                  }).toList(),
+                const SizedBox(height: 18),
+                AppSectionTitle(l10n.libraryCategoryColorSelect,
+                    accent: _selectedColor),
+                _ColorPalette(
+                  colors: _colorPalette,
+                  selected: _selectedColor,
+                  onSelect: (c) => setS(() => _selectedColor = c),
                 ),
               ],
             ),
@@ -182,7 +170,8 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
               Navigator.pop(ctx);
               ref.read(categoryProvider.notifier).deleteCategory(id);
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(ctx).colorScheme.error),
             child: Text(l10n.libraryDeleteCategoryTitle),
           ),
         ],
@@ -223,65 +212,27 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                   children: [
                     TextField(
                       controller: nameCtrl,
-                      decoration: InputDecoration(labelText: l10n.addItemTypeNameLabel),
+                      decoration: InputDecoration(
+                        labelText: l10n.addItemTypeNameLabel,
+                        prefixIcon: Icon(_iconDataFor(_selectedIcon), size: 20),
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    Text(l10n.addItemTypeSelectIcon, style: TextStyle(
-                      fontWeight: FontWeight.w600, color: cs.onSurface)),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _iconOptions.map((e) {
-                        final sel = _selectedIcon == e.key;
-                        return GestureDetector(
-                          onTap: () => setS(() => _selectedIcon = e.key),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: sel
-                                  ? _selectedColor.withAlpha(51)
-                                  : cs.surfaceContainerHigh,
-                              borderRadius: BorderRadius.circular(8),
-                              border: sel
-                                  ? Border.all(color: _selectedColor, width: 2)
-                                  : null,
-                            ),
-                            child: Icon(e.value,
-                                size: 22,
-                                color: sel ? _selectedColor : cs.onSurfaceVariant),
-                          ),
-                        );
-                      }).toList(),
+                    const SizedBox(height: 18),
+                    AppSectionTitle(l10n.addItemTypeSelectIcon,
+                        accent: _selectedColor),
+                    _IconPalette(
+                      options: _iconOptions,
+                      selectedKey: _selectedIcon,
+                      accent: _selectedColor,
+                      onSelect: (k) => setS(() => _selectedIcon = k),
                     ),
-                    const SizedBox(height: 16),
-                    Text(l10n.libraryCategoryColorSelect, style: TextStyle(
-                      fontWeight: FontWeight.w600, color: cs.onSurface)),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _colorPalette.map((c) {
-                        final sel = _selectedColor == c;
-                        return GestureDetector(
-                          onTap: () => setS(() => _selectedColor = c),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: c,
-                              shape: BoxShape.circle,
-                              border: sel
-                                  ? Border.all(color: cs.onSurface, width: 3)
-                                  : null,
-                            ),
-                            child: sel
-                                ? const Icon(Icons.check, color: Colors.white, size: 18)
-                                : null,
-                          ),
-                        );
-                      }).toList(),
+                    const SizedBox(height: 18),
+                    AppSectionTitle(l10n.libraryCategoryColorSelect,
+                        accent: _selectedColor),
+                    _ColorPalette(
+                      colors: _colorPalette,
+                      selected: _selectedColor,
+                      onSelect: (c) => setS(() => _selectedColor = c),
                     ),
 
                     const SizedBox(height: 20),
@@ -417,70 +368,32 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                   children: [
                     TextField(
                       controller: nameCtrl,
-                      decoration: InputDecoration(labelText: l10n.addItemTypeNameLabel),
+                      decoration: InputDecoration(
+                        labelText: l10n.addItemTypeNameLabel,
+                        prefixIcon: Icon(_iconDataFor(_selectedIcon), size: 20),
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    Text(l10n.addItemTypeSelectIcon, style: TextStyle(
-                      fontWeight: FontWeight.w600, color: cs.onSurface)),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _iconOptions.map((e) {
-                        final sel = _selectedIcon == e.key;
-                        return GestureDetector(
-                          onTap: () => setS(() => _selectedIcon = e.key),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: sel
-                                  ? _selectedColor.withAlpha(51)
-                                  : cs.surfaceContainerHigh,
-                              borderRadius: BorderRadius.circular(8),
-                              border: sel
-                                  ? Border.all(color: _selectedColor, width: 2)
-                                  : null,
-                            ),
-                            child: Icon(e.value,
-                                size: 22,
-                                color: sel ? _selectedColor : cs.onSurfaceVariant),
-                          ),
-                        );
-                      }).toList(),
+                    const SizedBox(height: 18),
+                    AppSectionTitle(l10n.addItemTypeSelectIcon,
+                        accent: _selectedColor),
+                    _IconPalette(
+                      options: _iconOptions,
+                      selectedKey: _selectedIcon,
+                      accent: _selectedColor,
+                      onSelect: (k) => setS(() => _selectedIcon = k),
                     ),
-                    const SizedBox(height: 16),
-                    Text(l10n.libraryCategoryColorSelect, style: TextStyle(
-                      fontWeight: FontWeight.w600, color: cs.onSurface)),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _colorPalette.map((c) {
-                        final sel = _selectedColor == c;
-                        return GestureDetector(
-                          onTap: () => setS(() => _selectedColor = c),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: c,
-                              shape: BoxShape.circle,
-                              border: sel
-                                  ? Border.all(color: cs.onSurface, width: 3)
-                                  : null,
-                            ),
-                            child: sel
-                                ? const Icon(Icons.check, color: Colors.white, size: 18)
-                                : null,
-                          ),
-                        );
-                      }).toList(),
+                    const SizedBox(height: 18),
+                    AppSectionTitle(l10n.libraryCategoryColorSelect,
+                        accent: _selectedColor),
+                    _ColorPalette(
+                      colors: _colorPalette,
+                      selected: _selectedColor,
+                      onSelect: (c) => setS(() => _selectedColor = c),
                     ),
                     if (fields.isNotEmpty) ...[
                       const SizedBox(height: 20),
-                      Divider(color: cs.outlineVariant),
-                      const SizedBox(height: 4),
+                      AppSectionTitle(l10n.addItemTypeFixedFields,
+                          accent: _selectedColor),
                       ...fields.map((f) {
                         final fid = f['id'] as String? ?? '';
                         final fieldType = f['field_type'] as String? ?? 'text';
@@ -488,19 +401,22 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
                             children: [
-                              Icon(
-                                fieldType == 'secret' ? Icons.lock_outline : Icons.text_fields,
-                                size: 16,
-                                color: cs.onSurfaceVariant,
+                              DuotoneIcon(
+                                fieldType == 'secret'
+                                    ? Icons.lock_outline
+                                    : Icons.text_fields,
+                                color: fieldType == 'secret'
+                                    ? kBlaze
+                                    : cs.onSurfaceVariant,
+                                size: 32,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 10),
                               Expanded(
                                 child: TextField(
                                   controller: fieldControllers[fid],
                                   decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
                                     isDense: true,
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                   ),
                                   style: const TextStyle(fontSize: 13),
                                 ),
@@ -514,33 +430,42 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                     ...newFields.asMap().entries.map((e) {
                       final i = e.key;
                       final nf = e.value;
+                      final isSecret = nf['isSecret'] == true;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Row(
                           children: [
-                            IconButton(
-                              tooltip: nf['isSecret'] == true ? 'Gizli' : 'Normal',
-                              icon: Icon(
-                                nf['isSecret'] == true ? Icons.lock_outline : Icons.text_fields,
-                                size: 18,
-                                color: nf['isSecret'] == true ? const Color(0xFFFF5900) : cs.onSurfaceVariant,
+                            // Tek dokunuşla normal ↔ gizli alan tipi
+                            Tooltip(
+                              message: isSecret
+                                  ? l10n.addItemTypeFieldTypeSecret
+                                  : l10n.addItemTypeFieldTypeText,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(10),
+                                onTap: () => setS(
+                                    () => nf['isSecret'] = !(nf['isSecret'] as bool)),
+                                child: DuotoneIcon(
+                                  isSecret ? Icons.lock_outline : Icons.text_fields,
+                                  color: isSecret ? kBlaze : cs.onSurfaceVariant,
+                                  size: 32,
+                                ),
                               ),
-                              onPressed: () => setS(() => nf['isSecret'] = !(nf['isSecret'] as bool)),
                             ),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: TextField(
                                 controller: nf['nameCtrl'] as TextEditingController,
                                 decoration: InputDecoration(
                                   labelText: l10n.addItemExtraFieldKeyLabel,
-                                  border: const OutlineInputBorder(),
                                   isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                 ),
                                 style: const TextStyle(fontSize: 13),
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.remove_circle_outline, color: Colors.red, size: 18),
+                              icon: const Icon(Icons.remove_circle_outline, size: 18),
+                              color: cs.error,
                               onPressed: () => setS(() => newFields.removeAt(i)),
                             ),
                           ],
@@ -551,7 +476,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                       onPressed: () => setS(() => newFields.add({'nameCtrl': TextEditingController(), 'isSecret': false})),
                       icon: const Icon(Icons.add, size: 18),
                       label: Text(l10n.addItemAddFieldButton),
-                      style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF5900)),
+                      style: TextButton.styleFrom(foregroundColor: kBlaze),
                     ),
                   ],
                 ),
@@ -617,7 +542,8 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
               Navigator.pop(ctx);
               ref.read(itemTypeProvider.notifier).deleteItemType(id);
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(ctx).colorScheme.error),
             child: Text(l10n.libraryDeleteCategoryTitle),
           ),
         ],
@@ -696,50 +622,80 @@ class _CategoriesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
+
     if (state.status == CategoryStatus.loading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.status == CategoryStatus.error) {
-      return Center(child: Text(state.errorMessage ?? l10n.libraryEmptyCategories));
+      return AppEmptyState(
+        icon: Icons.error_outline,
+        title: state.errorMessage ?? l10n.libraryEmptyCategories,
+        accent: cs.error,
+      );
     }
     if (state.categories.isEmpty) {
-      return Center(
-        child: Text(l10n.libraryEmptyCategories, style: const TextStyle(color: Colors.grey)),
-      );
+      return AppEmptyState(
+        icon: Icons.folder_outlined,
+        title: l10n.libraryEmptyCategories,
+      ).animate().fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth);
     }
 
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
       itemCount: state.categories.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final cat = state.categories[index];
         final isSystem = cat['is_system'] == true;
         final color = parseColor(cat['color'] as String?);
         final name = isSystem ? l10n.categoriesUncategorized : (cat['name_tr'] ?? cat['name_en'] ?? '');
 
-        return Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: color.withAlpha(38),
-              child: Icon(
+        return AppListCard(
+          onTap: () => context.push('/categories/detail', extra: cat),
+          child: Row(
+            children: [
+              DuotoneIcon(
                 isSystem ? Icons.folder : Icons.folder_outlined,
                 color: color,
               ),
-            ),
-            title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: isSystem
-                ? Text(l10n.librarySystemLabel, style: const TextStyle(fontSize: 12))
-                : null,
-            trailing: isSystem
-                ? const Icon(Icons.lock_outline, size: 16, color: Colors.grey)
-                : IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () => onDelete(cat['id'].toString(), isSystem),
-                  ),
-            onTap: () => context.push('/categories/detail', extra: cat),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.w600),
+                    ),
+                    if (isSystem) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        l10n.librarySystemLabel,
+                        style: TextStyle(
+                            fontSize: 12, color: cs.onSurfaceVariant),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              if (isSystem)
+                Icon(Icons.lock_outline, size: 17, color: cs.onSurfaceVariant)
+              else
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 20),
+                  color: cs.error,
+                  onPressed: () => onDelete(cat['id'].toString(), isSystem),
+                ),
+            ],
           ),
-        );
+        )
+            .animate(delay: AppAnim.listDelay(index))
+            .fadeIn(duration: AppAnim.normal)
+            .slideY(begin: 0.12, curve: AppAnim.smooth);
       },
     );
   }
@@ -766,19 +722,24 @@ class _ItemTypesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cs = Theme.of(context).colorScheme;
+
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.itemTypes.isEmpty) {
-      return Center(
-        child: Text(AppLocalizations.of(context).libraryEmptyTypes, style: const TextStyle(color: Colors.grey)),
-      );
+      return AppEmptyState(
+        icon: Icons.category_outlined,
+        title: l10n.libraryEmptyTypes,
+        accent: kTeal,
+      ).animate().fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth);
     }
 
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
       itemCount: state.itemTypes.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final type = state.itemTypes[index];
         final isSystem = type['is_system'] == true;
@@ -787,36 +748,156 @@ class _ItemTypesTab extends StatelessWidget {
         final name = type['name_tr'] ?? type['name_en'] ?? '';
         final fields = (type['fields'] as List<dynamic>? ?? []);
 
-        return Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: color.withAlpha(38),
-              child: Icon(icon, color: color),
-            ),
-            title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
-            subtitle: Text(
-              AppLocalizations.of(context).libraryTypeFieldCount(fields.length),
-              style: const TextStyle(fontSize: 12),
-            ),
-            trailing: isSystem
-                ? const Icon(Icons.lock_outline, size: 16, color: Colors.grey)
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, color: Colors.grey),
-                        onPressed: () => onEdit(type),
+        return AppListCard(
+          onTap: isSystem ? null : () => onEdit(type),
+          child: Row(
+            children: [
+              DuotoneIcon(icon, color: color),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      l10n.libraryTypeFieldCount(fields.length),
+                      style:
+                          TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+              if (isSystem)
+                Icon(Icons.lock_outline, size: 17, color: cs.onSurfaceVariant)
+              else ...[
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  color: cs.onSurfaceVariant,
+                  onPressed: () => onEdit(type),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 20),
+                  color: cs.error,
+                  onPressed: () => onDelete(type['id'].toString(), isSystem),
+                ),
+              ],
+            ],
+          ),
+        )
+            .animate(delay: AppAnim.listDelay(index))
+            .fadeIn(duration: AppAnim.normal)
+            .slideY(begin: 0.12, curve: AppAnim.smooth);
+      },
+    );
+  }
+}
+
+// --- Diyaloglarda kullanılan renk / ikon seçiciler ---
+
+class _ColorPalette extends StatelessWidget {
+  final List<Color> colors;
+  final Color selected;
+  final ValueChanged<Color> onSelect;
+
+  const _ColorPalette({
+    required this.colors,
+    required this.selected,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: colors.map((c) {
+        final sel = selected == c;
+        return GestureDetector(
+          onTap: () => onSelect(c),
+          child: AnimatedContainer(
+            duration: AppAnim.fast,
+            curve: AppAnim.smooth,
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: c,
+              borderRadius: BorderRadius.circular(sel ? 12 : 18),
+              boxShadow: sel
+                  ? [
+                      BoxShadow(
+                        color: c.withAlpha(120),
+                        blurRadius: 14,
+                        spreadRadius: -2,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red),
-                        onPressed: () => onDelete(type['id'].toString(), isSystem),
-                      ),
-                    ],
-                  ),
-            onTap: isSystem ? null : () => onEdit(type),
+                    ]
+                  : null,
+            ),
+            child: sel
+                ? const Icon(Icons.check, color: Colors.white, size: 18)
+                : null,
           ),
         );
-      },
+      }).toList(),
+    );
+  }
+}
+
+class _IconPalette extends StatelessWidget {
+  final List<MapEntry<String, IconData>> options;
+  final String selectedKey;
+  final Color accent;
+  final ValueChanged<String> onSelect;
+
+  const _IconPalette({
+    required this.options,
+    required this.selectedKey,
+    required this.accent,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: options.map((e) {
+        final sel = selectedKey == e.key;
+        return GestureDetector(
+          onTap: () => onSelect(e.key),
+          child: AnimatedContainer(
+            duration: AppAnim.fast,
+            curve: AppAnim.smooth,
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              gradient: sel
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [accent.withAlpha(70), accent.withAlpha(25)],
+                    )
+                  : null,
+              color: sel ? null : cs.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: sel ? accent : cs.outlineVariant,
+                width: sel ? 1.5 : 1,
+              ),
+            ),
+            child: Icon(e.value,
+                size: 21, color: sel ? accent : cs.onSurfaceVariant),
+          ),
+        );
+      }).toList(),
     );
   }
 }

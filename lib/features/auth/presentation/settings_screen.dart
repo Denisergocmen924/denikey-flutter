@@ -18,6 +18,7 @@ import '../../../core/biometric/biometric_service.dart';
 import '../../../core/presentation/app_nav_bar.dart';
 import '../../../core/presentation/app_shortcuts.dart';
 import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/app_tiles.dart';
 import '../../devices/data/device_repository.dart';
 import '../../devices/providers/device_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
@@ -188,7 +189,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             Text(
               l10n.settingsDeleteAccountWarningContent,
-              style: const TextStyle(color: Colors.red, fontSize: 13),
+              style: const TextStyle(color: _danger, fontSize: 13),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -204,7 +205,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.settingsDeleteAccountCancel)),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: _danger),
             onPressed: () {
               if (usernameCtrl.text.trim().isNotEmpty) Navigator.pop(ctx, true);
             },
@@ -237,7 +238,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.settingsDeleteAccountCancel)),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: _danger),
             onPressed: () {
               if (pass1Ctrl.text.isNotEmpty) Navigator.pop(ctx, true);
             },
@@ -286,7 +287,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.settingsDeleteAccountCancel)),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: _danger),
             onPressed: () {
               if (pass2Ctrl.text.isNotEmpty) Navigator.pop(ctx, true);
             },
@@ -313,7 +314,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } else {
       final err = ref.read(profileProvider).errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(err ?? l10n.settingsDeleteAccountFailed), backgroundColor: Colors.red),
+        SnackBar(content: Text(err ?? l10n.settingsDeleteAccountFailed), backgroundColor: _danger),
       );
       ref.read(profileProvider.notifier).reset();
     }
@@ -1100,7 +1101,7 @@ class _CountdownDialogState extends State<_CountdownDialog> {
             height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.red, width: 3),
+              border: Border.all(color: _danger, width: 3),
             ),
             child: Center(
               child: Text(
@@ -1108,7 +1109,8 @@ class _CountdownDialogState extends State<_CountdownDialog> {
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.red,
+                  color: _danger,
+                  fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
             ),
@@ -1120,7 +1122,7 @@ class _CountdownDialogState extends State<_CountdownDialog> {
                 : l10n.settingsDeleteAccountCountdownReady,
             style: TextStyle(
               fontSize: 13,
-              color: _seconds > 0 ? Colors.grey : Colors.red,
+              color: _seconds > 0 ? Theme.of(context).colorScheme.onSurfaceVariant : _danger,
             ),
           ),
         ],
@@ -1131,7 +1133,7 @@ class _CountdownDialogState extends State<_CountdownDialog> {
           child: Text(l10n.settingsDeleteAccountCancel),
         ),
         FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: Colors.red),
+          style: FilledButton.styleFrom(backgroundColor: _danger),
           onPressed: _seconds > 0 ? null : () => Navigator.pop(context, true),
           child: Text(l10n.settingsDeleteAccountYesConfirm),
         ),
@@ -1183,28 +1185,14 @@ class _HelpTileState extends State<_HelpTile> {
 }
 
 /// Navigasyon satırları için duotone (gradyan dolgulu) leading ikon kümesi.
+/// Ortak [DuotoneIcon] üzerine ince bir sarmalayıcı — çağrı yerleri değişmesin diye korundu.
 class _LeadingIcon extends StatelessWidget {
   final IconData icon;
   final Color color;
-  const _LeadingIcon(this.icon, {this.color = const Color(0xFFFF5900)});
+  const _LeadingIcon(this.icon, {this.color = kBlaze});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 38,
-      height: 38,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [color.withAlpha(55), color.withAlpha(20)],
-        ),
-        borderRadius: BorderRadius.circular(11),
-        border: Border.all(color: color.withAlpha(55)),
-      ),
-      child: Icon(icon, color: color, size: 20),
-    );
-  }
+  Widget build(BuildContext context) => DuotoneIcon(icon, color: color);
 }
 
 // ─── Cihazlarım alt sayfa ────────────────────────────────────────────────────
@@ -1236,31 +1224,32 @@ class _DevicesSheetState extends ConsumerState<_DevicesSheet> {
       builder: (_, controller) => Container(
         decoration: BoxDecoration(
           color: cs.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
             Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 4),
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: cs.onSurfaceVariant.withValues(alpha: 0.3),
+                color: cs.onSurfaceVariant.withAlpha(70),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.fromLTRB(16, 4, 8, 12),
               child: Row(
                 children: [
-                  Icon(Icons.devices_outlined, color: cs.primary),
-                  const SizedBox(width: 10),
-                  Text(l10n.settingsDevicesTitle,
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: cs.onSurface)),
-                  const Spacer(),
+                  const DuotoneIcon(Icons.devices_outlined),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(l10n.settingsDevicesTitle,
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: cs.onSurface)),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.refresh),
                     tooltip: l10n.settingsDeviceRefresh,
@@ -1269,25 +1258,31 @@ class _DevicesSheetState extends ConsumerState<_DevicesSheet> {
                 ],
               ),
             ),
-            const Divider(height: 1),
             Expanded(
               child: devicesAsync.when(
                 loading: () =>
                     const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(
-                  child: Text(l10n.settingsDevicesError,
-                      style: TextStyle(color: cs.error)),
+                error: (e, _) => AppErrorState(
+                  message: l10n.settingsDevicesError,
+                  retryLabel: l10n.settingsDeviceRefresh,
+                  onRetry: () => ref.invalidate(devicesProvider),
                 ),
                 data: (devices) => devices.isEmpty
-                    ? Center(
-                        child: Text(l10n.settingsDevicesEmpty,
-                            style: TextStyle(color: cs.onSurfaceVariant)),
+                    ? AppEmptyState(
+                        icon: Icons.devices_outlined,
+                        title: l10n.settingsDevicesEmpty,
+                        accent: kTeal,
                       )
-                    : ListView.builder(
+                    : ListView.separated(
                         controller: controller,
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                         itemCount: devices.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (_, i) =>
-                            _DeviceTile(device: devices[i]),
+                            _DeviceTile(device: devices[i])
+                                .animate(delay: AppAnim.listDelay(i))
+                                .fadeIn(duration: AppAnim.normal)
+                                .slideY(begin: 0.12, curve: AppAnim.smooth),
                       ),
               ),
             ),
@@ -1312,10 +1307,10 @@ class _DeviceTile extends ConsumerWidget {
     final isBanned = device.status == 'banned';
 
     final indicatorColor = isBanned
-        ? Colors.red
+        ? _danger
         : isActive
-            ? Colors.green
-            : Colors.orange;
+            ? kTeal
+            : const Color(0xFFFFB020);
 
     final statusLabel = isBanned
         ? l10n.settingsDeviceStatusBanned
@@ -1323,34 +1318,53 @@ class _DeviceTile extends ConsumerWidget {
             ? l10n.settingsDeviceStatusActive
             : l10n.settingsDeviceStatusPassive;
 
-    return ListTile(
-      leading: Stack(
-        clipBehavior: Clip.none,
+    return AppListCard(
+      accent: isActive || isBanned ? indicatorColor : null,
+      padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
+      child: Row(
         children: [
-          Icon(_deviceIcon(device.deviceType), size: 28,
-              color: cs.onSurfaceVariant),
-          Positioned(
-            right: -4,
-            bottom: -4,
-            child: _StatusDot(color: indicatorColor, pulse: isActive),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              DuotoneIcon(_deviceIcon(device.deviceType),
+                  color: indicatorColor),
+              Positioned(
+                right: -3,
+                bottom: -3,
+                child: _StatusDot(color: indicatorColor, pulse: isActive),
+              ),
+            ],
           ),
-        ],
-      ),
-      title: Text(device.label,
-          style: const TextStyle(fontWeight: FontWeight.w500)),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(statusLabel,
-              style: TextStyle(fontSize: 11, color: indicatorColor)),
-          if (device.lastActiveAt != null)
-            Text(_formatDate(device.lastActiveAt!, l10n),
-                style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
-        ],
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(device.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 14.5, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    AppStatusBadge(
+                        label: statusLabel, color: indicatorColor),
+                    if (device.lastActiveAt != null) ...[
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(_formatDate(device.lastActiveAt!, l10n),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 11, color: cs.onSurfaceVariant)),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
           IconButton(
             iconSize: 18,
             icon: const Icon(Icons.edit_outlined),
@@ -1374,29 +1388,30 @@ class _DeviceTile extends ConsumerWidget {
                 PopupMenuItem(
                   value: 'ban',
                   child: Row(children: [
-                    const Icon(Icons.block, size: 18, color: Colors.red),
+                    const Icon(Icons.block, size: 18, color: _danger),
                     const SizedBox(width: 8),
                     Text(l10n.settingsDeviceBan,
-                        style: const TextStyle(color: Colors.red)),
+                        style: const TextStyle(color: _danger)),
                   ]),
                 ),
               if (device.status == 'banned')
                 PopupMenuItem(
                   value: 'unban',
                   child: Row(children: [
-                    const Icon(Icons.check_circle_outline, size: 18, color: Colors.green),
+                    const Icon(Icons.check_circle_outline,
+                        size: 18, color: kTeal),
                     const SizedBox(width: 8),
                     Text(l10n.settingsDeviceUnban,
-                        style: const TextStyle(color: Colors.green)),
+                        style: const TextStyle(color: kTeal)),
                   ]),
                 ),
               PopupMenuItem(
                 value: 'delete',
                 child: Row(children: [
-                  const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                  const Icon(Icons.delete_outline, size: 18, color: _danger),
                   const SizedBox(width: 8),
                   Text(l10n.settingsDeviceRemove,
-                      style: const TextStyle(color: Colors.red)),
+                      style: const TextStyle(color: _danger)),
                 ]),
               ),
             ],
@@ -1445,7 +1460,7 @@ class _DeviceTile extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(l10n.settingsDeviceActionFailed),
-                      backgroundColor: Colors.red,
+                      backgroundColor: _danger,
                     ),
                   );
                 }
@@ -1475,7 +1490,7 @@ class _DeviceTile extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text(l10n.settingsDeviceBanSuccess),
-                backgroundColor: Colors.red),
+                backgroundColor: _danger),
           );
         }
       } else if (action == 'unban') {
@@ -1498,7 +1513,7 @@ class _DeviceTile extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                style: TextButton.styleFrom(foregroundColor: _danger),
                 child: Text(l10n.settingsDeviceRemove),
               ),
             ],
@@ -1518,7 +1533,7 @@ class _DeviceTile extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(l10n.settingsDeviceActionFailed),
-              backgroundColor: Colors.red),
+              backgroundColor: _danger),
         );
       }
     }

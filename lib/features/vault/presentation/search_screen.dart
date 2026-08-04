@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/vault_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
+import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/app_tiles.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -48,6 +51,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(vaultProvider);
     final results = _filter(state.items);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -57,9 +61,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           decoration: InputDecoration(
             hintText: l10n.searchHint,
             border: InputBorder.none,
-            hintStyle: const TextStyle(color: Colors.grey),
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            filled: false,
+            contentPadding: EdgeInsets.zero,
+            prefixIcon: Icon(Icons.search, size: 20, color: cs.onSurfaceVariant),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 32, minHeight: 20),
+            hintStyle: TextStyle(color: cs.onSurfaceVariant),
           ),
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          style: TextStyle(color: cs.onSurface, fontSize: 16),
           onChanged: (v) => setState(() => _query = v),
         ),
         actions: [
@@ -76,51 +87,68 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       body: state.status == VaultStatus.loading
           ? const Center(child: CircularProgressIndicator())
           : _query.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.search, size: 64, color: Colors.grey),
-                      const SizedBox(height: 12),
-                      Text(l10n.searchEmpty, style: const TextStyle(color: Colors.grey)),
-                    ],
-                  ),
-                )
+              ? AppEmptyState(
+                  icon: Icons.search,
+                  title: l10n.searchEmpty,
+                  accent: kTeal,
+                ).animate().fadeIn(
+                    duration: AppAnim.slow, curve: AppAnim.smooth)
               : results.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.search_off, size: 64, color: Colors.grey),
-                          const SizedBox(height: 12),
-                          Text(l10n.searchNoResults(_query),
-                              style: const TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
+                  ? AppEmptyState(
+                      icon: Icons.search_off,
+                      title: l10n.searchNoResults(_query),
+                      accent: kTeal,
+                    ).animate().fadeIn(duration: AppAnim.normal)
+                  : ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
                       itemCount: results.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (ctx, i) {
                         final item = results[i];
                         final l10n = AppLocalizations.of(ctx);
                         final title = item['title'] as String? ?? l10n.vaultItemUntitled;
                         final username = item['username'] as String? ?? '';
                         final type = item['item_type_name'] as String?;
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: const Color(0xFFFF5900).withAlpha(25),
-                            child: Icon(
-                              _iconForType(type),
-                              color: const Color(0xFFFF5900),
-                              size: 20,
-                            ),
+                        return AppListCard(
+                          onTap: () =>
+                              context.push('/vault/detail', extra: item),
+                          child: Row(
+                            children: [
+                              DuotoneIcon(_iconForType(type)),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    _HighlightText(
+                                      text: title,
+                                      query: _query,
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    if (username.isNotEmpty) ...[
+                                      const SizedBox(height: 3),
+                                      _HighlightText(
+                                        text: username,
+                                        query: _query,
+                                        style: TextStyle(
+                                            fontSize: 12.5,
+                                            color: cs.onSurfaceVariant),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              Icon(Icons.chevron_right,
+                                  size: 20, color: cs.onSurfaceVariant),
+                            ],
                           ),
-                          title: _HighlightText(text: title, query: _query),
-                          subtitle: username.isNotEmpty
-                              ? _HighlightText(text: username, query: _query, style: const TextStyle(fontSize: 12))
-                              : null,
-                          onTap: () => context.push('/vault/detail', extra: item),
-                        );
+                        )
+                            .animate(delay: AppAnim.listDelay(i))
+                            .fadeIn(duration: AppAnim.normal)
+                            .slideY(begin: 0.12, curve: AppAnim.smooth);
                       },
                     ),
     );
@@ -150,7 +178,7 @@ class _HighlightText extends StatelessWidget {
           TextSpan(
             text: text.substring(idx, idx + query.length),
             style: base.copyWith(
-              backgroundColor: const Color(0xFFFF5900).withAlpha(60),
+              backgroundColor: kBlaze.withAlpha(60),
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -44,6 +44,11 @@
   .v.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--blaze);}
   .count{color:var(--muted);font-size:13px;margin:18px 0 4px;}
   .foot{color:var(--muted);font-size:12px;margin-top:26px;line-height:1.6;}
+  .langs{margin-left:auto;display:flex;gap:6px;}
+  .langs button{background:#0d171c;border:1px solid var(--line);color:var(--muted);border-radius:10px;
+        padding:6px 11px;font-size:12px;font-weight:700;letter-spacing:.4px;transition:.15s;}
+  .langs button:hover{color:var(--txt);border-color:#3a4c55;}
+  .langs button.on{border-color:var(--blaze);color:var(--blaze);background:rgba(255,89,0,.10);}
   .hidden{display:none;}
 </style>
 </head>
@@ -51,27 +56,32 @@
 <div class="wrap">
   <div class="brand">
     <div class="badge">🔐</div>
-    <div><h1>DeniKey — Yedek Çözücü</h1></div>
+    <div><h1 data-i18n="h1">DeniKey — Yedek Çözücü</h1></div>
+    <div class="langs" id="langs">
+      <button type="button" data-lang="tr">TR</button>
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="ru">RU</button>
+    </div>
   </div>
-  <div class="sub">Tamamen cihazında / tarayıcında çalışır. İnternet gerekmez. Master parolan hiçbir yere gönderilmez.</div>
+  <div class="sub" data-i18n="sub">Tamamen cihazında / tarayıcında çalışır. İnternet gerekmez. Master parolan hiçbir yere gönderilmez.</div>
 
   <div class="card">
     <ol class="steps">
-      <li><b>1.</b> DeniKey'den aldığın <b>denikey_export_*.json</b> dosyasını aşağı sürükle (veya tıkla seç).</li>
-      <li><b>2.</b> <b>Master parolanı</b> gir.</li>
-      <li><b>3.</b> <b>Çöz</b> butonuna bas — şifreler okunabilir şekilde görünür.</li>
+      <li data-i18n="step1"><b>1.</b> DeniKey'den aldığın <b>denikey_export_*.json</b> dosyasını aşağı sürükle (veya tıkla seç).</li>
+      <li data-i18n="step2"><b>2.</b> <b>Master parolanı</b> gir.</li>
+      <li data-i18n="step3"><b>3.</b> <b>Çöz</b> butonuna bas — şifreler okunabilir şekilde görünür.</li>
     </ol>
   </div>
 
   <div class="card">
-    <div id="drop" class="drop" tabindex="0">📄 Yedek dosyasını buraya bırak veya <b>tıkla & seç</b></div>
+    <div id="drop" class="drop" tabindex="0" data-i18n="drop">📄 Yedek dosyasını buraya bırak veya <b>tıkla & seç</b></div>
     <input id="file" type="file" accept=".json,application/json" class="hidden">
-    <label for="pw">Master parola</label>
-    <input id="pw" type="password" autocomplete="off" placeholder="Master parolan">
+    <label for="pw" data-i18n="pwLabel">Master parola</label>
+    <input id="pw" type="password" autocomplete="off" placeholder="Master parolan" data-i18n-placeholder="pwPlaceholder">
     <div class="row">
-      <button id="go" class="primary" disabled>Çöz</button>
-      <button id="copy" class="ghost hidden">Tümünü kopyala</button>
-      <button id="dl" class="ghost hidden">Düz metin indir (.txt)</button>
+      <button id="go" class="primary" disabled data-i18n="go">Çöz</button>
+      <button id="copy" class="ghost hidden" data-i18n="copy">Tümünü kopyala</button>
+      <button id="dl" class="ghost hidden" data-i18n="dl">Düz metin indir (.txt)</button>
     </div>
     <div id="msg" class="msg"></div>
   </div>
@@ -79,7 +89,7 @@
   <div id="count" class="count hidden"></div>
   <div id="out"></div>
 
-  <div class="foot">
+  <div class="foot" data-i18n="foot">
     ⚠️ <b>Dikkat:</b> "Düz metin indir" ile kaydettiğin dosya <b>şifresizdir</b> — herkes okuyabilir. Güvenli bir yerde tut veya işin bitince sil.<br>
     DeniKey · denikey-export-v2 · Argon2id + AES-256-GCM
   </div>
@@ -100,14 +110,164 @@
   var $ = function(id){ return document.getElementById(id); };
   var wrapper = null, fileName = "";
 
-  var LABELS = {
-    title:"Başlık", username:"Kullanıcı adı", email:"E-posta", password:"Şifre",
-    url:"URL", notes:"Not", type:"Tip", category:"Kategori"
-  };
   var ORDER = ["username","email","password","url","type","category","notes"];
 
-  function setMsg(text, cls){
-    var m = $("msg"); m.textContent = text || ""; m.className = "msg" + (cls ? " "+cls : "");
+  // ─── Çok dilli metinler (TR / EN / RU) ──────────────────────────────────
+  // Sayfa tek dosya ve çevrimdışı çalıştığı için sözlük gömülüdür.
+  var I18N = {
+    tr: {
+      h1: "DeniKey — Yedek Çözücü",
+      sub: "Tamamen cihazında / tarayıcında çalışır. İnternet gerekmez. Master parolan hiçbir yere gönderilmez.",
+      step1: "<b>1.</b> DeniKey'den aldığın <b>denikey_export_*.json</b> dosyasını aşağı sürükle (veya tıkla seç).",
+      step2: "<b>2.</b> <b>Master parolanı</b> gir.",
+      step3: "<b>3.</b> <b>Çöz</b> butonuna bas — şifreler okunabilir şekilde görünür.",
+      drop: "📄 Yedek dosyasını buraya bırak veya <b>tıkla &amp; seç</b>",
+      pwLabel: "Master parola",
+      pwPlaceholder: "Master parolan",
+      go: "Çöz",
+      copy: "Tümünü kopyala",
+      dl: "Düz metin indir (.txt)",
+      foot: "⚠️ <b>Dikkat:</b> \"Düz metin indir\" ile kaydettiğin dosya <b>şifresizdir</b> — herkes okuyabilir. Güvenli bir yerde tut veya işin bitince sil.<br>DeniKey · denikey-export-v2 · Argon2id + AES-256-GCM",
+      loaded: "✅ <b>{0}</b> yüklendi",
+      fileReady: "Dosya hazır. Master parolanı gir ve Çöz'e bas.",
+      errNotDeniKey: "Bu bir DeniKey yedek dosyası değil.",
+      errOldFormat: "Dosya eski sürüm veya bozuk (salt/data yok).",
+      errReadDetail: "Dosya okunamadı: {0}",
+      errRead: "Dosya okunamadı.",
+      errNoPw: "Master parola gerekli.",
+      decrypting: "Çözülüyor… (anahtar türetiliyor, birkaç saniye sürebilir)",
+      decrypted: "Çözüldü ✓",
+      errDecrypt: "Çözülemedi. Master parola yanlış olabilir veya dosya bozuk.",
+      copied: "Panoya kopyalandı ✓",
+      errCopy: "Kopyalanamadı (tarayıcı izni gerekebilir).",
+      count: "{0} kayıt çözüldü",
+      untitled: "(başlıksız)",
+      field: "Alan",
+      txtFile: "denikey_duz_metin.txt",
+      labels: { title:"Başlık", username:"Kullanıcı adı", email:"E-posta", password:"Şifre",
+                url:"URL", notes:"Not", type:"Tip", category:"Kategori" }
+    },
+    en: {
+      h1: "DeniKey — Backup Decryptor",
+      sub: "Runs entirely on your device / in your browser. No internet needed. Your master password is never sent anywhere.",
+      step1: "<b>1.</b> Drag the <b>denikey_export_*.json</b> file you exported from DeniKey below (or click to select).",
+      step2: "<b>2.</b> Enter your <b>master password</b>.",
+      step3: "<b>3.</b> Press <b>Decrypt</b> — your passwords become readable.",
+      drop: "📄 Drop your backup file here or <b>click &amp; select</b>",
+      pwLabel: "Master password",
+      pwPlaceholder: "Your master password",
+      go: "Decrypt",
+      copy: "Copy all",
+      dl: "Download plain text (.txt)",
+      foot: "⚠️ <b>Warning:</b> the file saved with \"Download plain text\" is <b>unencrypted</b> — anyone can read it. Keep it somewhere safe or delete it when you are done.<br>DeniKey · denikey-export-v2 · Argon2id + AES-256-GCM",
+      loaded: "✅ <b>{0}</b> loaded",
+      fileReady: "File is ready. Enter your master password and press Decrypt.",
+      errNotDeniKey: "This is not a DeniKey backup file.",
+      errOldFormat: "The file is from an old version or corrupted (salt/data missing).",
+      errReadDetail: "Could not read the file: {0}",
+      errRead: "Could not read the file.",
+      errNoPw: "Master password is required.",
+      decrypting: "Decrypting… (deriving key, this may take a few seconds)",
+      decrypted: "Decrypted ✓",
+      errDecrypt: "Could not decrypt. The master password may be wrong or the file is corrupted.",
+      copied: "Copied to clipboard ✓",
+      errCopy: "Could not copy (browser permission may be required).",
+      count: "{0} entries decrypted",
+      untitled: "(untitled)",
+      field: "Field",
+      txtFile: "denikey_plain_text.txt",
+      labels: { title:"Title", username:"Username", email:"Email", password:"Password",
+                url:"URL", notes:"Note", type:"Type", category:"Category" }
+    },
+    ru: {
+      h1: "DeniKey — Расшифровка резервной копии",
+      sub: "Работает полностью на вашем устройстве / в браузере. Интернет не нужен. Мастер-пароль никуда не отправляется.",
+      step1: "<b>1.</b> Перетащите сюда файл <b>denikey_export_*.json</b>, полученный из DeniKey (или нажмите и выберите).",
+      step2: "<b>2.</b> Введите свой <b>мастер-пароль</b>.",
+      step3: "<b>3.</b> Нажмите <b>Расшифровать</b> — пароли станут читаемыми.",
+      drop: "📄 Перетащите файл резервной копии сюда или <b>нажмите и выберите</b>",
+      pwLabel: "Мастер-пароль",
+      pwPlaceholder: "Ваш мастер-пароль",
+      go: "Расшифровать",
+      copy: "Копировать всё",
+      dl: "Скачать открытым текстом (.txt)",
+      foot: "⚠️ <b>Внимание:</b> файл, сохранённый через «Скачать открытым текстом», <b>не зашифрован</b> — его может прочитать кто угодно. Храните его в надёжном месте или удалите, когда закончите.<br>DeniKey · denikey-export-v2 · Argon2id + AES-256-GCM",
+      loaded: "✅ <b>{0}</b> загружен",
+      fileReady: "Файл готов. Введите мастер-пароль и нажмите «Расшифровать».",
+      errNotDeniKey: "Это не файл резервной копии DeniKey.",
+      errOldFormat: "Файл устарел или повреждён (нет salt/data).",
+      errReadDetail: "Не удалось прочитать файл: {0}",
+      errRead: "Не удалось прочитать файл.",
+      errNoPw: "Требуется мастер-пароль.",
+      decrypting: "Расшифровка… (вычисление ключа, может занять несколько секунд)",
+      decrypted: "Расшифровано ✓",
+      errDecrypt: "Не удалось расшифровать. Возможно, мастер-пароль неверен или файл повреждён.",
+      copied: "Скопировано в буфер обмена ✓",
+      errCopy: "Не удалось скопировать (может потребоваться разрешение браузера).",
+      count: "Расшифровано записей: {0}",
+      untitled: "(без названия)",
+      field: "Поле",
+      txtFile: "denikey_plain_text.txt",
+      labels: { title:"Название", username:"Имя пользователя", email:"Эл. почта", password:"Пароль",
+                url:"URL", notes:"Заметка", type:"Тип", category:"Категория" }
+    }
+  };
+
+  var LANG_KEY = "denikey_lang";   // denikey.website ile aynı anahtar
+  var lang = "tr";
+
+  function detectLang(){
+    var saved = null;
+    try { saved = localStorage.getItem(LANG_KEY); } catch(e){}
+    if (saved && I18N[saved]) return saved;
+    var nav = String(navigator.language || "en").toLowerCase();
+    if (nav.indexOf("tr") === 0) return "tr";
+    if (nav.indexOf("ru") === 0) return "ru";
+    return "en";
+  }
+
+  function t(key){
+    var d = I18N[lang] || I18N.en;
+    return d[key] !== undefined ? d[key] : (I18N.en[key] !== undefined ? I18N.en[key] : key);
+  }
+
+  function fmt(key, val){ return String(t(key)).replace("{0}", val); }
+
+  var lastMsg = null;
+
+  function setMsg(key, cls, arg){
+    lastMsg = key ? { key:key, cls:cls, arg:arg } : null;
+    var m = $("msg");
+    m.textContent = key ? (arg !== undefined ? fmt(key, arg) : t(key)) : "";
+    m.className = "msg" + (cls ? " "+cls : "");
+  }
+
+  function applyLang(next){
+    if (next && I18N[next]) lang = next;
+    document.documentElement.lang = lang;
+    document.title = t("h1");
+
+    var nodes = document.querySelectorAll("[data-i18n]");
+    for (var i=0;i<nodes.length;i++)
+      nodes[i].innerHTML = t(nodes[i].getAttribute("data-i18n"));
+
+    var phs = document.querySelectorAll("[data-i18n-placeholder]");
+    for (var p=0;p<phs.length;p++)
+      phs[p].setAttribute("placeholder", t(phs[p].getAttribute("data-i18n-placeholder")));
+
+    var btns = $("langs").getElementsByTagName("button");
+    for (var b=0;b<btns.length;b++)
+      btns[b].className = btns[b].getAttribute("data-lang") === lang ? "on" : "";
+
+    // Dinamik durumlar dil değişince yeniden yazılır
+    if (wrapper && fileName) $("drop").innerHTML = fmt("loaded", esc(fileName));
+    if (lastMsg) setMsg(lastMsg.key, lastMsg.cls, lastMsg.arg);
+    if (lastItems) render(lastItems);
+  }
+
+  function setLang(next){
+    try { localStorage.setItem(LANG_KEY, next); } catch(e){}
+    applyLang(next);
   }
 
   function b64ToBytes(b64){
@@ -124,18 +284,18 @@
       try {
         wrapper = JSON.parse(r.result);
         if (!wrapper || String(wrapper.format||"").indexOf("denikey-export") !== 0)
-          throw new Error("Bu bir DeniKey yedek dosyası değil.");
+          throw new Error(t("errNotDeniKey"));
         if (!wrapper.salt || !wrapper.data)
-          throw new Error("Dosya eski sürüm veya bozuk (salt/data yok).");
-        $("drop").innerHTML = "✅ <b>" + fileName + "</b> yüklendi";
-        setMsg("Dosya hazır. Master parolanı gir ve Çöz'e bas.", "ok");
+          throw new Error(t("errOldFormat"));
+        $("drop").innerHTML = fmt("loaded", esc(fileName));
+        setMsg("fileReady", "ok");
         refreshGo();
       } catch(e){
         wrapper = null; refreshGo();
-        setMsg("Dosya okunamadı: " + e.message, "err");
+        setMsg("errReadDetail", "err", e.message);
       }
     };
-    r.onerror = function(){ setMsg("Dosya okunamadı.", "err"); };
+    r.onerror = function(){ setMsg("errRead", "err"); };
     r.readAsText(file);
   }
 
@@ -156,11 +316,12 @@
 
   function render(items){
     var out = $("out"); out.innerHTML = "";
+    var LABELS = t("labels");
     $("count").className = "count";
-    $("count").textContent = items.length + " kayıt çözüldü";
+    $("count").textContent = fmt("count", items.length);
     for (var i=0;i<items.length;i++){
       var it = items[i] || {};
-      var html = '<div class="item"><div class="t">'+esc(it.title || "(başlıksız)")+'</div>';
+      var html = '<div class="item"><div class="t">'+esc(it.title || t("untitled"))+'</div>';
       for (var j=0;j<ORDER.length;j++){
         var key = ORDER[j];
         if (it[key] !== undefined && it[key] !== null && it[key] !== "")
@@ -168,7 +329,7 @@
       }
       var cf = it.custom_fields || [];
       for (var f=0; f<cf.length; f++){
-        if (cf[f] && cf[f].value) html += kv(cf[f].field_name || "Alan", cf[f].value, false);
+        if (cf[f] && cf[f].value) html += kv(cf[f].field_name || t("field"), cf[f].value, false);
       }
       html += '</div>';
       out.insertAdjacentHTML("beforeend", html);
@@ -179,10 +340,11 @@
 
   function toPlainText(items){
     var lines = [];
+    var LABELS = t("labels");
     for (var i=0;i<items.length;i++){
       var it = items[i] || {};
       lines.push("━━━━━━━━━━━━━━━━━━━━");
-      if (it.title) lines.push("Başlık: " + it.title);
+      if (it.title) lines.push(LABELS.title + ": " + it.title);
       for (var j=0;j<ORDER.length;j++){
         var key = ORDER[j];
         if (it[key] !== undefined && it[key] !== null && it[key] !== "")
@@ -190,7 +352,7 @@
       }
       var cf = it.custom_fields || [];
       for (var f=0; f<cf.length; f++){
-        if (cf[f] && cf[f].value) lines.push((cf[f].field_name||"Alan") + ": " + cf[f].value);
+        if (cf[f] && cf[f].value) lines.push((cf[f].field_name||t("field")) + ": " + cf[f].value);
       }
       lines.push("");
     }
@@ -202,9 +364,9 @@
   async function decrypt(){
     if (!wrapper) return;
     var pw = $("pw").value;
-    if (!pw){ setMsg("Master parola gerekli.", "err"); return; }
+    if (!pw){ setMsg("errNoPw", "err"); return; }
     $("go").disabled = true;
-    setMsg("Çözülüyor… (anahtar türetiliyor, birkaç saniye sürebilir)");
+    setMsg("decrypting");
     try {
       var k = wrapper.kdf || {};
       var keyBytes = await hashwasm.argon2id({
@@ -225,9 +387,10 @@
       var items = JSON.parse(text);
       lastItems = items;
       render(items);
-      setMsg("Çözüldü ✓", "ok");
+      setMsg("decrypted", "ok");
     } catch(e){
-      setMsg("Çözülemedi. Master parola yanlış olabilir veya dosya bozuk.", "err");
+      lastItems = null;
+      setMsg("errDecrypt", "err");
       $("out").innerHTML = ""; $("count").className = "count hidden";
       $("copy").className = "ghost hidden"; $("dl").className = "ghost hidden";
     } finally {
@@ -240,7 +403,7 @@
     var blob = new Blob([toPlainText(lastItems)], {type:"text/plain;charset=utf-8"});
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "denikey_duz_metin.txt";
+    a.download = t("txtFile");
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(a.href);
   }
@@ -248,8 +411,8 @@
   function copyAll(){
     if (!lastItems) return;
     navigator.clipboard.writeText(toPlainText(lastItems)).then(
-      function(){ setMsg("Panoya kopyalandı ✓", "ok"); },
-      function(){ setMsg("Kopyalanamadı (tarayıcı izni gerekebilir).", "err"); }
+      function(){ setMsg("copied", "ok"); },
+      function(){ setMsg("errCopy", "err"); }
     );
   }
 
@@ -271,6 +434,14 @@
   $("go").addEventListener("click", decrypt);
   $("dl").addEventListener("click", download);
   $("copy").addEventListener("click", copyAll);
+
+  // Dil seçimi
+  $("langs").addEventListener("click", function(e){
+    var btn = e.target.closest ? e.target.closest("button[data-lang]") : null;
+    if (btn) setLang(btn.getAttribute("data-lang"));
+  });
+
+  applyLang(detectLang());
 })();
 </script>
 </body>

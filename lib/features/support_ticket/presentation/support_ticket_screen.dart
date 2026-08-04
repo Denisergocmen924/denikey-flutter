@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/support_ticket_provider.dart';
 import 'package:denikey_app/l10n/generated/app_localizations.dart';
 import '../../../core/presentation/app_nav_bar.dart';
+import '../../../core/presentation/app_animations.dart';
+import '../../../core/presentation/app_tiles.dart';
 
 class SupportTicketScreen extends ConsumerStatefulWidget {
   const SupportTicketScreen({super.key});
@@ -21,10 +24,12 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
   String _priority = 'normal';
   bool _ticketsExpanded = false;
 
+  // Durum renkleri "Onyx & Ember" paletiyle hizalandı:
+  // açık → bilgi mavisi, işlemde → amber, kapandı → teal.
   static const _statusColors = {
-    'open': Color(0xFF2563EB),
-    'in_progress': Color(0xFFD97706),
-    'closed': Color(0xFF16A34A),
+    'open': Color(0xFF4FC3F7),
+    'in_progress': Color(0xFFFFB020),
+    'closed': kTeal,
   };
 
   Map<String, String> _categoryLabels(AppLocalizations l10n) => {
@@ -97,7 +102,8 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                 child: Text(l10n.supportTicketDeleteCancel),
               ),
               FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(ctx).colorScheme.error),
                 onPressed: countdown > 0
                     ? null
                     : () async {
@@ -122,16 +128,20 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
     final l10n = AppLocalizations.of(context);
     final status = ticket['status'] as String? ?? 'open';
     final adminReply = ticket['admin_reply'] as String?;
-    final statusColor = _statusColors[status] ?? Colors.grey;
+    final statusColor =
+        _statusColors[status] ?? Theme.of(context).colorScheme.onSurfaceVariant;
     final statusLabel = _statusLabels(l10n)[status] ?? status;
     final category = _categoryLabels(l10n)[ticket['category']] ?? ticket['category'] ?? '';
     final repliedAt = ticket['replied_at'];
+
+    final cs = Theme.of(context).colorScheme;
+    final hasReply = adminReply != null && adminReply.isNotEmpty;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => DraggableScrollableSheet(
         expand: false,
@@ -140,92 +150,115 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
         builder: (_, controller) => SingleChildScrollView(
           controller: controller,
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: cs.onSurfaceVariant.withAlpha(70),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    DuotoneIcon(
+                      hasReply
+                          ? Icons.mark_email_read_outlined
+                          : Icons.mail_outline,
+                      color: statusColor,
+                    ),
+                    const SizedBox(width: 14),
                     Expanded(
-                      child: Text(
-                        ticket['subject'] ?? '',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ticket['subject'] ?? '',
+                            style: const TextStyle(
+                                fontSize: 17.5, fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            category,
+                            style: TextStyle(
+                                fontSize: 12.5, color: cs.onSurfaceVariant),
+                          ),
+                        ],
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withAlpha(25),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: statusColor.withAlpha(80)),
-                      ),
-                      child: Text(
-                        statusLabel,
-                        style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w600),
-                      ),
-                    ),
+                    const SizedBox(width: 8),
+                    AppStatusBadge(label: statusLabel, color: statusColor),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(category, style: const TextStyle(fontSize: 13, color: Colors.grey)),
-                const Divider(height: 28),
+                const SizedBox(height: 24),
 
-                Text(l10n.supportTicketDetailMessage, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey)),
-                const SizedBox(height: 8),
+                AppSectionTitle(l10n.supportTicketDetailMessage),
+                const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(12),
+                    color: cs.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: cs.outlineVariant),
                   ),
                   child: Text(ticket['message'] ?? '',
                       style: TextStyle(
-                          fontSize: 14,
-                          height: 1.5,
-                          color: Theme.of(context).colorScheme.onSurface)),
+                          fontSize: 14, height: 1.5, color: cs.onSurface)),
                 ),
 
-                if (adminReply != null && adminReply.isNotEmpty) ...[
-                  const SizedBox(height: 20),
+                if (hasReply) ...[
+                  const SizedBox(height: 22),
                   Row(
                     children: [
-                      Icon(Icons.support_agent, size: 16, color: Theme.of(context).colorScheme.primary),
-                      const SizedBox(width: 6),
-                      Text(
-                        l10n.supportTicketAdminReply,
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
+                      Expanded(
+                        child: AppSectionTitle(l10n.supportTicketAdminReply,
+                            accent: kTeal),
                       ),
-                      if (repliedAt != null) ...[
-                        const Spacer(),
+                      if (repliedAt != null)
                         Text(
                           _formatDate(repliedAt.toString()),
-                          style: const TextStyle(fontSize: 11, color: Colors.grey),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
-                      ],
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer.withAlpha(80),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Theme.of(context).colorScheme.primary.withAlpha(60)),
+                      color: kTeal.withAlpha(22),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: kTeal.withAlpha(70)),
                     ),
                     child: Text(
                       adminReply,
-                      style: TextStyle(fontSize: 14, height: 1.5, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                      style: TextStyle(
+                          fontSize: 14, height: 1.5, color: cs.onSurface),
                     ),
-                  ),
+                  ).animate().fadeIn(duration: AppAnim.normal).slideY(
+                      begin: 0.08, curve: AppAnim.smooth),
                 ] else ...[
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 22),
                   Row(
                     children: [
-                      const Icon(Icons.schedule, size: 14, color: Colors.grey),
+                      Icon(Icons.schedule,
+                          size: 15, color: cs.onSurfaceVariant),
                       const SizedBox(width: 6),
-                      Text(l10n.supportTicketWaitingReply, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                      Text(l10n.supportTicketWaitingReply,
+                          style: TextStyle(
+                              fontSize: 13, color: cs.onSurfaceVariant)),
                     ],
                   ),
                 ],
@@ -254,6 +287,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
     final categories = _categoryLabels(l10n);
     final priorities = _priorityLabels(l10n);
     final statusLabels = _statusLabels(l10n);
+    final cs = Theme.of(context).colorScheme;
 
     ref.listen(supportTicketProvider, (prev, next) {
       if (next.status == SupportTicketStatus.success) {
@@ -291,14 +325,24 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                 child: CircularProgressIndicator(),
               ))
             else if (state.ticketsError)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+                decoration: BoxDecoration(
+                  color: cs.error.withAlpha(20),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: cs.error.withAlpha(70)),
+                ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, size: 16, color: Colors.red),
-                    const SizedBox(width: 8),
-                    Text(l10n.supportTicketLoadingError, style: const TextStyle(color: Colors.red, fontSize: 13)),
-                    const Spacer(),
+                    Icon(Icons.error_outline, size: 18, color: cs.error),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        l10n.supportTicketLoadingError,
+                        style: TextStyle(color: cs.error, fontSize: 13),
+                      ),
+                    ),
                     TextButton(
                       onPressed: () => ref.read(supportTicketProvider.notifier).loadTickets(),
                       child: Text(l10n.supportTicketLoadingRetry),
@@ -307,114 +351,120 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                 ),
               )
             else if (state.tickets.isNotEmpty) ...[
-              InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () => setState(() => _ticketsExpanded = !_ticketsExpanded),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      Text(l10n.supportTicketMyTickets, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary.withAlpha(25),
-                          borderRadius: BorderRadius.circular(10),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => setState(() => _ticketsExpanded = !_ticketsExpanded),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        Expanded(child: AppSectionTitle(l10n.supportTicketMyTickets)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: kBlaze.withAlpha(28),
+                            borderRadius: BorderRadius.circular(9),
+                            border: Border.all(color: kBlaze.withAlpha(70)),
+                          ),
+                          child: Text(
+                            '${state.tickets.length}',
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: kBlaze,
+                                fontWeight: FontWeight.w700),
+                          ),
                         ),
-                        child: Text(
-                          '${state.tickets.length}',
-                          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
+                        const SizedBox(width: 6),
+                        AnimatedRotation(
+                          turns: _ticketsExpanded ? 0.5 : 0,
+                          duration: AppAnim.fast,
+                          curve: AppAnim.smooth,
+                          child: Icon(Icons.expand_more,
+                              color: cs.onSurfaceVariant),
                         ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        _ticketsExpanded ? Icons.expand_less : Icons.expand_more,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
               if (_ticketsExpanded) ...[
-              const SizedBox(height: 10),
-              ...state.tickets.map((t) {
+              const SizedBox(height: 12),
+              ...state.tickets.asMap().entries.map((entry) {
+                final index = entry.key;
+                final t = entry.value;
                 final status = t['status'] as String? ?? 'open';
-                final statusColor = _statusColors[status] ?? Colors.grey;
+                final statusColor = _statusColors[status] ?? cs.onSurfaceVariant;
                 final statusLabel = statusLabels[status] ?? status;
                 final hasReply = (t['admin_reply'] as String?)?.isNotEmpty == true;
 
-                return Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color: hasReply ? Theme.of(context).colorScheme.primary.withAlpha(80) : Colors.grey.shade200,
-                    ),
-                  ),
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: AppListCard(
                     onTap: () => _showTicketDetail(t),
-                    leading: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: hasReply
-                          ? Theme.of(context).colorScheme.primary.withAlpha(25)
-                          : Colors.grey.shade100,
-                      child: Icon(
-                        hasReply ? Icons.mark_email_read_outlined : Icons.mail_outline,
-                        size: 20,
-                        color: hasReply ? Theme.of(context).colorScheme.primary : Colors.grey,
-                      ),
-                    ),
-                    title: Text(
-                      t['subject'] ?? '',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      hasReply ? l10n.supportTicketReplied : l10n.supportTicketWaitingReplyLong,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: hasReply ? Theme.of(context).colorScheme.primary : Colors.grey,
-                      ),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    accent: hasReply ? kTeal : null,
+                    child: Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: statusColor.withAlpha(20),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            statusLabel,
-                            style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w600),
+                        DuotoneIcon(
+                          hasReply
+                              ? Icons.mark_email_read_outlined
+                              : Icons.mail_outline,
+                          color: hasReply ? kTeal : statusColor,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                t['subject'] ?? '',
+                                style: const TextStyle(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w600),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                hasReply
+                                    ? l10n.supportTicketReplied
+                                    : l10n.supportTicketWaitingReplyLong,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight:
+                                      hasReply ? FontWeight.w600 : null,
+                                  color:
+                                      hasReply ? kTeal : cs.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 8),
+                        AppStatusBadge(label: statusLabel, color: statusColor),
                         IconButton(
                           icon: const Icon(Icons.delete_outline, size: 20),
-                          color: Colors.red.shade300,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
+                          color: cs.error,
+                          tooltip: l10n.supportTicketDeleteConfirm,
                           onPressed: () => _showDeleteDialog(t),
                         ),
                       ],
                     ),
                   ),
-                );
+                )
+                    .animate(delay: AppAnim.listDelay(index))
+                    .fadeIn(duration: AppAnim.normal)
+                    .slideY(begin: 0.12, curve: AppAnim.smooth);
               }),
-              const SizedBox(height: 8),
               ],
-              const Divider(height: 32),
+              const SizedBox(height: 24),
             ],
 
-            Text(l10n.supportTicketNew, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(l10n.supportTicketQuestion, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+            AppSectionTitle(l10n.supportTicketNew),
+            const SizedBox(height: 6),
+            Text(l10n.supportTicketQuestion,
+                style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant)),
             const SizedBox(height: 20),
 
             Form(
@@ -427,7 +477,6 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                     decoration: InputDecoration(
                       labelText: l10n.supportTicketCategoryLabel,
                       prefixIcon: const Icon(Icons.category_outlined),
-                      border: const OutlineInputBorder(),
                     ),
                     items: categories.entries
                         .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
@@ -440,7 +489,6 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                     decoration: InputDecoration(
                       labelText: l10n.supportTicketSubjectLabel,
                       prefixIcon: const Icon(Icons.title_outlined),
-                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return l10n.supportTicketSubjectError;
@@ -459,7 +507,6 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                         padding: EdgeInsets.only(bottom: 64),
                         child: Icon(Icons.message_outlined),
                       ),
-                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return l10n.supportTicketMessageError;
@@ -473,7 +520,6 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                     decoration: InputDecoration(
                       labelText: l10n.supportTicketPriorityLabel,
                       prefixIcon: const Icon(Icons.flag_outlined),
-                      border: const OutlineInputBorder(),
                     ),
                     items: priorities.entries
                         .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
@@ -497,7 +543,7 @@ class _SupportTicketScreenState extends ConsumerState<SupportTicketScreen> {
                   const SizedBox(height: 24),
                 ],
               ),
-            ),
+            ).animate().fadeIn(duration: AppAnim.slow, curve: AppAnim.smooth),
           ],
         ),
       ),
